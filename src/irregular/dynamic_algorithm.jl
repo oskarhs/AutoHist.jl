@@ -20,8 +20,13 @@ function dynamic_algorithm(phi::Function, k_max::Int)
     end
 
     # Compute weights for each possible interval
-    for i in 1:k_max
+#=     for i in 1:k_max
         for j in (i+1):(k_max+1)
+            @inbounds weight[i, j] = phi(i, j)
+        end
+    end =#
+    for j = 1:(k_max+1)
+        for i = 1:(j-1)
             @inbounds weight[i, j] = phi(i, j)
         end
     end
