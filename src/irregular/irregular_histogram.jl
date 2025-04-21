@@ -108,9 +108,9 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
         chosen_ind = findall(grid_ind)
 
         # Update bin counts to the newly constructed grid
-        N_cum = zeros(Float64, length(grid))
-        N_cum[2:end] = cumsum(bin_irregular(y, grid, right))
-
+        #N_cum = zeros(Float64, length(grid))
+        #N_cum[2:end] = cumsum(bin_irregular(y, grid, right))
+        N_cum = N_cum[grid_ind]
     else
         k_max = maxbins
         grid = finestgrid

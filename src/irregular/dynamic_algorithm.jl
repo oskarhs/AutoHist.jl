@@ -5,7 +5,7 @@ function dynamic_algorithm(phi::Function, k_max::Int)
     weight = Matrix{Float64}(undef, k_max+1, k_max+1)
 
     function optimal_path!(ancestor, cum_weight, k)
-        ancestor0 = Array{Int64}(undef, k_max-k+1)
+        ancestor0 = Array{Int64}(undef, k_max-k+1) # these don't have to be reallocated
         cum_weight0 = Array{Float64}(undef, k_max-k+1)
 
         @inbounds for i = k:k_max
@@ -35,15 +35,6 @@ function dynamic_algorithm(phi::Function, k_max::Int)
 end
 
 # Compute optimal partition based on the output of the DP algorithm
-#= function compute_bounds(ancestor, grid, k)
-    L = [size(ancestor, 1)]
-    for i = k:-1:1
-        pushfirst!(L, ancestor[L[1],i])
-    end
-    bounds = grid[L .+ 1]
-    return bounds
-end =#
-
 function compute_bounds(ancestor, grid, k)
     L = Array{Int64}(undef, k+1)
     L[k+1] = size(ancestor, 1)
@@ -53,6 +44,15 @@ function compute_bounds(ancestor, grid, k)
     bounds = grid[L .+ 1]
     return bounds
 end
+
+#= function compute_bounds(ancestor, grid, k)
+    L = [size(ancestor, 1)]
+    for i = k:-1:1
+        pushfirst!(L, ancestor[L[1],i])
+    end
+    bounds = grid[L .+ 1]
+    return bounds
+end =#
 
 
 # Φ corresponding to penB of Rozenholc et al. (2010)
