@@ -39,7 +39,7 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
 
     grid = lowercase(grid)
     if !(grid in ["data", "regular", "quantile"])
-        grid = "data"
+        grid = "regular"
     end
 
     if support[1] == -Inf
