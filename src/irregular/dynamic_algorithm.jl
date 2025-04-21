@@ -1,9 +1,10 @@
 # The dynamical programming algorithm of Kanazawa (1988)
 function dynamic_algorithm(phi::Function, k_max::Int)
     cum_weight = Matrix{Float64}(undef, k_max, k_max)
-    ancestor = zeros(Int64, k_max, k_max)
-    #ancestor = Array{Int64}(undef, k_max, k_max)
-    #ancestor[:, 1] = 0
+    #ancestor = zeros(Int64, k_max, k_max)
+    ancestor = Array{Int64}(undef, k_max, k_max)
+    ancestor[:, 1] .= 0
+    ancestor[1,:] .= 0
     weight = Matrix{Float64}(undef, k_max+1, k_max+1)
 
     function optimal_path!(ancestor, cum_weight, k)
@@ -46,16 +47,6 @@ function compute_bounds(ancestor, grid, k)
     bounds = grid[L .+ 1]
     return bounds
 end
-
-#= function compute_bounds(ancestor, grid, k)
-    L = [size(ancestor, 1)]
-    for i = k:-1:1
-        pushfirst!(L, ancestor[L[1],i])
-    end
-    bounds = grid[L .+ 1]
-    return bounds
-end =#
-
 
 # Φ corresponding to penB of Rozenholc et al. (2010)
 function phi_penB(i, j, N_cum, grid)

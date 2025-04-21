@@ -22,7 +22,6 @@ function greedy_grid(N_cum, finestgrid, maxbins, gr_maxbins)
     grid_ind = fill(false, maxbins+1) # Array of booleans storing which indices to use
     grid_ind[1] = true
     grid_ind[end] = true
-    #incr = zeros(Float64, maxbins+1) # Array of increments from splitting at index d at each step
     incr = Array{Float64}(undef, maxbins+1) # Array of increments from splitting at index d at each step
     incr[1] = -Inf # Would create a bin of lebesgue measure 0
     incr[end] = -Inf
