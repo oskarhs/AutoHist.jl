@@ -45,7 +45,7 @@ function histogram_regular(x::AbstractVector{<:Real}; rule::String="bayes", righ
     end
     k_max = min(ceil(Int, 4.0*n / log(n)^2), maxbins)
 
-    criterion = zeros(k_max) # Criterion to be maximized depending on the specified rule
+    criterion = Array{Float64}(undef, k_max) # Criterion to be maximized depending on the specified rule
 
     # Scale data to the interval [0,1]:
     if support[1] == -Inf
