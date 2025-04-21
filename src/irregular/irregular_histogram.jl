@@ -1,5 +1,5 @@
 """
-    histogram_irregular(x::AbstractVector{<:Real}; rule::Str="bayes", grid::String="data", right::Bool=true, greedy::Bool=true, maxbins::Int=-1, support::Tuple{Real,Real}=(-Inf,Inf), use_min_length::Bool=false, logprior::Function=k->0.0, a::Real=1.0)
+    histogram_irregular(x::AbstractVector{<:Real}; rule::Str="bayes", grid::String="regular", right::Bool=true, greedy::Bool=true, maxbins::Int=-1, support::Tuple{Real,Real}=(-Inf,Inf), use_min_length::Bool=false, logprior::Function=k->0.0, a::Real=1.0)
 
 Create an irregular histogram based on optimization of a criterion based on Bayesian probability, penalized likelihood or LOOCV.
 Returns a tuple where the first argument is a StatsBase.Histogram object, the second the value of the maxinized criterion.
@@ -108,8 +108,6 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
         chosen_ind = findall(grid_ind)
 
         # Update bin counts to the newly constructed grid
-        #N_cum = zeros(Float64, length(grid))
-        #N_cum[2:end] = cumsum(bin_irregular(y, grid, right))
         N_cum = N_cum[grid_ind]
     else
         k_max = maxbins
