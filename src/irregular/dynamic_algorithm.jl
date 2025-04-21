@@ -1,7 +1,8 @@
 # The dynamical programming algorithm of Kanazawa (1988)
 function dynamic_algorithm(phi::Function, k_max::Int)
     cum_weight = Matrix{Float64}(undef, k_max, k_max)
-    ancestor = zeros(Int64, k_max, k_max)
+    #ancestor = zeros(Int64, k_max, k_max)
+    ancestor = Array{Int64}(undef, k_max, k_max)
     weight = Matrix{Float64}(undef, k_max+1, k_max+1)
 
     function optimal_path!(ancestor, cum_weight, k)

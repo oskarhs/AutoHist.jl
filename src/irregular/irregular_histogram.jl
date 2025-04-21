@@ -64,7 +64,9 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
     # Calculate gridpoints (left-open grid, breaks at data points)
     # right == true means to include observation in the right endpoint, i.e. right-closed
     finestgrid = Array{Float64}(undef, maxbins+1)
-    N_cum = zeros(Float64, length(finestgrid)) # cumulative cell counts
+    #N_cum = zeros(Float64, length(finestgrid)) # cumulative cell counts
+    N_cum = Array{Float64}(undef, length(finestgrid)) # cumulative cell counts
+    N_cum[1] = 0.0
     if grid == "data"
         sort!(y)
         if right
