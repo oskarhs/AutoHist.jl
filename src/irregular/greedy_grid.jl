@@ -1,5 +1,3 @@
-import SpecialFunctions.loggamma
-
 # Uses the greedy algorithm of Rozenholc et al. to construct a coarser grid to make the algorithm better suited for large datasets.
 # To be used prior to running the dynamic programming algorithm.
 function greedy_grid(N_cum, finestgrid, maxbins, gr_maxbins)

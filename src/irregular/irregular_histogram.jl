@@ -1,11 +1,3 @@
-using StatsBase
-import Statistics.quantile
-import SpecialFunctions.loggamma, SpecialFunctions.logabsbinomial
-
-#include("greedy_grid.jl")
-#include("dynamic_algorithm.jl")
-#include(joinpath(@__DIR__, "..", "utils.jl"))
-
 """
     histogram_irregular(x::AbstractVector{<:Real}; rule::Str="bayes", grid::String="data", right::Bool=true, greedy::Bool=true, maxbins::Int=-1, support::Tuple{Real,Real}=(-Inf,Inf), use_min_length::Bool=false, logprior::Function=k->0.0, a::Real=1.0)
 
