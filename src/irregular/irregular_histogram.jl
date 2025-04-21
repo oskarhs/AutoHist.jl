@@ -164,7 +164,7 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
     criterion_opt = optimal[k_opt] + psi[k_opt]
 
     bin_edges_norm = compute_bounds(ancestor, grid, k_opt)
-    bin_edges =  xmin .+ (xmax - xmin) * bin_edges_norm
+    bin_edges = @. xmin + (xmax - xmin) * bin_edges_norm
     N = bin_irregular(x, bin_edges, right)
     if right
         H = Histogram(bin_edges, N, :right, true)
@@ -173,9 +173,9 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
     end
     p0 = bin_edges_norm[2:end] - bin_edges_norm[1:end-1]
     if rule == "bayes"
-        H.weights = (H.weights .+ a*p0) ./ ((n + a)*(bin_edges[2:end] - bin_edges[1:end-1]))
+        H.weights = @. (H.weights + a*p0) / ((n + a)*(bin_edges[2:end] - bin_edges[1:end-1]))
     else
-        H.weights = H.weights ./ (n * (bin_edges[2:end] - bin_edges[1:end-1]) )
+        H.weights = @. H.weights / (n * (bin_edges[2:end] - bin_edges[1:end-1]) )
     end
     H.isdensity = true
     return H, criterion_opt
