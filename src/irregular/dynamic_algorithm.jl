@@ -11,7 +11,7 @@ function dynamic_algorithm(phi::Function, k_max::Int)
         cum_weight0 = Array{Float64}(undef, k_max-k+1)
 
         @inbounds for i = k:k_max
-            obj = cum_weight[(k-1):(i-1), k-1] .+ weight[k:i, i+1]
+            @views obj = cum_weight[(k-1):(i-1), k-1] .+ weight[k:i, i+1]
             ancestor0[i-k+1] = argmax(obj)
             cum_weight0[i-k+1] = obj[ancestor0[i-k+1]]
         end
@@ -32,11 +32,11 @@ function dynamic_algorithm(phi::Function, k_max::Int)
     end =#
 
     # Compute cumulative weights
-    @inbounds cum_weight[:,1] = weight[1,2:k_max+1]
+    @views cum_weight[:,1] = weight[1,2:k_max+1]
     for k in 2:k_max
         optimal_path!(ancestor, cum_weight, k)
     end
-    @inbounds optimal = cum_weight[k_max,:] # Get weight function for each partition
+    @views optimal = cum_weight[k_max,:] # Get weight function for each partition
 
     return optimal, ancestor
 end
