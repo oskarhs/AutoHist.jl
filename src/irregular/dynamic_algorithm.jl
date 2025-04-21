@@ -13,8 +13,8 @@ function dynamic_algorithm(phi::Function, k_max::Int)
             ancestor0[i-k+1] = argmax(obj)
             cum_weight0[i-k+1] = obj[ancestor0[i-k+1]]
         end
-        ancestor[k:k_max, k] = ancestor0 .+ (k-2)
-        cum_weight[k:k_max, k] = cum_weight0
+        @inbounds ancestor[k:k_max, k] = ancestor0 .+ (k-2)
+        @inbounds cum_weight[k:k_max, k] = cum_weight0
     end
 
     # Compute weights for each possible interval
@@ -25,11 +25,11 @@ function dynamic_algorithm(phi::Function, k_max::Int)
     end
 
     # Compute cumulative weights
-    cum_weight[:,1] = weight[1,2:k_max+1]
+    @inbounds cum_weight[:,1] = weight[1,2:k_max+1]
     for k in 2:k_max
         optimal_path!(ancestor, cum_weight, k)
     end
-    optimal = cum_weight[k_max,:] # Get weight function for each partition
+    @inbounds optimal = cum_weight[k_max,:] # Get weight function for each partition
 
     return optimal, ancestor
 end
