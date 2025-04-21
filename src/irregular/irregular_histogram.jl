@@ -64,7 +64,6 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
     # Calculate gridpoints (left-open grid, breaks at data points)
     # right == true means to include observation in the right endpoint, i.e. right-closed
     finestgrid = Array{Float64}(undef, maxbins+1)
-    #N_cum = zeros(Float64, length(finestgrid)) # cumulative cell counts
     N_cum = Array{Float64}(undef, length(finestgrid)) # cumulative cell counts
     N_cum[1] = 0.0
     if grid == "data"
@@ -98,9 +97,6 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
         N_cum[2:end] = cumsum(bin_irregular(y, finestgrid, right))
     end
 
-    # Compute cell counts for the finest resolution grid
-    #N_cum = zeros(Int64, length(finestgrid))
-    #N_cum[2:end] = cumsum(Hist1D(y; binedges=finestgrid).bincounts)
     if greedy
         gr_maxbins = min(maxbins, max(floor(Int, (log(n)*n)^(1.0/3.0)), 100))
         grid_ind = greedy_grid(N_cum, finestgrid, maxbins, gr_maxbins)
@@ -137,7 +133,7 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
     end
 
     optimal, ancestor = dynamic_algorithm(phi, k_max)
-    psi = zeros(k_max)
+    psi = Array{Float64}(undef, k_max)
     if rule == "penb"    
         @inbounds for k = 1:k_max
             psi[k] = -logabsbinomial(maxbins-1, k-1)[1] - k - log(k)^(2.5)
