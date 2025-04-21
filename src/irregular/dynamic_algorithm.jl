@@ -36,7 +36,7 @@ end
 
 # Compute optimal partition based on the output of the DP algorithm
 function compute_bounds(ancestor, grid, k)
-    L = [size(ancestor)[1]]
+    L = [size(ancestor, 1)]
     for i = k:-1:1
         pushfirst!(L, ancestor[L[1],i])
     end

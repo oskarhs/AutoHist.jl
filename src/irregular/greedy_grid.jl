@@ -5,7 +5,7 @@ function greedy_grid(N_cum, finestgrid, maxbins, gr_maxbins)
     function compute_loglik_increments!(incr, i, j)
         if finestgrid[i] < finestgrid[j]
             # Log-likelihood contribution 
-            loglik_old = (N_cum[j] - N_cum[i]) * log((N_cum[j]-N_cum[i])/(n*(finestgrid[j]-finestgrid[i])))
+            @inbounds loglik_old = (N_cum[j] - N_cum[i]) * log((N_cum[j]-N_cum[i])/(n*(finestgrid[j]-finestgrid[i])))
             @inbounds for l = (i+1):(j-1)
                 if isapprox(N_cum[l], N_cum[i]) || isapprox(N_cum[j], N_cum[l])
                     incr[l] = 0.0
@@ -49,9 +49,6 @@ function greedy_grid(N_cum, finestgrid, maxbins, gr_maxbins)
         compute_loglik_increments!(incr, i, d)
         compute_loglik_increments!(incr, d, j)
     end
-    # Compute the grid we will use for the dynamic programming part
-    #grid = finestgrid[grid_ind]
-    #return grid
     return grid_ind
 end
 
