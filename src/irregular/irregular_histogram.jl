@@ -26,7 +26,8 @@ julia> H2, criterion2 = histogram_irregular(x; grid="quantile", support=(0.0, 1.
 """
 function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", grid::String="regular", 
                             right::Bool=true, greedy::Bool=true, maxbins::Int=-1, support::Tuple{Real,Real}=(-Inf,Inf),
-                            use_min_length::Bool=false, logprior::Function=k->0.0, a::Real=1.0)
+                            use_min_length::Bool=false, logprior::Function=k->0.0, a::Real=1.0
+                            )::Tuple{StatsBase.Histogram, <:Real}
     rule = lowercase(rule)
     if !(rule in ["pena", "penb", "penr", "bayes", "klcv", "l2cv", "nml"])
         rule = "bayes" # Set penalty to default
