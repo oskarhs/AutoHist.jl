@@ -43,7 +43,8 @@ function dynamic_algorithm(phi::Function, k_max::Int)
 end
 
 # Compute optimal partition based on the output of the DP algorithm
-function compute_bounds(ancestor::AbstractVector{Int}, grid::AbstractVector{<:Real}, k::Int)
+#function compute_bounds(ancestor::AbstractVector{Int}, grid::AbstractVector{<:Real}, k::Int)
+function compute_bounds(ancestor::Matrix{Int}, grid::AbstractVector{<:Real}, k::Int)
     L = Array{Int64}(undef, k+1)
     L[k+1] = size(ancestor, 1)
     for i = k:-1:1
