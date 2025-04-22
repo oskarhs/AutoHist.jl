@@ -12,7 +12,7 @@ Returns a tuple where the first argument is a StatsBase.Histogram object, the se
 - `rule`: The criterion used to determine the optimal number of bins. Defaults to the method Bayesian method of Simensen et al. (2025)
 - `right`: Boolean indicating whether the drawn intervals should be right-inclusive or not. Defaults to `true`.
 - `maxbins`: The maximal number of bins to be considered by the optimization criterion. Ignored if the specified argument is not a positive integer. Defaults to `maxbins=1000`
-- `support`: Tuple specifying the the support of the histogram estimate. If the first element is -Inf, then `minimum(x)` is taken as the leftmost cutpoint. Likewise, if the second elemen is `Inf`, then the rightmost cutpoint is `maximum(x)`. Default value is `(-Inf, Inf)`, which estimates the support of the data.
+- `support`: Tuple specifying the the support of the histogram estimate. If the first element is -Inf, then `minimum(x)` is taken as the leftmost cutpoint. Likewise, if the second element is `Inf`, then the rightmost cutpoint is `maximum(x)`. Default value is `(-Inf, Inf)`, which estimates the support of the data.
 - `logprior`: Unnormalized logprior distribution of the number k of bins. Only used in the case where the supplied rule is `"bayes"`. Defaults to a uniform prior.
 - `a`: Specifies Dirichlet concentration parameter in the Bayesian histogram model. Can either be a fixed positive number or a function computing aₖ for different values of k. Defaults to `1.0` if not supplied. Uses default if suppled value is negative.
 
@@ -120,9 +120,9 @@ function histogram_regular(x::AbstractVector{<:Real}; rule::String="bayes", righ
     end
     if rule == "bayes"
         aₖ = a_func(k_opt)
-        H_opt.weights = k_opt/(xmax-xmin) * (N.+ aₖ/k_opt) / (aₖ + n) # Estimated density
+        H_opt.weights = k_opt/(xmax-xmin) * (N .+ aₖ/k_opt) / (aₖ + n) # Estimated density
     else
-        H_opt.weights = k_opt/(xmax-xmin) * N.weights / n # Estimated density
+        H_opt.weights = k_opt/(xmax-xmin) * N / n # Estimated density
     end
     return H_opt, criterion[k_opt]
 end
