@@ -118,7 +118,7 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
         end
     elseif rule == "bayes"
         phi = let N_cum = N_cum, mesh = mesh, a = a
-            f(i,j) = phi_bayes(i, j, N_cum, grid, a)
+            f(i,j) = phi_bayes(i, j, N_cum, mesh, a)
         end
     elseif rule == "penr"
         phi = let N_cum = N_cum, mesh = mesh, n = n
