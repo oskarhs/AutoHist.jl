@@ -114,17 +114,17 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
 
     if rule in ["pena", "penb", "nml"]
         phi = let N_cum = N_cum, grid = grid
-            phi(i,j) = phi_penB(i, j, N_cum, grid)
+            f(i,j) = phi_penB(i, j, N_cum, grid)
         end
         #phi = (i,j) -> phi_penB(i, j, N_cum, grid)
     elseif rule == "bayes"
         phi = let N_cum = N_cum, grid = grid, a = a
-            phi(i,j) = phi_bayes(i, j, N_cum, grid, a)
+            f(i,j) = phi_bayes(i, j, N_cum, grid, a)
         end
         #phi = (i,j) -> phi_bayes(i, j, N_cum, grid, a)
     elseif rule == "penr"
         phi = let N_cum = N_cum, grid = grid, n = n
-            phi(i,j) = phi_penR(i, j, N_cum, grid, n)
+            f(i,j) = phi_penR(i, j, N_cum, grid, n)
         end
         #phi = (i,j) -> phi_penR(i, j, N_cum, grid, n)
     elseif rule == "klcv"
@@ -133,7 +133,7 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
             minlength = log(n)^(1.5)/n
         end
         phi = let N_cum = N_cum, grid = grid, n = n, minlength=minlength
-            phi(i,j) = phi_KLCV(i, j, N_cum, grid, n; minlength=minlength)
+            f(i,j) = phi_KLCV(i, j, N_cum, grid, n; minlength=minlength)
         end
         #phi = (i,j) -> phi_KLCV(i, j, N_cum, grid, n; minlength=minlength)
     elseif rule == "l2cv"
@@ -142,7 +142,7 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
             minlength = log(n)^(1.5)/n
         end
         phi = let N_cum = N_cum, grid = grid, n = n, minlength=minlength
-            phi(i,j) = phi_L2CV(i, j, N_cum, grid, n; minlength=minlength)
+            f(i,j) = phi_L2CV(i, j, N_cum, grid, n; minlength=minlength)
         end
         #phi = (i,j) -> phi_L2CV(i, j, N_cum, grid, n; minlength=minlength)
     end
