@@ -119,12 +119,12 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
         #phi = (i,j) -> phi_penB(i, j, N_cum, grid)
     elseif rule == "bayes"
         phi = let N_cum = N_cum, grid = grid, a = a
-            phi(i,j) = phi_penB(i, j, N_cum, grid, a)
+            phi(i,j) = phi_bayes(i, j, N_cum, grid, a)
         end
         #phi = (i,j) -> phi_bayes(i, j, N_cum, grid, a)
     elseif rule == "penr"
         phi = let N_cum = N_cum, grid = grid, n = n
-            phi(i,j) = phi_penB(i, j, N_cum, grid, n)
+            phi(i,j) = phi_penR(i, j, N_cum, grid, n)
         end
         #phi = (i,j) -> phi_penR(i, j, N_cum, grid, n)
     elseif rule == "klcv"
