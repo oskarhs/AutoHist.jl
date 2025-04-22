@@ -1,7 +1,8 @@
 # Uses the greedy algorithm of Rozenholc et al. to construct a coarser grid to make the algorithm better suited for large datasets.
 # To be used prior to running the dynamic programming algorithm.
-function greedy_grid(N_cum, finestgrid, maxbins, gr_maxbins)
+function greedy_grid(N_cum::AbstractVector{<:Real}, finestgrid::AbstractVector{<:Real}, maxbins::Int, gr_maxbins::Int)
     # Update increments between the values i and j
+    n = N_cum[end]
     function compute_loglik_increments!(incr, i, j)
         if finestgrid[i] < finestgrid[j]
             # Log-likelihood contribution 
@@ -17,8 +18,6 @@ function greedy_grid(N_cum, finestgrid, maxbins, gr_maxbins)
             end
         end
     end
-    n = N_cum[end]
-
     grid_ind = fill(false, maxbins+1) # Array of booleans storing which indices to use
     grid_ind[1] = true
     grid_ind[end] = true

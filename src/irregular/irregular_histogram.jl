@@ -26,8 +26,7 @@ julia> H2, criterion2 = histogram_irregular(x; grid="quantile", support=(0.0, 1.
 """
 function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", grid::String="regular", 
                             right::Bool=true, greedy::Bool=true, maxbins::Int=-1, support::Tuple{Real,Real}=(-Inf,Inf),
-                            use_min_length::Bool=false, logprior::Function=k->0.0, a::Real=1.0
-                            )::Tuple{StatsBase.Histogram, <:Real}
+                            use_min_length::Bool=false, logprior::Function=k->0.0, a::Real=1.0)
     rule = lowercase(rule)
     if !(rule in ["pena", "penb", "penr", "bayes", "klcv", "l2cv", "nml"])
         rule = "bayes" # Set penalty to default
@@ -114,23 +113,38 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
     end
 
     if rule in ["pena", "penb", "nml"]
-        phi = (i,j) -> phi_penB(i, j, N_cum, grid)
+        phi = let N_cum = N_cum, grid = grid
+            phi(i,j) = phi_penB(i, j, N_cum, grid)
+        end
+        #phi = (i,j) -> phi_penB(i, j, N_cum, grid)
     elseif rule == "bayes"
-        phi = (i,j) -> phi_bayes(i, j, N_cum, grid, a)
+        phi = let N_cum = N_cum, grid = grid, a = a
+            phi(i,j) = phi_penB(i, j, N_cum, grid, a)
+        end
+        #phi = (i,j) -> phi_bayes(i, j, N_cum, grid, a)
     elseif rule == "penr"
-        phi = (i,j) -> phi_penR(i, j, N_cum, grid, n)
+        phi = let N_cum = N_cum, grid = grid, n = n
+            phi(i,j) = phi_penB(i, j, N_cum, grid, n)
+        end
+        #phi = (i,j) -> phi_penR(i, j, N_cum, grid, n)
     elseif rule == "klcv"
         minlength = 0.0
         if use_min_length
             minlength = log(n)^(1.5)/n
         end
-        phi = (i,j) -> phi_KLCV(i, j, N_cum, grid, n; minlength=minlength)
+        phi = let N_cum = N_cum, grid = grid, n = n, minlength=minlength
+            phi(i,j) = phi_KLCV(i, j, N_cum, grid, n; minlength=minlength)
+        end
+        #phi = (i,j) -> phi_KLCV(i, j, N_cum, grid, n; minlength=minlength)
     elseif rule == "l2cv"
         minlength = 0.0
         if use_min_length
             minlength = log(n)^(1.5)/n
         end
-        phi = (i,j) -> phi_L2CV(i, j, N_cum, grid, n; minlength=minlength)
+        phi = let N_cum = N_cum, grid = grid, n = n, minlength=minlength
+            phi(i,j) = phi_L2CV(i, j, N_cum, grid, n; minlength=minlength)
+        end
+        #phi = (i,j) -> phi_L2CV(i, j, N_cum, grid, n; minlength=minlength)
     end
 
     optimal, ancestor = dynamic_algorithm(phi, k_max)

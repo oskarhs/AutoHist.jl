@@ -6,6 +6,7 @@ function dynamic_algorithm(phi::Function, k_max::Int)
     ancestor[1,:] .= 0
     weight = Matrix{Float64}(undef, k_max+1, k_max+1)
 
+    #function optimal_path!(ancestor::AbstractVector{Int}, cum_weight::AbstractArray{Float64}, k::Int)
     function optimal_path!(ancestor, cum_weight, k)
         ancestor0 = Array{Int64}(undef, k_max-k+1) # these don't have to be reallocated
         cum_weight0 = Array{Float64}(undef, k_max-k+1)
@@ -42,7 +43,7 @@ function dynamic_algorithm(phi::Function, k_max::Int)
 end
 
 # Compute optimal partition based on the output of the DP algorithm
-function compute_bounds(ancestor, grid, k)
+function compute_bounds(ancestor::AbstractVector{Int}, grid::AbstractVector{<:Real}, k::Int)
     L = Array{Int64}(undef, k+1)
     L[k+1] = size(ancestor, 1)
     for i = k:-1:1
@@ -53,7 +54,7 @@ function compute_bounds(ancestor, grid, k)
 end
 
 # Φ corresponding to penB of Rozenholc et al. (2010)
-function phi_penB(i, j, N_cum, grid)
+function phi_penB(i::Int, j::Int, N_cum::AbstractArray{<:Real}, grid::AbstractArray{<:Real})::Real
     @inbounds N_bin = N_cum[j] - N_cum[i]
     @inbounds len_bin = grid[j] - grid[i]
     contrib = N_bin * log(N_bin / len_bin) # Contribution of the given bin to log-likelihood
