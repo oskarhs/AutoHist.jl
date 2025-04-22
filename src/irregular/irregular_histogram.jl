@@ -100,8 +100,8 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
     if greedy
         gr_maxbins = min(maxbins, max(floor(Int, (log(n)*n)^(1.0/3.0)), 100))
         grid_ind = greedy_grid(N_cum, finestgrid, maxbins, gr_maxbins)
-        grid = finestgrid[grid_ind]
-        k_max = length(grid) - 1
+        mesh = finestgrid[grid_ind]
+        k_max = length(mesh) - 1
         # convert grid_ind to array of integers equal to true
         chosen_ind = findall(grid_ind)
 
@@ -109,42 +109,37 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
         N_cum = N_cum[grid_ind]
     else
         k_max = maxbins
-        grid = finestgrid
+        mesh = finestgrid
     end
 
     if rule in ["pena", "penb", "nml"]
-        phi = let N_cum = N_cum, grid = grid
-            f(i,j) = phi_penB(i, j, N_cum, grid)
+        phi = let N_cum = N_cum, mesh = mesh
+            f(i,j) = phi_penB(i, j, N_cum, mesh)
         end
-        #phi = (i,j) -> phi_penB(i, j, N_cum, grid)
     elseif rule == "bayes"
-        phi = let N_cum = N_cum, grid = grid, a = a
+        phi = let N_cum = N_cum, mesh = mesh, a = a
             f(i,j) = phi_bayes(i, j, N_cum, grid, a)
         end
-        #phi = (i,j) -> phi_bayes(i, j, N_cum, grid, a)
     elseif rule == "penr"
-        phi = let N_cum = N_cum, grid = grid, n = n
-            f(i,j) = phi_penR(i, j, N_cum, grid, n)
+        phi = let N_cum = N_cum, mesh = mesh, n = n
+            f(i,j) = phi_penR(i, j, N_cum, mesh, n)
         end
-        #phi = (i,j) -> phi_penR(i, j, N_cum, grid, n)
     elseif rule == "klcv"
         minlength = 0.0
         if use_min_length
             minlength = log(n)^(1.5)/n
         end
-        phi = let N_cum = N_cum, grid = grid, n = n, minlength=minlength
-            f(i,j) = phi_KLCV(i, j, N_cum, grid, n; minlength=minlength)
+        phi = let N_cum = N_cum, mesh = mesh, n = n, minlength=minlength
+            f(i,j) = phi_KLCV(i, j, N_cum, mesh, n; minlength=minlength)
         end
-        #phi = (i,j) -> phi_KLCV(i, j, N_cum, grid, n; minlength=minlength)
     elseif rule == "l2cv"
         minlength = 0.0
         if use_min_length
             minlength = log(n)^(1.5)/n
         end
-        phi = let N_cum = N_cum, grid = grid, n = n, minlength=minlength
-            f(i,j) = phi_L2CV(i, j, N_cum, grid, n; minlength=minlength)
+        phi = let N_cum = N_cum, mesh = mesh, n = n, minlength=minlength
+            f(i,j) = phi_L2CV(i, j, N_cum, mesh, n; minlength=minlength)
         end
-        #phi = (i,j) -> phi_L2CV(i, j, N_cum, grid, n; minlength=minlength)
     end
 
     optimal, ancestor = dynamic_algorithm(phi, k_max)
@@ -178,7 +173,7 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
     k_opt = argmax(optimal + psi)
     criterion_opt = optimal[k_opt] + psi[k_opt]
 
-    bin_edges_norm = compute_bounds(ancestor, grid, k_opt)
+    bin_edges_norm = compute_bounds(ancestor, mesh, k_opt)
     bin_edges =  xmin .+ (xmax - xmin) * bin_edges_norm
     N = bin_irregular(x, bin_edges, right)
     if right

@@ -43,7 +43,6 @@ function dynamic_algorithm(phi::Function, k_max::Int)
 end
 
 # Compute optimal partition based on the output of the DP algorithm
-#function compute_bounds(ancestor::AbstractVector{Int}, grid::AbstractVector{<:Real}, k::Int)
 function compute_bounds(ancestor::Matrix{Int}, grid::AbstractVector{<:Real}, k::Int)
     L = Array{Int64}(undef, k+1)
     L[k+1] = size(ancestor, 1)
@@ -55,7 +54,7 @@ function compute_bounds(ancestor::Matrix{Int}, grid::AbstractVector{<:Real}, k::
 end
 
 # Φ corresponding to penB of Rozenholc et al. (2010)
-function phi_penB(i::Int, j::Int, N_cum::AbstractArray{<:Real}, grid::AbstractArray{<:Real})::Real
+function phi_penB(i::Int, j::Int, N_cum::AbstractArray{<:Real}, grid::AbstractArray{<:Real})
     @inbounds N_bin = N_cum[j] - N_cum[i]
     @inbounds len_bin = grid[j] - grid[i]
     contrib = N_bin * log(N_bin / len_bin) # Contribution of the given bin to log-likelihood
@@ -63,7 +62,7 @@ function phi_penB(i::Int, j::Int, N_cum::AbstractArray{<:Real}, grid::AbstractAr
 end
 
 # Φ corresponding to Bayesian histogram with fixed concentration parameter a (not dep. on k)
-function phi_bayes(i, j, N_cum, grid, a)
+function phi_bayes(i::Int, j::Int, N_cum::AbstractArray{<:Real}, grid::AbstractArray{<:Real}, a::Real)
     @inbounds N_bin = N_cum[j] - N_cum[i]
     @inbounds len_bin = grid[j] - grid[i] # Note: p0 = len_bin on the interval 0-1
     contrib = loggamma(a*len_bin + N_bin) - loggamma(a*len_bin) - N_bin * log(len_bin)
@@ -71,7 +70,7 @@ function phi_bayes(i, j, N_cum, grid, a)
 end
 
 # Φ corresponding to penR of Rozenholc et al. (2010)
-function phi_penR(i, j, N_cum, grid, n)
+function phi_penR(i::Int, j::Int, N_cum::AbstractArray{<:Real}, grid::AbstractArray{<:Real}, n::Real)
     @inbounds N_bin = N_cum[j] - N_cum[i]
     @inbounds len_bin = grid[j] - grid[i]
     contrib = N_bin * log(N_bin / len_bin) - 0.5 * N_bin / (n*len_bin)
@@ -79,7 +78,7 @@ function phi_penR(i, j, N_cum, grid, n)
 end
 
 # Φ corresponding to Kullback-Leibler LOOCV
-function phi_KLCV(i, j, N_cum, grid, n; minlength=0.0)
+function phi_KLCV(i::Int, j::Int, N_cum::AbstractArray{<:Real}, grid::AbstractArray{<:Real}, n::Real; minlength::Real=0.0)
     @inbounds N_bin = N_cum[j] - N_cum[i]
     @inbounds len_bin = grid[j] - grid[i]
     contrib = 0.0
@@ -96,7 +95,7 @@ function phi_KLCV(i, j, N_cum, grid, n; minlength=0.0)
 end
 
 # Φ corresponding to L2 LOOCV
-function phi_L2CV(i, j, N_cum, grid, n; minlength=0.0)
+function phi_L2CV(i::Int, j::Int, N_cum::AbstractArray{<:Real}, grid::AbstractArray{<:Real}, n::Real; minlength::Real=0.0)
     @inbounds N_bin = N_cum[j] - N_cum[i]
     @inbounds len_bin = grid[j] - grid[i]
     if len_bin > minlength
