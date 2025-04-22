@@ -7,6 +7,8 @@ Returns a tuple where the first argument is a StatsBase.Histogram object, the se
 ...
 # Arguments
 - `x`: 1D vector of data for which a histogram is to be constructed.
+
+# Keyword arguments
 - `rule`: The criterion used to determine the optimal number of bins. Defaults to the method Bayesian method of Simensen et al. (2025)
 - `right`: Boolean indicating whether the drawn intervals should be right-inclusive or not. Defaults to `true`.
 - `maxbins`: The maximal number of bins to be considered by the optimization criterion. Ignored if the specified argument is not a positive integer. Defaults to `maxbins=1000`

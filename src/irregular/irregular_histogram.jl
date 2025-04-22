@@ -6,6 +6,8 @@ Returns a tuple where the first argument is a StatsBase.Histogram object, the se
 
 # Arguments
 - `x`: 1D vector of data for which a histogram is to be constructed.
+
+# Keyword arguments
 - `rule`: The criterion used to determine the optimal number of bins. Defaults to the Bayesian method of Simensen et al. (2025).
 - `grid`: String indicating how the finest possible mesh should be constructed. Options are `"data"`, which uses each unique data point as a grid point, `"regular"` (default) which constructs a fine regular grid, and `"quantile"` which constructs the grid based on the sample quantiles.
 - `right`: Boolean indicating whether the drawn intervals should be right-inclusive or not. Defaults to `true`.
