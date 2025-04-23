@@ -3,7 +3,24 @@
 function greedy_grid(N_cum::AbstractVector{<:Real}, finestgrid::AbstractVector{<:Real}, maxbins::Int, gr_maxbins::Int)
     # Update increments between the values i and j
     n = N_cum[end]
-    function compute_loglik_increments!(incr, i, j)
+    compute_loglik_increments! = let N_cum = N_cum, finestgrid=finestgrid, n = n
+        function (incr, i, j)
+            if finestgrid[i] < finestgrid[j]
+                # Log-likelihood contribution 
+                @inbounds loglik_old = (N_cum[j] - N_cum[i]) * log((N_cum[j]-N_cum[i])/(n*(finestgrid[j]-finestgrid[i])))
+                @inbounds for l = (i+1):(j-1)
+                    if isapprox(N_cum[l], N_cum[i]) || isapprox(N_cum[j], N_cum[l])
+                        incr[l] = 0.0
+                    else
+                        loglik_new = (N_cum[l] - N_cum[i]) * log((N_cum[l]-N_cum[i])/(n*(finestgrid[l]-finestgrid[i]))) +
+                                (N_cum[j] - N_cum[l]) * log((N_cum[j]-N_cum[l])/(n*(finestgrid[j]-finestgrid[l])))
+                        incr[l] = loglik_new - loglik_old
+                    end
+                end
+            end
+        end
+    end
+    #= function compute_loglik_increments!(incr, i, j)
         if finestgrid[i] < finestgrid[j]
             # Log-likelihood contribution 
             @inbounds loglik_old = (N_cum[j] - N_cum[i]) * log((N_cum[j]-N_cum[i])/(n*(finestgrid[j]-finestgrid[i])))
@@ -17,7 +34,7 @@ function greedy_grid(N_cum::AbstractVector{<:Real}, finestgrid::AbstractVector{<
                 end
             end
         end
-    end
+    end =#
     grid_ind = fill(false, maxbins+1) # Array of booleans storing which indices to use
     grid_ind[1] = true
     grid_ind[end] = true
