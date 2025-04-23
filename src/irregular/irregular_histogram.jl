@@ -147,25 +147,25 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
     optimal, ancestor = dynamic_algorithm(phi, k_max)
     psi = Array{Float64}(undef, k_max)
     if rule == "penb"    
-        @inbounds for k = 1:k_max
-            psi[k] = -logabsbinomial(maxbins-1, k-1)[1] - k - log(k)^(2.5)
+        for k = 1:k_max
+            @inbounds psi[k] = -logabsbinomial(maxbins-1, k-1)[1] - k - log(k)^(2.5)
         end
     elseif rule == "bayes"
-        @inbounds for k = 1:k_max
-            psi[k] = logprior(k) - logabsbinomial(maxbins-1, k-1)[1] + loggamma(a) - loggamma(a + n)
+        for k = 1:k_max
+            @inbounds psi[k] = logprior(k) - logabsbinomial(maxbins-1, k-1)[1] + loggamma(a) - loggamma(a + n)
         end
     elseif rule == "penr"
-        @inbounds for k = 1:k_max
-            psi[k] = -logabsbinomial(maxbins-1, k-1)[1] - k - log(k)^(2.5)
+        for k = 1:k_max
+            @inbounds psi[k] = -logabsbinomial(maxbins-1, k-1)[1] - k - log(k)^(2.5)
         end
     elseif rule == "pena"
-        @inbounds for k = 1:k_max
-            psi[k] = -logabsbinomial(maxbins-1, k-1)[1] - k - 2.0*log(k) -
+        for k = 1:k_max
+            @inbounds psi[k] = -logabsbinomial(maxbins-1, k-1)[1] - k - 2.0*log(k) -
                     2.0 * sqrt(1.0*0.5*(k-1)*(logabsbinomial(maxbins-1, k-1)[1] + 1.0*log(k)))
         end
     elseif rule == "nml"
-        @inbounds for k = 1:k_max
-            psi[k] =  -( 0.5*k*log(0.5*n) - loggamma(0.5*k) +
+        for k = 1:k_max
+            @inbounds psi[k] =  -( 0.5*k*log(0.5*n) - loggamma(0.5*k) +
             1.0/sqrt(n) * sqrt(2.0)*k/3.0 * exp(loggamma(0.5*k) - loggamma(0.5*k-0.5)) +
             1.0/n * ((3.0 + k*(k-2.0)*(2.0*k+1.0))/36.0 - k^2/9.0*exp(2.0*loggamma(0.5*k) - 2.0*loggamma(0.5*k-0.5)))
             )
