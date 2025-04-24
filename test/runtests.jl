@@ -1,7 +1,16 @@
 using AutoHist, Random, Distributions
 using Test
 
-# Write a test for return types here
+import StatsBase: Histogram
+
+@testset "return type" begin
+    x = collect(LinRange(0,1,11))
+    H1, _ = histogram_regular(x)
+    H2, _ = histogram_irregular(x)
+
+    @test typeof(H1) <: Histogram
+    @test typeof(H2) <: Histogram
+end
 
 @testset "estimated support" begin
     rng = Xoshiro(1812)
