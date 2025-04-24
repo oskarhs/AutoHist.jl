@@ -1,5 +1,5 @@
 # The dynamical programming algorithm of Kanazawa (1988)
-function dynamic_algorithm(phi::Function, k_max::Int)
+function dynamic_algorithm(rule::String, N_cum::AbstractVector{<:Real}, mesh::AbstractVector{<:Real}, n::Int, k_max::Int, control::Dict{String, Float64})
     cum_weight = Matrix{Float64}(undef, k_max, k_max)
     ancestor = Array{Int64}(undef, k_max, k_max)
     ancestor[:, 1] .= 0
@@ -20,17 +20,36 @@ function dynamic_algorithm(phi::Function, k_max::Int)
         @inbounds cum_weight[k:k_max, k] = cum_weight0
     end
 
+    if rule in ["pena", "penb", "nml"]
+        phi = let N_cum = N_cum, mesh = mesh
+            f(i,j) = phi_penB(i, j, N_cum, mesh)
+        end
+    elseif rule == "bayes"
+        phi = let N_cum = N_cum, mesh = mesh, a = control["a"]
+            f(i,j) = phi_bayes(i, j, N_cum, mesh, a)
+        end
+    elseif rule == "penr"
+        phi = let N_cum = N_cum, mesh = mesh, n = n
+            f(i,j) = phi_penR(i, j, N_cum, mesh, n)
+        end
+    elseif rule == "klcv"
+        minlength = control["minlength"]
+        phi = let N_cum = N_cum, mesh = mesh, n = n, minlength=minlength
+            f(i,j) = phi_KLCV(i, j, N_cum, mesh, n; minlength=minlength)
+        end
+    elseif rule == "l2cv"
+        minlength = control["minlength"]
+        phi = let N_cum = N_cum, mesh = mesh, n = n, minlength=minlength
+            f(i,j) = phi_L2CV(i, j, N_cum, mesh, n; minlength=minlength)
+        end
+    end
+
     # Compute weights for each possible interval
     for i in 1:k_max
         for j in (i+1):(k_max+1)
             @inbounds weight[i, j] = phi(i, j)
         end
     end
-#=     for j = 1:(k_max+1)
-        for i = 1:(j-1)
-            @inbounds weight[i, j] = phi(i, j)
-        end
-    end =#
 
     # Compute cumulative weights
     @views cum_weight[:,1] = weight[1,2:k_max+1]
