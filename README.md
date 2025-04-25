@@ -25,10 +25,10 @@ The following code snippet shows an example where an automatic regular histogram
 ```julia
 julia> using AutoHist, Plots
 julia> x = randn(10^6);
-julia> H1, _ = histogram_regular(x);
+julia> H1 = histogram_regular(x);
 julia> plot(H1)
 
-julia> H2, _ = histogram_irregular(x);
+julia> H2 = histogram_irregular(x);
 julia> plot(H2)
 ```
 

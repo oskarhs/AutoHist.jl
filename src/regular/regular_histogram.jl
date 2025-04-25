@@ -2,7 +2,7 @@
     histogram_regular(x::AbstractVector{<:Real}; rule::Str="bayes", right::Bool=true, maxbins::Int=1000, support::Tuple{Real,Real}=(-Inf,Inf), logprior::Function=k->0.0, a::Union{Real,Function}=1.0)
 
 Create a regular histogram based on optimization criterion from Bayesian probability, penalized likelihood or LOOCV.
-Returns a tuple where the first argument is a StatsBase.Histogram object, the second the value of the maxinized criterion.
+Returns a StatsBase.Histogram object with regular bins, with the optimal bin number corresponding to the supplied criterion.
 
 ...
 # Arguments
@@ -16,11 +16,14 @@ Returns a tuple where the first argument is a StatsBase.Histogram object, the se
 - `logprior`: Unnormalized logprior distribution of the number k of bins. Only used in the case where the supplied rule is `"bayes"`. Defaults to a uniform prior.
 - `a`: Specifies Dirichlet concentration parameter in the Bayesian histogram model. Can either be a fixed positive number or a function computing aₖ for different values of k. Defaults to `1.0` if not supplied. Uses default if suppled value is negative.
 
+# Returns
+- `H`: StatsBase.Histogram object with weights corresponding to densities, e.g. `:isdensity` is set to true.
+
 # Examples
 ```
 julia> x = [0.037, 0.208, 0.189, 0.656, 0.45, 0.846, 0.986, 0.751, 0.249, 0.447]
-julia> H1, criterion1 = histogram_regular(x)
-julia> H2, criterion2 = histogram_regular(x; logprior=k->-log(k), a=k->0.5*k)
+julia> H1 = histogram_regular(x)
+julia> H2 = histogram_regular(x; logprior=k->-log(k), a=k->0.5*k)
 ```
 ...
 """
@@ -124,5 +127,5 @@ function histogram_regular(x::AbstractVector{<:Real}; rule::String="bayes", righ
     else
         H_opt.weights = k_opt/(xmax-xmin) * N / n # Estimated density
     end
-    return H_opt, criterion[k_opt]
+    return H_opt
 end

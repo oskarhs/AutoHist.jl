@@ -2,7 +2,7 @@
     histogram_irregular(x::AbstractVector{<:Real}; rule::Str="bayes", grid::String="regular", right::Bool=true, greedy::Bool=true, maxbins::Int=-1, support::Tuple{Real,Real}=(-Inf,Inf), use_min_length::Bool=false, logprior::Function=k->0.0, a::Real=1.0)
 
 Create an irregular histogram based on optimization of a criterion based on Bayesian probability, penalized likelihood or LOOCV.
-Returns a tuple where the first argument is a StatsBase.Histogram object, the second the value of the maxinized criterion.
+Returns a StatsBase.Histogram object with the optimal partition corresponding to the supplied rule.
 
 # Arguments
 - `x`: 1D vector of data for which a histogram is to be constructed.
@@ -18,11 +18,14 @@ Returns a tuple where the first argument is a StatsBase.Histogram object, the se
 - `logprior`: Unnormalized logprior distribution for the number k of bins. Defaults to a uniform prior. Only used in when `rule="bayes"`.
 - `a`: Dirichlet concentration parameter in the Bayesian irregular histogram model. Set to the default value (1.0) if the supplied value is not a positive real number. Only used when `rule="bayes"`.
 
+# Returns
+- `H`: StatsBase.Histogram object with weights corresponding to densities, e.g. `:isdensity` is set to true.
+
 # Examples
 ```
 julia> x = [0.037, 0.208, 0.189, 0.656, 0.45, 0.846, 0.986, 0.751, 0.249, 0.447]
-julia> H1, criterion1 = histogram_irregular(x)
-julia> H2, criterion2 = histogram_irregular(x; grid="quantile", support=(0.0, 1.0), logprior=k->-log(k), a=sqrt(10))
+julia> H1 = histogram_irregular(x)
+julia> H2 = histogram_irregular(x; grid="quantile", support=(0.0, 1.0), logprior=k->-log(k), a=sqrt(10))
 ```
 ...
 """
@@ -173,7 +176,7 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
         end
     end # NB! no penalties for klcv and l2cv
     k_opt = argmax(optimal + psi)
-    criterion_opt = optimal[k_opt] + psi[k_opt]
+    #criterion_opt = optimal[k_opt] + psi[k_opt]
 
     bin_edges_norm = compute_bounds(ancestor, mesh, k_opt)
     bin_edges =  xmin .+ (xmax - xmin) * bin_edges_norm
@@ -190,5 +193,5 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
         H.weights = H.weights ./ (n * (bin_edges[2:end] - bin_edges[1:end-1]) )
     end
     H.isdensity = true
-    return H, criterion_opt
+    return H
 end
