@@ -150,24 +150,24 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
     optimal, ancestor = dynamic_algorithm(phi, k_max)
     psi = Array{Float64}(undef, k_max)
     if rule == "penb"    
-        for k = 1:k_max
+        @simd for k = 1:k_max
             @inbounds psi[k] = -logabsbinomial(maxbins-1, k-1)[1] - k - log(k)^(2.5)
         end
     elseif rule == "bayes"
-        for k = 1:k_max
+        @simd for k = 1:k_max
             @inbounds psi[k] = logprior(k) - logabsbinomial(maxbins-1, k-1)[1] + loggamma(a) - loggamma(a + n)
         end
     elseif rule == "penr"
-        for k = 1:k_max
+        @simd for k = 1:k_max
             @inbounds psi[k] = -logabsbinomial(maxbins-1, k-1)[1] - k - log(k)^(2.5)
         end
     elseif rule == "pena"
-        for k = 1:k_max
+        @simd for k = 1:k_max
             @inbounds psi[k] = -logabsbinomial(maxbins-1, k-1)[1] - k - 2.0*log(k) -
                     2.0 * sqrt(1.0*0.5*(k-1)*(logabsbinomial(maxbins-1, k-1)[1] + 1.0*log(k)))
         end
     elseif rule == "nml"
-        for k = 1:k_max
+        @simd for k = 1:k_max
             @inbounds psi[k] =  -( 0.5*k*log(0.5*n) - loggamma(0.5*k) +
             1.0/sqrt(n) * sqrt(2.0)*k/3.0 * exp(loggamma(0.5*k) - loggamma(0.5*k-0.5)) +
             1.0/n * ((3.0 + k*(k-2.0)*(2.0*k+1.0))/36.0 - k^2/9.0*exp(2.0*loggamma(0.5*k) - 2.0*loggamma(0.5*k-0.5)))
@@ -179,7 +179,7 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
     #criterion_opt = optimal[k_opt] + psi[k_opt]
 
     bin_edges_norm = compute_bounds(ancestor, mesh, k_opt)
-    bin_edges =  xmin .+ (xmax - xmin) * bin_edges_norm
+    bin_edges = @. xmin + (xmax - xmin) * bin_edges_norm
     N = bin_irregular(x, bin_edges, right)
     if right
         H = Histogram(bin_edges, N, :right, true)

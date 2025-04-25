@@ -12,7 +12,7 @@ function dynamic_algorithm(phi::Function, k_max::Int)
         cum_weight0 = Array{Float64}(undef, k_max-k+1)
 
         @inbounds for i = k:k_max
-            @views obj = cum_weight[(k-1):(i-1), k-1] .+ weight[k:i, i+1]
+            obj = @views cum_weight[(k-1):(i-1), k-1] .+ weight[k:i, i+1]
             ancestor0[i-k+1] = argmax(obj)
             cum_weight0[i-k+1] = obj[ancestor0[i-k+1]]
         end
@@ -22,22 +22,17 @@ function dynamic_algorithm(phi::Function, k_max::Int)
 
     # Compute weights for each possible interval
     for i in 1:k_max
-        for j in (i+1):(k_max+1)
+        @simd for j in (i+1):(k_max+1)
             @inbounds weight[i, j] = phi(i, j)
         end
     end
-#=     for j = 1:(k_max+1)
-        for i = 1:(j-1)
-            @inbounds weight[i, j] = phi(i, j)
-        end
-    end =#
 
     # Compute cumulative weights
-    @views cum_weight[:,1] = weight[1,2:k_max+1]
+    @inbounds cum_weight[:,1] = @views weight[1,2:k_max+1]
     for k in 2:k_max
         optimal_path!(ancestor, cum_weight, k)
     end
-    @views optimal = cum_weight[k_max,:] # Get weight function for each partition
+    optimal = @views cum_weight[k_max,:] # Get weight function for each partition
 
     return optimal, ancestor
 end
@@ -46,7 +41,7 @@ end
 function compute_bounds(ancestor::Matrix{Int}, grid::AbstractVector{<:Real}, k::Int)
     L = Array{Int64}(undef, k+1)
     L[k+1] = size(ancestor, 1)
-    for i = k:-1:1
+    @inbounds for i = k:-1:1
         L[i] = ancestor[L[i+1], i]
     end
     bounds = grid[L .+ 1]
