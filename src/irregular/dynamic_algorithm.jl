@@ -1,9 +1,5 @@
 # The dynamical programming algorithm of Kanazawa (1988)
-<<<<<<< HEAD
 function dynamic_algorithm(weight::AbstractMatrix{Float64}, k_max::Int)
-=======
-function dynamic_algorithm(rule::String, N_cum::AbstractVector{<:Real}, mesh::AbstractVector{<:Real}, n::Int, k_max::Int, control::Dict{String, Float64})
->>>>>>> 539ff8b75ed0f9988b7470bafabe91641c1b6a28
     cum_weight = Matrix{Float64}(undef, k_max, k_max)
     ancestor = Array{Int64}(undef, k_max, k_max)
     ancestor[:, 1] .= 0
@@ -29,7 +25,6 @@ function dynamic_algorithm(rule::String, N_cum::AbstractVector{<:Real}, mesh::Ab
         ancestor0 = Array{Int64}(undef, k_max-k+1) # these don't have to be reallocated
         cum_weight0 = Array{Float64}(undef, k_max-k+1)
 
-<<<<<<< HEAD
         @inbounds for i = k:k_max
             obj = @views cum_weight[(k-1):(i-1), k-1] .+ weight[k:i, i+1]
             ancestor0[i-k+1] = argmax(obj)
@@ -38,38 +33,6 @@ function dynamic_algorithm(rule::String, N_cum::AbstractVector{<:Real}, mesh::Ab
         @inbounds ancestor[k:k_max, k] = ancestor0 .+ (k-2)
         @inbounds cum_weight[k:k_max, k] = cum_weight0
     end =#
-=======
-    if rule in ["pena", "penb", "nml"]
-        phi = let N_cum = N_cum, mesh = mesh
-            f(i,j) = phi_penB(i, j, N_cum, mesh)
-        end
-    elseif rule == "bayes"
-        phi = let N_cum = N_cum, mesh = mesh, a = control["a"]
-            f(i,j) = phi_bayes(i, j, N_cum, mesh, a)
-        end
-    elseif rule == "penr"
-        phi = let N_cum = N_cum, mesh = mesh, n = n
-            f(i,j) = phi_penR(i, j, N_cum, mesh, n)
-        end
-    elseif rule == "klcv"
-        minlength = control["minlength"]
-        phi = let N_cum = N_cum, mesh = mesh, n = n, minlength=minlength
-            f(i,j) = phi_KLCV(i, j, N_cum, mesh, n; minlength=minlength)
-        end
-    elseif rule == "l2cv"
-        minlength = control["minlength"]
-        phi = let N_cum = N_cum, mesh = mesh, n = n, minlength=minlength
-            f(i,j) = phi_L2CV(i, j, N_cum, mesh, n; minlength=minlength)
-        end
-    end
-
-    # Compute weights for each possible interval
-    for i in 1:k_max
-        for j in (i+1):(k_max+1)
-            @inbounds weight[i, j] = phi(i, j)
-        end
-    end
->>>>>>> 539ff8b75ed0f9988b7470bafabe91641c1b6a28
 
     # Compute cumulative weights
     @inbounds cum_weight[:,1] = @views weight[1,2:k_max+1]

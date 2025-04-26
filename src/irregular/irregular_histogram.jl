@@ -136,11 +136,7 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
         end
     end
 
-<<<<<<< HEAD
     optimal, ancestor = dynamic_algorithm(weight, k_max)
-=======
-    optimal, ancestor = dynamic_algorithm(rule, N_cum, mesh, n, k_max, control)
->>>>>>> 539ff8b75ed0f9988b7470bafabe91641c1b6a28
     psi = Array{Float64}(undef, k_max)
     if rule == "penb"    
         @simd for k = 1:k_max
