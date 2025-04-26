@@ -146,8 +146,15 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
             f(i,j) = phi_L2CV(i, j, N_cum, mesh, n; minlength=minlength)
         end
     end
+    # Compute weights for each possible interval
+    weight = Matrix{Float64}(undef, k_max+1, k_max+1)
+    for i in 1:k_max
+        @simd for j in (i+1):(k_max+1)
+            @inbounds weight[i, j] = phi(i, j)
+        end
+    end
 
-    optimal, ancestor = dynamic_algorithm(phi, k_max)
+    optimal, ancestor = dynamic_algorithm(weight, k_max)
     psi = Array{Float64}(undef, k_max)
     if rule == "penb"    
         @simd for k = 1:k_max
