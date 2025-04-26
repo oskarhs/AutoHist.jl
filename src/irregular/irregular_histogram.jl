@@ -117,34 +117,16 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
         mesh = finestgrid
     end
 
-    if rule in ["pena", "penb", "nml"]
-        phi = let N_cum = N_cum, mesh = mesh
-            f(i,j) = phi_penB(i, j, N_cum, mesh)
-        end
+    if rule in ["pena", "penb", "nml", "penr"]
+        control = Dict{String, Float64}()
     elseif rule == "bayes"
-        phi = let N_cum = N_cum, mesh = mesh, a = a
-            f(i,j) = phi_bayes(i, j, N_cum, mesh, a)
-        end
-    elseif rule == "penr"
-        phi = let N_cum = N_cum, mesh = mesh, n = n
-            f(i,j) = phi_penR(i, j, N_cum, mesh, n)
-        end
-    elseif rule == "klcv"
+        control = Dict{String, Float64}("a" => a)
+    elseif rule in ["klcv", "l2cv"]
         minlength = 0.0
         if use_min_length
             minlength = log(n)^(1.5)/n
         end
-        phi = let N_cum = N_cum, mesh = mesh, n = n, minlength=minlength
-            f(i,j) = phi_KLCV(i, j, N_cum, mesh, n; minlength=minlength)
-        end
-    elseif rule == "l2cv"
-        minlength = 0.0
-        if use_min_length
-            minlength = log(n)^(1.5)/n
-        end
-        phi = let N_cum = N_cum, mesh = mesh, n = n, minlength=minlength
-            f(i,j) = phi_L2CV(i, j, N_cum, mesh, n; minlength=minlength)
-        end
+        control = Dict{String, Float64}("minlength" => minlength)
     end
     # Compute weights for each possible interval
     weight = Matrix{Float64}(undef, k_max+1, k_max+1)
@@ -154,7 +136,11 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
         end
     end
 
+<<<<<<< HEAD
     optimal, ancestor = dynamic_algorithm(weight, k_max)
+=======
+    optimal, ancestor = dynamic_algorithm(rule, N_cum, mesh, n, k_max, control)
+>>>>>>> 539ff8b75ed0f9988b7470bafabe91641c1b6a28
     psi = Array{Float64}(undef, k_max)
     if rule == "penb"    
         @simd for k = 1:k_max

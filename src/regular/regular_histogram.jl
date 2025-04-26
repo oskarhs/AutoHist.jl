@@ -64,52 +64,52 @@ function histogram_regular(x::AbstractVector{<:Real}; rule::String="bayes", righ
         xmax = support[2]
     end
     z = @. (x - xmin) / (xmax - xmin)
-
+    N = Vector{Float64}(undef, k_max)
     if rule == "aic"
         for k = 1:k_max
-            N = bin_regular(z, 0.0, 1.0, k, right)
-            criterion[k] = compute_AIC(N, k, n) # Note: negative of AIC is computed
+            N[1:k] = bin_regular(z, 0.0, 1.0, k, right)
+            criterion[k] = compute_AIC(view(N, 1:k), k, n) # Note: negative of AIC is computed
         end
     elseif rule == "bic"
         for k = 1:k_max
-            N = bin_regular(z, 0.0, 1.0, k, right)
-            criterion[k] = compute_BIC(N, k, n) # Note: negative of BIC is computed
+            N[1:k] = bin_regular(z, 0.0, 1.0, k, right)
+            criterion[k] = compute_BIC(view(N, 1:k), k, n) # Note: negative of BIC is computed
         end
     elseif rule == "br"
         for k = 1:k_max
-            N = bin_regular(z, 0.0, 1.0, k, right)
-            criterion[k] = compute_BR(N, k, n)
+            N[1:k] = bin_regular(z, 0.0, 1.0, k, right)
+            criterion[k] = compute_BR(view(N, 1:k), k, n)
         end
     elseif rule == "bayes"
         for k = 1:k_max
             aₖ = a_func(k)
-            N = bin_regular(z, 0.0, 1.0, k, right)
-            criterion[k] = logposterior_k(N, k, ones(k)/k, aₖ, n, logprior)
+            N[1:k] = bin_regular(z, 0.0, 1.0, k, right)
+            criterion[k] = logposterior_k(view(N, 1:k), k, ones(k)/k, aₖ, n, logprior)
         end
     elseif rule == "mdl"
         for k = 1:k_max
-            N = bin_regular(z, 0.0, 1.0, k, right)
-            criterion[k] = compute_MDL(N, k, n)
+            N[1:k] = bin_regular(z, 0.0, 1.0, k, right)
+            criterion[k] = compute_MDL(view(N, 1:k), k, n)
         end
     elseif rule == "sc"
         for k = 1:k_max
-            N = bin_regular(z, 0.0, 1.0, k, right)
-            criterion[k] = compute_SC(N, k, n)
+            N[1:k] = bin_regular(z, 0.0, 1.0, k, right)
+            criterion[k] = compute_SC(view(N, 1:k), k, n)
         end
     elseif rule == "klcv"
         for k = 1:k_max
-            N = bin_regular(z, 0.0, 1.0, k, right)
-            criterion[k] = compute_KLCV(N, k, n)
+            N[1:k] = bin_regular(z, 0.0, 1.0, k, right)
+            criterion[k] = compute_KLCV(view(N, 1:k), k, n)
         end
     elseif rule == "l2cv"
         for k = 1:k_max
-            N = bin_regular(z, 0.0, 1.0, k, right)
-            criterion[k] = compute_L2CV(N, k, n)
+            N[1:k] = bin_regular(z, 0.0, 1.0, k, right)
+            criterion[k] = compute_L2CV(view(N, 1:k), k, n)
         end
     elseif rule == "nml"
         for k = 1:k_max
-            N = bin_regular(z, 0.0, 1.0, k, right)
-            criterion[k] = compute_NML(N, k, n)
+            N[1:k] = bin_regular(z, 0.0, 1.0, k, right)
+            criterion[k] = compute_NML(view(N, 1:k), k, n)
         end
     end
 
