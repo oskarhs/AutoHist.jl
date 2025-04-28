@@ -145,6 +145,10 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
         phi = let N_cum = N_cum, mesh = mesh, n = n, minlength=minlength
             f(i,j) = phi_L2CV(i, j, N_cum, mesh, n; minlength=minlength)
         end
+    elseif rule == "bayesian_blocks"
+        phi = let N_cum = N_cum, mesh = mesh, n = n
+            f(i,j) = phi_L2CV(i, j, N_cum, mesh, n)
+        end
     end
 
     optimal, ancestor = dynamic_algorithm(phi, k_max)
@@ -176,7 +180,6 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
         end
     end # NB! no penalties for klcv and l2cv
     k_opt = argmax(optimal + psi)
-    #criterion_opt = optimal[k_opt] + psi[k_opt]
 
     bin_edges_norm = compute_bounds(ancestor, mesh, k_opt)
     bin_edges = @. xmin + (xmax - xmin) * bin_edges_norm
