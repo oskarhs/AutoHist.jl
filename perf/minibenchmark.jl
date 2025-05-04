@@ -1,3 +1,5 @@
+include(joinpath(@__DIR__, "..", "src", "AutoHist.jl"))
+
 using AutoHist, StatsBase, Random, Distributions
 
 import BenchmarkTools: @benchmark
@@ -7,11 +9,9 @@ function benchmark_autohist()
     n = 25000
     x = rand(rng, Normal(), n)
 
-    b_reg = @benchmark histogram_regular(x)
-    @show b_reg
+    @btime histogram_regular($x)
 
-    b_irr = @benchmark histogram_irregular(x; grid="data")
-    @show b_irr
+    @btime histogram_irregular($x; grid="data")
     return nothing
 end
 

@@ -5,7 +5,7 @@ function greedy_grid(N_cum::AbstractVector{<:Real}, finestgrid::AbstractVector{<
     n = N_cum[end]
     compute_loglik_increments! = let N_cum = N_cum, finestgrid=finestgrid, n = n
         function (incr, i, j)
-            if finestgrid[i] < finestgrid[j]
+            @inbounds if finestgrid[i] < finestgrid[j]
                 # Log-likelihood contribution 
                 @inbounds loglik_old = (N_cum[j] - N_cum[i]) * log((N_cum[j]-N_cum[i])/(n*(finestgrid[j]-finestgrid[i])))
                 @inbounds for l = (i+1):(j-1)
