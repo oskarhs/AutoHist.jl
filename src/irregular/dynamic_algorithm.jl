@@ -11,7 +11,7 @@ function dynamic_algorithm(phi::Function, k_max::Int)
         ancestor0 = Array{Int64}(undef, k_max-k+1) # these don't have to be reallocated
         cum_weight0 = Array{Float64}(undef, k_max-k+1)
 
-        @inbounds for i = k:k_max
+        @inbounds @simd for i = k:k_max
             obj = @views cum_weight[(k-1):(i-1), k-1] .+ weight[k:i, i+1]
             ancestor0[i-k+1] = argmax(obj)
             cum_weight0[i-k+1] = obj[ancestor0[i-k+1]]

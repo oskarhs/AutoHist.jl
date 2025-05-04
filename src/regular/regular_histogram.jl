@@ -66,50 +66,50 @@ function histogram_regular(x::AbstractVector{<:Real}; rule::String="bayes", righ
     z = @. (x - xmin) / (xmax - xmin)
 
     if rule == "aic"
-        for k = 1:k_max
+        Threads.@threads for k = 1:k_max
             N = bin_regular(z, 0.0, 1.0, k, right)
-            criterion[k] = compute_AIC(N, k, n) # Note: negative of AIC is computed
+            @inbounds criterion[k] = compute_AIC(N, k, n) # Note: negative of AIC is computed
         end
     elseif rule == "bic"
-        for k = 1:k_max
+        Threads.@threads for k = 1:k_max
             N = bin_regular(z, 0.0, 1.0, k, right)
-            criterion[k] = compute_BIC(N, k, n) # Note: negative of BIC is computed
+            @inbounds criterion[k] = compute_BIC(N, k, n) # Note: negative of BIC is computed
         end
     elseif rule == "br"
-        for k = 1:k_max
+        Threads.@threads for k = 1:k_max
             N = bin_regular(z, 0.0, 1.0, k, right)
-            criterion[k] = compute_BR(N, k, n)
+            @inbounds criterion[k] = compute_BR(N, k, n)
         end
     elseif rule == "bayes"
-        for k = 1:k_max
+        Threads.@threads for k = 1:k_max
             aₖ = a_func(k)
             N = bin_regular(z, 0.0, 1.0, k, right)
-            criterion[k] = logposterior_k(N, k, ones(k)/k, aₖ, n, logprior)
+            @inbounds criterion[k] = logposterior_k(N, k, ones(k)/k, aₖ, n, logprior)
         end
     elseif rule == "mdl"
-        for k = 1:k_max
+        Threads.@threads for k = 1:k_max
             N = bin_regular(z, 0.0, 1.0, k, right)
-            criterion[k] = compute_MDL(N, k, n)
+            @inbounds criterion[k] = compute_MDL(N, k, n)
         end
     elseif rule == "sc"
-        for k = 1:k_max
+        Threads.@threads for k = 1:k_max
             N = bin_regular(z, 0.0, 1.0, k, right)
-            criterion[k] = compute_SC(N, k, n)
+            @inbounds criterion[k] = compute_SC(N, k, n)
         end
     elseif rule == "klcv"
-        for k = 1:k_max
+        Threads.@threads for k = 1:k_max
             N = bin_regular(z, 0.0, 1.0, k, right)
-            criterion[k] = compute_KLCV(N, k, n)
+            @inbounds criterion[k] = compute_KLCV(N, k, n)
         end
     elseif rule == "l2cv"
-        for k = 1:k_max
+        Threads.@threads for k = 1:k_max
             N = bin_regular(z, 0.0, 1.0, k, right)
-            criterion[k] = compute_L2CV(N, k, n)
+            @inbounds criterion[k] = compute_L2CV(N, k, n)
         end
     elseif rule == "nml"
-        for k = 1:k_max
+        Threads.@threads for k = 1:k_max
             N = bin_regular(z, 0.0, 1.0, k, right)
-            criterion[k] = compute_NML(N, k, n)
+            @inbounds criterion[k] = compute_NML(N, k, n)
         end
     end
 

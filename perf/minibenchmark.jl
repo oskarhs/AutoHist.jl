@@ -1,8 +1,8 @@
 include(joinpath(@__DIR__, "..", "src", "AutoHist.jl"))
+using .AutoHist
+using StatsBase, Random, Distributions, Plots
 
-using AutoHist, StatsBase, Random, Distributions
-
-import BenchmarkTools: @benchmark
+import BenchmarkTools: @benchmark, @btime
 
 function benchmark_autohist()
     rng = Xoshiro(1812)
@@ -10,8 +10,16 @@ function benchmark_autohist()
     x = rand(rng, Normal(), n)
 
     @btime histogram_regular($x)
+    H = histogram_regular(x)
 
     @btime histogram_irregular($x; grid="data")
+    H2 = histogram_irregular(x; grid="data")
+
+    p = plot(H)
+    savefig(p, "example.pdf")
+
+    p2 = plot(H2)
+    savefig(p2, "example2.pdf")
     return nothing
 end
 
