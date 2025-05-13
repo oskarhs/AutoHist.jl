@@ -9,10 +9,8 @@ end
 
 function compute_BIC(N, k, n)
     BIC = n*log(k) - 0.5 *k * log(n)
-    @inbounds for i in eachindex(N)
-        if N[i] > 0
-            BIC = BIC + N[i] * log(N[i]/n)
-        end
+    @turbo for i in eachindex(N)
+        BIC += ifelse(N[i] > 0.0, N[i] * log(N[i]/n), 0.0)
     end
     return BIC
 end
@@ -20,10 +18,8 @@ end
 # Corresponds to -0.5*AIC
 function compute_AIC(N, k, n)
     AIC = n*log(k) - k
-    @inbounds for i in eachindex(N)
-        if N[i] > 0
-            AIC = AIC + N[i] * log(N[i]/n)
-        end
+    @turbo for i in eachindex(N)
+        AIC += ifelse(N[i] > 0.0, N[i] * log(N[i]/n), 0.0)
     end
     return AIC
 end
@@ -32,10 +28,8 @@ end
 # Note that the sign is flipped relative to AIC to stay consistent with their original paper
 function compute_BR(N, k, n)
     BR = n*log(k) - k - log(k)^(2.5)
-    @inbounds for i in eachindex(N)
-        if N[i] > 0
-            BR = BR + N[i] * log(N[i]/n)
-        end
+    @turbo for i in eachindex(N)
+        BR += ifelse(N[i] > 0.0, N[i] * log(N[i]/n), 0.0)
     end
     return BR
 end

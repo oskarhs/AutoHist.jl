@@ -2,7 +2,7 @@ module AutoHist
 
 export histogram_regular, histogram_irregular
 
-using StatsBase, Base.Threads
+using StatsBase, Base.Threads, LoopVectorization
 import Statistics: quantile
 import SpecialFunctions: loggamma, logabsbinomial
 

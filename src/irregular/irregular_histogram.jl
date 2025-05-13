@@ -16,7 +16,7 @@ Returns a StatsBase.Histogram object with the optimal partition corresponding to
 - `support`: Tuple specifying the the support of the histogram estimate. If the first element is -Inf, then `minimum(x)` is taken as the leftmost cutpoint. Likewise, if the second elemen is `Inf`, then the rightmost cutpoint is `maximum(x)`. Default value is `(-Inf, Inf)`, which estimates the support of the data.
 - `use_min_length`: Boolean indicating whether or not to impose a restriction on the minimum bin length of the histogram. If set to true, the smallest allowed bin length is set to `(maximum(x)-minimum(x))/n*log(n)^(1.5)`.
 - `logprior`: Unnormalized logprior distribution for the number k of bins. Defaults to a uniform prior. Only used in when `rule="bayes"`.
-- `a`: Dirichlet concentration parameter in the Bayesian irregular histogram model. Set to the default value (1.0) if the supplied value is not a positive real number. Only used when `rule="bayes"`.
+- `a`: Dirichlet concentration parameter in the Bayesian irregular histogram model. Set to the default value (5.0) if the supplied value is not a positive real number. Only used when `rule="bayes"`.
 
 # Returns
 - `H`: StatsBase.Histogram object with weights corresponding to densities, e.g. `:isdensity` is set to true.
@@ -31,7 +31,7 @@ julia> H2 = histogram_irregular(x; grid="quantile", support=(0.0, 1.0), logprior
 """
 function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", grid::String="regular", 
                             right::Bool=true, greedy::Bool=true, maxbins::Int=-1, support::Tuple{Real,Real}=(-Inf,Inf),
-                            use_min_length::Bool=false, logprior::Function=k->0.0, a::Real=1.0)
+                            use_min_length::Bool=false, logprior::Function=k->0.0, a::Real=5.0)
     rule = lowercase(rule)
     if !(rule in ["pena", "penb", "penr", "bayes", "klcv", "l2cv", "nml"])
         rule = "bayes" # Set penalty to default
