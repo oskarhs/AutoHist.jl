@@ -12,10 +12,10 @@ The development of this package started with the writing of the Master's thesis 
 This module exports the two functions `histogram_regular` and `histogram_irregular`, offering automatic histogram construction for 1-dimensional samples. A detailed exposition of all keyword arguments can be found by typing `?histogram_regular` and `?histogram_irregular` in the repl.
 
 ## Installation
-Installing the package is most easily done via Julia's builtin package manager `Pkg`. The repository is not as of yet part of the Julia general registry, so installing directly from github is the best option for now.
+Installing the package is most easily done via Julia's builtin package manager `Pkg`. This package is part of the Julia general registry, so the installation can be done via the two following lines of code:
 ```julia
 using Pkg
-Pkg.add(url="https://github.com/oskarhs/AutoHist.jl.git")
+Pkg.add("AutoHist")
 ```
 
 ## Example usage
