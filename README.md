@@ -64,10 +64,10 @@ A detailed description of the supported methods will be added at a later point i
 Our implementation uses the dynamical programming algorithm of Kanazawa (1988) together with the greedy search heuristic of Rozenholc et al. (2010) to build a histogram in linearithmic time, making this package an excellent option for histogram construction for large data sets.
 
 ## References
-Simensen, O. H., Christensen, D. & Hjort, N. L. (2025). Random Irregular Histograms. _arXiv preprint_. doi: [10.48550/ARXIV.2505.22034](doi.org/10.48550/ARXIV.2505.22034)
+Simensen, O. H., Christensen, D. & Hjort, N. L. (2025). Random Irregular Histograms. _arXiv preprint_. doi: [10.48550/ARXIV.2505.22034](https://doi.org/10.48550/ARXIV.2505.22034)
 
-Rozenholc, Y., Mildenberger, T., & Gather, U. (2010). Combining regular and irregular histograms by penalized likelihood. _Computational Statistics & Data Analysis_, 54, 3313–3323. doi: [10.1016/j.csda.2010.04.021](doi.org/10.1016/j.csda.2010.04.021)
+Rozenholc, Y., Mildenberger, T., & Gather, U. (2010). Combining regular and irregular histograms by penalized likelihood. _Computational Statistics & Data Analysis_, 54, 3313–3323. doi: [10.1016/j.csda.2010.04.021](https://doi.org/10.1016/j.csda.2010.04.021)
 
-Kanazawa, Y. (1988). An optimal variable cell histogram. _Communications in Statistics-Theory and Methods_, 17, 1401–1422. doi: [10.1080/03610928808829688](doi.org/10.1080/03610928808829688)
+Kanazawa, Y. (1988). An optimal variable cell histogram. _Communications in Statistics-Theory and Methods_, 17, 1401–1422. doi: [10.1080/03610928808829688](https://doi.org/10.1080/03610928808829688)
 
-Birgé, L., & Rozenholc, Y. (2006). How many bins should be put in a regular histogram. _ESAIM: Probability and Statistics_, 10, 24–45. doi: [10.1051/ps:2006001](doi.org/10.1051/ps:2006001)
+Birgé, L., & Rozenholc, Y. (2006). How many bins should be put in a regular histogram. _ESAIM: Probability and Statistics_, 10, 24–45. doi: [10.1051/ps:2006001](https://doi.org/10.1051/ps:2006001)
