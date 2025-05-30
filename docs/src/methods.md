@@ -18,7 +18,11 @@ In the sequel, we let ``\log L_n(k) = \sum_{j=1}^k N_j \log (N_j/[n |\mathcal{I}
 ## Regular histograms
 The following presents the selection criteria maximized by each keyword supported by the `histogram_regular` function. In each case the chosen value of ``k`` is understood to be the maximizer of the expression in question, and ``\mathcal{I} = (\mathcal{I}_1, \mathcal{I}_2, \ldots, \mathcal{I}_k)`` is the corresponding partition of ``[0,1]`` consisting of ``k`` equal-length bins .
 - bayes [Simensen et al. (2025)]:
-    Maximize ``n\log (k) + \sum_{j=1}^k \big\{\log \Gamma(a_j + N_j) - \log \Gamma(a_j + N_j)\big\} + \log p_n(k)``
+
+```math
+    n\log (k) + \sum_{j=1}^k \big\{\log \Gamma(a_j + N_j) - \log \Gamma(a_j + N_j)\big\} + \log p_n(k)
+```
+- 
     Here ``p_n(k)`` is the prior distribution on the number ``k`` of bins.
 - aic:
     Maximize ``\log L_n(k) - k``
@@ -26,6 +30,9 @@ The following presents the selection criteria maximized by each keyword supporte
     Maximize ``\log L_n(k) - 0.5k\log(n)``
 - br [Birgé and Rozenholc (2006)]:
     Maximize ``\log L_n(k) - k - \log^{2.5}(k)``
+- l2cv [Rudemo (1982)]:
+    Maximize ````
+
 
 
 ## References
@@ -34,3 +41,5 @@ Simensen, O. H., Christensen, D. & Hjort, N. L. (2025). Random Irregular Histogr
 Rozenholc, Y., Mildenberger, T., & Gather, U. (2010). Combining regular and irregular histograms by penalized likelihood. _Computational Statistics & Data Analysis_, 54, 3313–3323. doi: [10.1016/j.csda.2010.04.021](https://doi.org/10.1016/j.csda.2010.04.021)
 
 Birgé, L., & Rozenholc, Y. (2006). How many bins should be put in a regular histogram. _ESAIM: Probability and Statistics_, 10, 24–45. doi: [10.1051/ps:2006001](https://doi.org/10.1051/ps:2006001)
+
+Rudemo, M. (1982). Empirical choice of histograms and kernel density estimators. _Scandinavian Journal of Statistics_, 9, 65-78

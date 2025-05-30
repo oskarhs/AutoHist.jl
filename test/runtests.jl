@@ -6,12 +6,16 @@ import StatsBase: Histogram, fit
 @testset "return type" begin
     x = collect(LinRange(0,1,11))
 
-    for rule in ["bayes", "aic", "bic", "bic", "mdl", "nml", "l2cv", "klcv"]
+    for rule in ["bayes", "aic", "bic", "br", "mdl", "nml", "l2cv", "klcv"]
         H = histogram_regular(x; rule=rule)
         @test typeof(H) <: Histogram
     end
     for rule in ["pena", "penb", "penr", "bayes", "klcv", "l2cv", "nml"]
         H = histogram_irregular(x; rule=rule)
+        @test typeof(H) <: Histogram
+    end
+    for grid in ["regular","data", "quantile"]
+        H = histogram_irregular(x; grid=grid)
         @test typeof(H) <: Histogram
     end
 end
