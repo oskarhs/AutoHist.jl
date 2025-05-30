@@ -46,9 +46,9 @@ function greedy_grid(N_cum::AbstractVector{<:Real}, finestgrid::AbstractVector{<
         num_bins = num_bins + 1
 
         # Set i to maximal index < than d s.t. grid_ind[i] == true
-        i = @turbo findlast(@views grid_ind[1:d-1])
+        i = findlast(@views grid_ind[1:d-1])
         # Set j to minimal index > than d s.t. grid_ind[j] == true
-        j = @turbo findfirst(@views grid_ind[d+1:end]) + d
+        j = findfirst(@views grid_ind[d+1:end]) + d
 
         compute_loglik_increments!(incr, i, d)
         compute_loglik_increments!(incr, d, j)
