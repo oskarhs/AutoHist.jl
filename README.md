@@ -1,6 +1,6 @@
 # AutoHist.jl
 
-[![Build Status](https://github.com/oskarhs/AutoHist.jl/actions/workflows/CI.yml/badge.svg?branch=master)](https://github.com/oskarhs/AutoHist.jl/actions/workflows/CI.yml?query=branch%3Amaster)
+[![Build Status](https://github.com/oskarhs/AutoHist.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/oskarhs/AutoHist.jl/actions/workflows/CI.yml?query=branch%3Amain)
 
 A pure Julia implementation of automatic regular and irregular histogram methods based on maximizing a goodness-of-fit criterion.
 
@@ -55,13 +55,18 @@ A detailed description of the supported methods will be added at a later point i
     - Kullback-Leibler cross-validation: "klcv"
     - Rozenholc et al. penalty R: "penR"
     - Rozenholc et al. penalty B: "penB"
-    - Rozenholc et al. penalty B: "penB"
     - Normalized Maximum Likelihood: "nml"
 
 ## Implementation
 
 ### Irregular histograms
 Our implementation uses the dynamical programming algorithm of Kanazawa (1988) together with the greedy search heuristic of Rozenholc et al. (2010) to build a histogram in linearithmic time, making this package an excellent option for histogram construction for large data sets.
+
+### Regular histograms
+For regular histograms, we provide a multithreaded implementation, which will be automatically used when Julia is launched with more than one thread.
+
+## To do
+- Use VectorizedStatistics implementations for minimum, maximum
 
 ## References
 Simensen, O. H., Christensen, D. & Hjort, N. L. (2025). Random Irregular Histograms. _arXiv preprint_. doi: [10.48550/ARXIV.2505.22034](https://doi.org/10.48550/ARXIV.2505.22034)
