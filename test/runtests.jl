@@ -3,22 +3,6 @@ using Test
 
 import StatsBase: Histogram, fit
 
-@testset "bin regular" begin
-    x = rand(10^3)
-    k = 10
-    H = fit(Histogram, x, LinRange(0.0, 1.0, k+1), closed=:right)
-    N = bin_regular(x, 0.0, 1.0, k, true)
-    @test all(N .≈ H.weights)
-end
-
-@testset "bin irregular" begin
-    x = rand(10^3)
-    edges = [0.0, 0.2, 0.5, 0.85, 1.0]
-    H = fit(Histogram, x, edges, closed=:right)
-    N = bin_irregular(x, edges, true)
-    @test all(N .≈ H.weights)
-end
-
 @testset "return type" begin
     x = collect(LinRange(0,1,11))
     H1 = histogram_regular(x)

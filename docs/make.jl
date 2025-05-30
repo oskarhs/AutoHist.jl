@@ -11,6 +11,6 @@ makedocs(
 )
 
 deploydocs(;
-    repo="github.com/oskarhs/AutoHist.jl",
+    repo="git@github.com/oskarhs/AutoHist.jl",
     push_preview = true
 )

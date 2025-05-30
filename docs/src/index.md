@@ -43,4 +43,4 @@ julia> histogram_regular(x; rule="aic")
 WIP: Add another page where each method is described in greater detail.
 
 ## Features 
-In addition to providing automatic histogram construction, this library will at a later point in time include several convenience functions for histograms. These include functions to determine the number and the location of a histogram, and functions to compute numerical estimation error made with piecewise continuous densities in mind.
+In addition to providing automatic histogram construction, this library will at a later point in time include several convenience functions for histograms. These include functions to determine the number and the location of the modes of a histogram, and functions to compute numerical estimation error made with piecewise continuous densities in mind.
