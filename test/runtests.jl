@@ -1,4 +1,4 @@
-using AutoHist, Random, Distributions
+using AutoHist, Distributions
 using Test
 
 import StatsBase: Histogram
@@ -13,9 +13,8 @@ import StatsBase: Histogram
 end
 
 @testset "estimated support" begin
-    rng = Xoshiro(1812)
     n = 100
-    x = rand(rng, Normal(0.0, 1.0), n)
+    x = [-5.0, 4.5]
     H1 = histogram_regular(x)
     edges1 = H1.edges[1]
     H2 = histogram_irregular(x)
@@ -28,9 +27,8 @@ end
 end
 
 @testset "given support" begin
-    rng = Xoshiro(1812)
     n = 100
-    x = rand(rng, Uniform(0.0, 1.0), n)
+    x = rand(n)
     H1 = histogram_regular(x; support=(0.0, 1.0))
     edges1 = H1.edges[1]
     H2 = histogram_irregular(x; support=(0.0, 1.0))
@@ -43,9 +41,8 @@ end
 end
 
 @testset "is density" begin
-    rng = Xoshiro(1812)
     n = 100
-    x = rand(rng, Normal(0.0, 1.0), n)
+    x = randn(n)
 
     H1 = histogram_regular(x)
     edges1 = H1.edges[1]
