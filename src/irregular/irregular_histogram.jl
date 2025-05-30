@@ -38,7 +38,7 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
     end
     if rule == "bayes"
         if a ≤ 0.0
-            a = 1.0
+            a = 5.0
         end
     end
 
@@ -144,10 +144,6 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
         end
         phi = let N_cum = N_cum, mesh = mesh, n = n, minlength=minlength
             f(i,j) = phi_L2CV(i, j, N_cum, mesh, n; minlength=minlength)
-        end
-    elseif rule == "bayesian_blocks"
-        phi = let N_cum = N_cum, mesh = mesh, n = n
-            f(i,j) = phi_L2CV(i, j, N_cum, mesh, n)
         end
     end
 

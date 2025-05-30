@@ -75,3 +75,14 @@ end
     @test sum(dens1 .* (edges1[2:end] - edges1[1:end-1])) ≈ 1.0
     @test sum(dens2 .* (edges2[2:end] - edges2[1:end-1])) ≈ 1.0
 end
+
+@testset "erroneous to default" begin
+    # The arguments are of the right type, but are set to nonsensical values.
+    # In this case, the function should use the default parameter values instead.
+    x = randn(10^3)
+    H1 = histogram_regular(x; rule="nonsense", a=-1.0, maxbins=-100)
+    H2 = histogram_irregular(x; rule="nonsense", grid="nonsense", a=-1.0)
+
+    @test H1 == histogram_regular(x)
+    @test H2 == histogram_irregular(x)
+end
