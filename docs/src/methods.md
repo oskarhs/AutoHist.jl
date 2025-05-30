@@ -16,13 +16,13 @@ The goal of an automatic histogram procedure is to find a partition ``\mathcal{I
 In the sequel, we let ``\log L_n(k) = \sum_{j=1}^k N_j \log (N_j/[n |\mathcal{I}_j|])`` be the maximized log-likelihood.
 
 ## Regular histograms
-The following presents the selection criteria maximized by each keyword supported by the `histogram_regular` function. In each case the chosen value of ``k`` is understood to be the maximizer of the expression in question, and ``\mathcal{I} = (\mathcal{I}_1, \mathcal{I}_2, \ldots, \mathcal{I}_k)`` is the corresponding partition of ``[0,1]`` consisting of ``k`` equal-length bins .
-- bayes [Simensen et al. (2025)]:
+The following presents the selection criteria maximized by each keyword supported by the `histogram_regular` function. In each case the chosen value of ``k`` is understood to be the maximizer of the expression in question, and ``\mathcal{I} = (\mathcal{I}_1, \mathcal{I}_2, \ldots, \mathcal{I}_k)`` is the corresponding partition of ``[0,1]`` consisting of ``k`` equal-length bins.
 
+FORMAT THIS LATER.
+- bayes [Simensen et al. (2025)]:
 ```math
-    n\log (k) + \sum_{j=1}^k \big\{\log \Gamma(a_j + N_j) - \log \Gamma(a_j + N_j)\big\} + \log p_n(k)
+   \quad n\log (k) + \sum_{j=1}^k \big\{\log \Gamma(a_j + N_j) - \log \Gamma(a_j + N_j)\big\} + \log p_n(k)
 ```
-- 
     Here ``p_n(k)`` is the prior distribution on the number ``k`` of bins.
 - aic:
     Maximize ``\log L_n(k) - k``
