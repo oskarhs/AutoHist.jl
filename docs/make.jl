@@ -9,3 +9,8 @@ makedocs(
         "API" => "api.md"
     ]
 )
+
+deploydocs(;
+    repo="https://github.com/oskarhs/AutoHist.jl",
+    push_preview = true
+)
