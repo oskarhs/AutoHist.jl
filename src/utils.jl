@@ -6,12 +6,12 @@ function bin_regular(x::AbstractVector{<:Real}, xmin::Real, xmax::Real, k::Int, 
     edges_inc = k/R
     if right
         for val in x
-            idval = min(k-1, floor(Int, (val-xmin)*edges_inc+eps())) + 1
+            idval = min(k-1, floor(Int, (val-xmin)*edges_inc+10.0*eps())) + 1
             @inbounds bincounts[idval] += 1.0
         end
     else
         for val in x
-            idval = max(0, floor(Int, (val-xmin)*edges_inc-eps())) + 1
+            idval = max(0, floor(Int, (val-xmin)*edges_inc-10.0*eps())) + 1
             @inbounds bincounts[idval] += 1.0
         end
     end
@@ -26,6 +26,7 @@ function bin_irregular(x::AbstractVector{<:Real}, edges::AbstractVector{<:Real},
             @inbounds bincounts[idval] += 1.0
         end
     else
+        k = length(edges)-1
         for val in x
             idval = min(k, searchsortedlast(edges, val))
             @inbounds bincounts[idval] += 1.0

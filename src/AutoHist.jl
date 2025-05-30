@@ -4,7 +4,7 @@ export histogram_regular, histogram_irregular
 
 using StatsBase, Base.Threads, LoopVectorization
 import Statistics: quantile
-import SpecialFunctions: loggamma, logabsbinomial
+import SpecialFunctions: loggamma, logabsbinomial, gamma
 
 include("utils.jl")
 

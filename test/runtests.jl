@@ -5,11 +5,28 @@ import StatsBase: Histogram, fit
 
 @testset "return type" begin
     x = collect(LinRange(0,1,11))
-    H1 = histogram_regular(x)
-    H2 = histogram_irregular(x)
 
-    @test typeof(H1) <: Histogram
-    @test typeof(H2) <: Histogram
+    for rule in ["bayes", "aic", "bic", "bic", "mdl", "nml", "l2cv", "klcv"]
+        H = histogram_regular(x; rule=rule)
+        @test typeof(H) <: Histogram
+    end
+    for rule in ["pena", "penb", "penr", "bayes", "klcv", "l2cv", "nml"]
+        H = histogram_irregular(x; rule=rule)
+        @test typeof(H) <: Histogram
+    end
+end
+
+@testset "left open and right open intervals" begin
+    x = collect(LinRange(0,1,11))
+    H1 = histogram_regular(x; right=true)
+    H2 = histogram_regular(x; right=false)
+    H3 = histogram_irregular(x; right=true)
+    H4 = histogram_irregular(x; right=false)
+
+    @test H1.closed == :right
+    @test H2.closed == :left
+    @test H3.closed == :right
+    @test H4.closed == :left
 end
 
 @testset "estimated support" begin

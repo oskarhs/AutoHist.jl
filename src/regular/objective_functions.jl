@@ -45,7 +45,7 @@ function compute_MDL(N, k, n)
             is_inf = true
         end
     end
-    return return ifselse(is_inf, -Inf, MDL)
+    return return ifelse(is_inf, -Inf, MDL)
 end
 
 # Objective (maximization) for regular histograms based on the stochastic complexity criterion ()
