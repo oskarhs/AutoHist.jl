@@ -15,8 +15,10 @@ import StatsBase: Histogram, fit
         @test typeof(H) <: Histogram
     end
     for grid in ["regular","data", "quantile"]
-        H = histogram_irregular(x; grid=grid)
-        @test typeof(H) <: Histogram
+        for right in [false, true]
+            H = histogram_irregular(x; grid=grid, right=right)
+            @test typeof(H) <: Histogram
+        end
     end
 end
 
