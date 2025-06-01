@@ -14,12 +14,14 @@ import StatsBase: Histogram, fit
         H = histogram_irregular(x; rule=rule)
         @test typeof(H) <: Histogram
     end
-    for grid in ["regular","data", "quantile"]
+    for grid in ["regular","data", "quantile"] # test grid, right-left open interval combinations
         for right in [false, true]
             H = histogram_irregular(x; grid=grid, right=right)
             @test typeof(H) <: Histogram
         end
     end
+    H = histogram_irregular(x; greedy=false) # check that greedy != false works
+    @test typeof(H) <: Histogram
 end
 
 @testset "left open and right open intervals" begin
