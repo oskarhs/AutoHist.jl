@@ -91,11 +91,6 @@ function histogram_regular(x::AbstractVector{<:Real}; rule::String="bayes", righ
             N = bin_regular(z, 0.0, 1.0, k, right)
             @inbounds criterion[k] = compute_MDL(N, k, n)
         end
-    elseif rule == "sc"
-        Threads.@threads for k = 1:k_max
-            N = bin_regular(z, 0.0, 1.0, k, right)
-            @inbounds criterion[k] = compute_SC(N, k, n)
-        end
     elseif rule == "klcv"
         Threads.@threads for k = 1:k_max
             N = bin_regular(z, 0.0, 1.0, k, right)
