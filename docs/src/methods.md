@@ -23,54 +23,61 @@ Consists of maximizing the log-marginal likelihood for given ``k``,
 ```
 Here ``p_n(k)`` is the prior distribution on the number ``k`` of bins.
 
-#### aic [Taylor (1987)]:
+The particular choices ``a_j = 0.5`` and ``p_n(k)\propto 1`` were suggested by [Knuth (2019)](#knuth2019optimal).
+
+#### aic:
 Consists of maximizing a penalized log-likelihood,
 ```math
     n\log (n) + \sum_{j=1}^k N_j \log (N_j/n) - k.
 ```
-#### bic [Davies et al. (2009)]:
+The aic criterion was proposed by [Taylor (1987)](#taylor1987akaike) for histograms.
+#### bic:
 Consists of maximizing a penalized log-likelihood,
 ```math
     n\log (n) + \sum_{j=1}^k N_j \log (N_j/n) - \frac{k}{2}\log(n).
 ```
-#### br [Birgé and Rozenholc (2006)]:
+#### br:
 Consists of maximizing a penalized log-likelihood,
 ```math
     n\log (n) + \sum_{j=1}^k N_j \log (N_j/n) - k - \log^{2.5}(k).
 ```
-#### l2cv [Rudemo (1982)]:
+This criterion was proposed by [Birgé and Rozenholc](#birge2006bins).
+#### l2cv:
 Consists of maximizing a L2 leave-one-out cross-validation criterion,
 ```math
     -2k + k\frac{n+1}{n^2}\sum_{j=1}^k N_j^2.
 ```
-#### klcv [Hall (1990)]:
+This approach to histogram density estimation was first considered by [Rudemo (1982)](#rudemo1982empirical).
+#### klcv:
 Consists of maximizing a Kullback-Leibler leave-one-out cross-validation criterion,
 ```math
     n\log(k) + \sum_{j=1}^k N_j\log (N_j-1).
 ```
+This approach was first studied by [Hall (1990)](#hall1990akaike).
 #### mdl [Hall and Hannan (1988)]:
 Consists of finding the model providing the shortest encoding of the data, which is equivalent to maximization of
 ```math
     n\log(k) + \sum_{j=1}^k \big(N_j-\frac{1}{2}\big)\log\big(N_j-\frac{1}{2}\big) - \big(n-\frac{k}{2}\big)\log\big(n-\frac{k}{2}\big) - \frac{k}{2}\log(n).
 ```
+The minimum description length principle was first applied to histogram estimation by [Hall and Hannan (1988)](#hall1988stochastic).
 
 ## References
 <a name="simensen2025random"></a> Simensen, O. H., Christensen, D. & Hjort, N. L. (2025). Random Irregular Histograms. _arXiv preprint_. doi: [10.48550/ARXIV.2505.22034](https://doi.org/10.48550/ARXIV.2505.22034)
 
-Taylor, C. C. (1987). Akaike’s information criterion and the histogram. _Biometrika_. 74, 636–639.
+<a name="taylor1987akaike"></a> Taylor, C. C. (1987). Akaike’s information criterion and the histogram. _Biometrika_. 74, 636–639.
 doi: [10.1093/biomet/74.3.636](https://doi.org/10.1093/biomet/74.3.636)
-
-Davies, P. L., Gather, U., Nordman, D., and Weinert, H. (2009). A comparison of automatic histogram
-constructions. _ESAIM: Probability and Statistics_, 13, 181–196. doi: [10.1051/ps:2008005](https://doi.org/10.1051/ps:2008005).
 
 Rozenholc, Y., Mildenberger, T., & Gather, U. (2010). Combining regular and irregular histograms by penalized likelihood. _Computational Statistics & Data Analysis_. 54, 3313–3323. doi: [10.1016/j.csda.2010.04.021](https://doi.org/10.1016/j.csda.2010.04.021)
 
 <a name="birge2006bins"></a> Birgé, L., & Rozenholc, Y. (2006). How many bins should be put in a regular histogram. _ESAIM: Probability and Statistics_. 10, 24–45. doi: [10.1051/ps:2006001](https://doi.org/10.1051/ps:2006001)
 
-Rudemo, M. (1982). Empirical choice of histograms and kernel density estimators. _Scandinavian Journal of Statistics_. 9, 65-78
+<a name="rudemo1982empirical"></a> Rudemo, M. (1982). Empirical choice of histograms and kernel density estimators. _Scandinavian Journal of Statistics_. 9, 65-78
 
-Hall, P. (1990). Akaike’s information criterion and Kullback–Leibler loss for histogram density estimation.
+<a name="hall1990akaike"></a> Hall, P. (1990). Akaike’s information criterion and Kullback–Leibler loss for histogram density estimation.
 _Probability Theory and Related Fields_. 85, 449–467. doi: [10.1007/BF01203164](https://doi.org/10.1007/BF01203164)
 
-Hall, P. and Hannan, E. J. (1988). On stochastic complexity and nonparametric density estimation. _Biometrika_.
+<a name="hall1998stochastic"></a> Hall, P. and Hannan, E. J. (1988). On stochastic complexity and nonparametric density estimation. _Biometrika_.
 75, 705–714. doi: [10.1093/biomet/75.4.705](https://doi.org/10.1093/biomet/75.4.705)
+
+<a name="knuth2019optimal"></a> Knuth, K. H. (2019). Optimal data-based binning for histograms and histogram-based probability density
+models. _Digital Signal Processing_ 95. doi: [10.1016/j.dsp.2019.102581](https://doi.org/10.1016/j.dsp.2019.102581)
