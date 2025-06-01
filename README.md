@@ -37,7 +37,7 @@ The keyword argument `rule` determines the method used to construct the histogra
 
 The default method is the Bayesian approach of [Simensen et al. (2025)](#simensen2025random), corresponding to keyword `rule="bayes"`.
 
-A detailed description of the supported methods will be added at a later point in time. A list of the supported methods, along with their corresponding keywords can be found below. 
+A list of the supported methods, along with their corresponding keywords can be found below. A detailed description of the supported methods can be found in the [methods documentation](https://oskarhs.github.io/AutoHist.jl/dev/methods/).
 
 - Regular Histograms:
     - Regular random histogram, "bayes"
@@ -66,6 +66,7 @@ For regular histograms, we provide a multithreaded implementation, which will be
 
 ## To do
 - Use VectorizedStatistics implementations for minimum, maximum
+- Add a few popular, simple methods such as Diaconnis-Freedman, Scott (with corrections for skew, kurtosis) and Sturges. 
 
 ## References
 <a name="simensen2025random"></a> Simensen, O. H., Christensen, D. & Hjort, N. L. (2025). Random Irregular Histograms. _arXiv preprint_. doi: [10.48550/ARXIV.2505.22034](https://doi.org/10.48550/ARXIV.2505.22034)
