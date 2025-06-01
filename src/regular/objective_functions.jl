@@ -48,17 +48,6 @@ function compute_MDL(N, k, n)
     return return ifelse(is_inf, -Inf, MDL)
 end
 
-# Objective (maximization) for regular histograms based on the stochastic complexity criterion ()
-function compute_SC(N, k, n)
-    SC = n*log(k) + loggamma(k) - loggamma(k+n)
-    @inbounds for i in eachindex(N)
-        if N[i] > 0
-            SC = SC + loggamma(N[i]+1)
-        end
-    end
-    return SC
-end
-
 # Objective (maximization) for regular histograms based on Kullback-Leibler Cross Validation
 function compute_KLCV(N, k, n)
     is_inf = false
