@@ -112,6 +112,7 @@ Consists of maximization of a penalized likelihood,
     &\sum_{j=1}^k N_j\log \frac{N_j}{|\mathcal{I}_j|} - \frac{k-1}{2}\log(n/2) - \log\frac{\sqrt{\pi}}{\Gamma(k/2)} - n^{-1/2}\frac{\sqrt{2}k\Gamma(k/2)}{3\Gamma(k/2-1/2)} \\
     &- n^{-1}\left(\frac{3+k(k-2)(2k+1)}{36} - \frac{\Gamma(k/2)^2 k^2}{9\Gamma(k/2-1/2)^2} \right)
 \end{aligned}
+```
 This is a regular variant of the normalized maximum likelihood criterion considered by Kontkanen and Myllymäki (2007).
 
 ## References
