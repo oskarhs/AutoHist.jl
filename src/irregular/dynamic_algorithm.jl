@@ -100,7 +100,7 @@ function phi_L2CV(i::Int, j::Int, N_cum::AbstractArray{<:Real}, grid::AbstractAr
     @inbounds N_bin = N_cum[j] - N_cum[i]
     @inbounds len_bin = grid[j] - grid[i]
     if len_bin > minlength
-        contrib = (2.0*N_bin - (n+1)/n^2 * N_bin^2) / len_bin
+        contrib = ((n+1)/n^2 * N_bin^2 - 2.0*N_bin) / len_bin
     else
         contrib = -Inf64
     end
