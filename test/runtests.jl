@@ -86,3 +86,12 @@ end
     @test H1 == histogram_regular(x)
     @test H2 == histogram_irregular(x)
 end
+
+@testset "a as function" begin
+    x = randn(10^3)
+    H1 = histogram_regular(x; a = k->8.0)
+    H2 = histogram_regular(x; a = k->-1.0) # should return a = 1.0 for all k where a(k) is negative
+
+    @test H1 == histogram_regular(x; a=8.0)
+    @test H2 == histogram_regular(x; a=1.0)
+end
