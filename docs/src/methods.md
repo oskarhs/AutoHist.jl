@@ -44,8 +44,9 @@ This approach dates back to Rudemo (1982).
 #### klcv:
 Consists of maximization of a Kullback-Leibler cross-validation criterion,
 ```math
-    \sum_{j=1}^k N_j\log(N_j-1) - \sum_{j=1}^k N_j\log |I_j|.
+    \sum_{j=1}^k N_j\log(N_j-1) - \sum_{j=1}^k N_j\log |I_j|,
 ```
+where the maximmization is over all partitions with ``N_j \geq 2`` for all ``j``.
 This approach was, to our knowledge, first pursued by Simensen et al. (2025).
 #### nml:
 Consists of maximization of a penalized likelihood,
@@ -95,14 +96,16 @@ This approach to histogram density estimation was first considered by Rudemo (19
 #### klcv:
 Consists of maximizing a Kullback-Leibler leave-one-out cross-validation criterion,
 ```math
-    n\log(k) + \sum_{j=1}^k N_j\log (N_j-1).
+    n\log(k) + \sum_{j=1}^k N_j\log (N_j-1),
 ```
+where the maximmization is over all partitions with ``N_j \geq 2`` for all ``j``.
 This approach was first studied by Hall (1990).
 #### mdl:
 Consists of finding the model providing the shortest encoding of the data, which is equivalent to maximization of
 ```math
-    n\log(k) + \sum_{j=1}^k \big(N_j-\frac{1}{2}\big)\log\big(N_j-\frac{1}{2}\big) - \big(n-\frac{k}{2}\big)\log\big(n-\frac{k}{2}\big) - \frac{k}{2}\log(n).
+    n\log(k) + \sum_{j=1}^k \big(N_j-\frac{1}{2}\big)\log\big(N_j-\frac{1}{2}\big) - \big(n-\frac{k}{2}\big)\log\big(n-\frac{k}{2}\big) - \frac{k}{2}\log(n),
 ```
+where the maximmization is over all partitions with ``N_j \geq 1`` for all ``j``.
 The minimum description length principle was first applied to histogram estimation by Hall and Hannan (1988).
 
 #### nml:
