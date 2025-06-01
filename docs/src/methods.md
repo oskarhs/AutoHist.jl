@@ -38,7 +38,7 @@ This criterion was also suggested by Rozenholc et al. (2010).
 #### l2cv:
 Consists of maximization of an L2 leave-one-out cross-validation criterion,
 ```math
-    \frac{n+1}{n^2}\sum_{j=1}^k \frac{N_j^2}{|\mathcal{I}_j|} - 2\sum_{j=1}^k \frac{N_j}{|\mathcal{I}_j|}.
+    \frac{n+1}{n}\sum_{j=1}^k \frac{N_j^2}{|\mathcal{I}_j|} - 2\sum_{j=1}^k \frac{N_j}{|\mathcal{I}_j|}.
 ```
 This approach dates back to Rudemo (1982).
 #### klcv:
