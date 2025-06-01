@@ -13,13 +13,23 @@ For most of the methods considered here, the estimated bin probabilities are the
 
 The goal of an automatic histogram procedure is to find a partition ``\mathcal{I}`` based on the sample alone which produces a reasonable density estimate. Regular histogram procedures only consider regular partitions, where all intervals in the partition are of equal length, so that one only needs to determine the number ``k`` of bins. Irregular histograms allow for partitions with intervals of unequal length, and try to determine both the number of bins and the locations of the cutpoints between the intervals. In all the irregular procedures covered here, we attempt to find best partition according to a criterion among all partitions with endpoints belonging to a given discrete mesh.
 
+## Irregular histograms
+The following section describes how each value of the `rule` keyword supported by the `histogram_irregular` function selects the optimal histogram partition. In each case, the best partition is selected among the subset of partitions which have cut points belonging to a discrete set of ``k_n`` possible cut points.
+
+#### bayes:
+Consists of maximizing the log-marginal likelihood conditional on the partition ``\mathcal{I} = (\mathcal{I}_1, \ldots, \mathcal{I}_k])``,
+```math
+    \sum_{j=1}^k \big\{\log \Gamma(a_j + N_j) - \log \Gamma(a_j) - N_j\log|\mathcal{I}_j|\big\} + \log p_n(k) - \log \binom{k_n-1}{k-1}
+```
+This approach to irregular histograms was pioneered by [Simensen et al. (2025)](#simensen2025random).
+
 ## Regular histograms
-The following presents the selection criteria maximized by each keyword supported by the `histogram_regular` function. In each case the chosen value of ``k`` is understood to be the maximizer of the expression in question, and ``\mathcal{I} = (\mathcal{I}_1, \mathcal{I}_2, \ldots, \mathcal{I}_k)`` is the corresponding partition of ``[0,1]`` consisting of ``k`` equal-length bins.
+The following section details how each value of the `rule` keyword supported by the `histogram_regular` function selects the number ``k`` of bins to draw a histogram automatically based on a random sample. In the following, ``\mathcal{I} = (\mathcal{I}_1, \mathcal{I}_2, \ldots, \mathcal{I}_k)`` is the corresponding partition of ``[0,1]`` consisting of ``k`` equal-length bins.
 
 #### bayes:
 Consists of maximizing the log-marginal likelihood for given ``k``,
 ```math
-   \quad n\log (k) + \sum_{j=1}^k \big\{\log \Gamma(a_j + N_j) - \log \Gamma(a_j)\big\} + \log p_n(k).
+   n\log (k) + \sum_{j=1}^k \big\{\log \Gamma(a_j + N_j) - \log \Gamma(a_j)\big\} + \log p_n(k).
 ```
 Here ``p_n(k)`` is the prior distribution on the number ``k`` of bins.
 
@@ -62,7 +72,7 @@ Consists of finding the model providing the shortest encoding of the data, which
 The minimum description length principle was first applied to histogram estimation by Hall and Hannan (1988).
 
 ## References
-Simensen, O. H., Christensen, D. & Hjort, N. L. (2025). Random Irregular Histograms. _arXiv preprint_. doi: [10.48550/ARXIV.2505.22034](https://doi.org/10.48550/ARXIV.2505.22034)
+<a id="simensen2025random"></a> Simensen, O. H., Christensen, D. & Hjort, N. L. (2025). Random Irregular Histograms. _arXiv preprint_. doi: [10.48550/ARXIV.2505.22034](https://doi.org/10.48550/ARXIV.2505.22034)
 
 Taylor, C. C. (1987). Akaike’s information criterion and the histogram. _Biometrika_. 74, 636–639.
 doi: [10.1093/biomet/74.3.636](https://doi.org/10.1093/biomet/74.3.636)
