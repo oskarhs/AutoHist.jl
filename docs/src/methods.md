@@ -21,7 +21,41 @@ Consists of maximizing the log-marginal likelihood conditional on the partition 
 ```math
     \sum_{j=1}^k \big\{\log \Gamma(a_j + N_j) - \log \Gamma(a_j) - N_j\log|\mathcal{I}_j|\big\} + \log p_n(k) - \log \binom{k_n-1}{k-1}
 ```
-This approach to irregular histograms was pioneered by [Simensen et al. (2025)](#simensen2025random).
+This approach to irregular histograms was pioneered by Simensen et al. (2025).
+
+#### penb:
+Consists of maximizing a penalized log-likelihood,
+```math
+    n\log (n) + \sum_{j=1}^k N_j \log (N_j/|\mathcal{I}_j|) - \log \binom{k_n-1}{k-1} - k - \log^{2.5}(k).
+```
+This approach was suggested by Rozenholc et al. (2010).
+#### penr:
+Consists of maximizing a penalized log-likelihood,
+```math
+    n\log (n) + \sum_{j=1}^k N_j \log (N_j/|\mathcal{I}_j|) - \frac{1}{2n}\sum_{j=1}^k \frac{N_j}{|\mathcal{I}_j} - \log \binom{k_n-1}{k-1} - \log^{2.5}(k).
+```
+This criterion was also suggested by Rozenholc et al. (2010).
+#### l2cv:
+Consists of maximization of an L2 leave-one-out cross-validation criterion,
+```math
+    \frac{n+1}{n^2}\sum_{j=1}^k \frac{N_j^2}{|\mathcal{I}_j|} - 2\sum_{j=1}^k \frac{N_j}{|\mathcal{I}_j|}.
+```
+This approach dates back to Rudemo (1982).
+#### klcv:
+Consists of maximization of a Kullback-Leibler cross-validation criterion,
+```math
+    \sum_{j=1}^k N_j\log(N_j-1) - \sum_{j=1}^k N_j\log |I_j|.
+```
+This approach was, to our knowledge, first pursued by Simensen et al. (2025).
+#### nml:
+Consists of maximization of a penalized likelihood,
+```math
+\begin{aligned}
+    &\sum_{j=1}^k N_j\log \frac{N_j}{|\mathcal{I}_j|} - \frac{k-1}{2}\log(n/2) - \log\frac{\sqrt{\pi}}{\Gamma(k/2)} - n^{-1/2}\frac{\sqrt{2}k\Gamma(k/2)}{3\Gamma(k/2-1/2)} \\
+    &- n^{-1}\left(\frac{3+k(k-2)(2k+1)}{36} - \frac{\Gamma(k/2)^2 k^2}{9\Gamma(k/2-1/2)^2} \right)  - \log \binom{k_n-1}{k-1}
+\end{aligned}
+```
+This a variant of this criterion first suggested by Kontkanen and Myllymäki (2007). The above criterion uses an asymptotic expansion of their proposed penalty term, as their proposed penalty can be quite expensive to evaluate.
 
 ## Regular histograms
 The following section details how each value of the `rule` keyword supported by the `histogram_regular` function selects the number ``k`` of bins to draw a histogram automatically based on a random sample. In the following, ``\mathcal{I} = (\mathcal{I}_1, \mathcal{I}_2, \ldots, \mathcal{I}_k)`` is the corresponding partition of ``[0,1]`` consisting of ``k`` equal-length bins.
@@ -71,8 +105,17 @@ Consists of finding the model providing the shortest encoding of the data, which
 ```
 The minimum description length principle was first applied to histogram estimation by Hall and Hannan (1988).
 
+#### nml:
+Consists of maximization of a penalized likelihood,
+```math
+\begin{aligned}
+    &\sum_{j=1}^k N_j\log \frac{N_j}{|\mathcal{I}_j|} - \frac{k-1}{2}\log(n/2) - \log\frac{\sqrt{\pi}}{\Gamma(k/2)} - n^{-1/2}\frac{\sqrt{2}k\Gamma(k/2)}{3\Gamma(k/2-1/2)} \\
+    &- n^{-1}\left(\frac{3+k(k-2)(2k+1)}{36} - \frac{\Gamma(k/2)^2 k^2}{9\Gamma(k/2-1/2)^2} \right)
+\end{aligned}
+This is a regular variant of the normalized maximum likelihood criterion considered by Kontkanen and Myllymäki (2007).
+
 ## References
-<a id="simensen2025random"></a> Simensen, O. H., Christensen, D. & Hjort, N. L. (2025). Random Irregular Histograms. _arXiv preprint_. doi: [10.48550/ARXIV.2505.22034](https://doi.org/10.48550/ARXIV.2505.22034)
+Simensen, O. H., Christensen, D. & Hjort, N. L. (2025). Random Irregular Histograms. _arXiv preprint_. doi: [10.48550/ARXIV.2505.22034](https://doi.org/10.48550/ARXIV.2505.22034)
 
 Taylor, C. C. (1987). Akaike’s information criterion and the histogram. _Biometrika_. 74, 636–639.
 doi: [10.1093/biomet/74.3.636](https://doi.org/10.1093/biomet/74.3.636)
@@ -91,3 +134,5 @@ Hall, P. and Hannan, E. J. (1988). On stochastic complexity and nonparametric de
 
 Knuth, K. H. (2019). Optimal data-based binning for histograms and histogram-based probability density
 models. _Digital Signal Processing_ 95. doi: [10.1016/j.dsp.2019.102581](https://doi.org/10.1016/j.dsp.2019.102581)
+
+P. Kontkanen and P. Myllymäki. (2007). Mdl histogram density estimation. _Proceedings of the Eleventh International Conference on Artificial Intelligence and Statistics_, 2, 219–226
