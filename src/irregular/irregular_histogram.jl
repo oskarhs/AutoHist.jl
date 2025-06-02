@@ -61,7 +61,7 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
     n = length(x)
 
     if grid == "data"
-        maxbins = n
+        maxbins = n-1
     elseif maxbins ≤ 0
         maxbins = min(n, ceil(Int, 4.0*n/log(n)^2))
     end
@@ -75,14 +75,12 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
         sort!(y)
         if right
             finestgrid[1] = - eps()
-            finestgrid[2] = 0.5*(y[1]+y[2])
-            finestgrid[3:n] = y[2:n-1] .+ eps()
-            finestgrid[n+1] = 1.0 + eps()
+            finestgrid[2:end-1] = y[2:n-1]
+            finestgrid[end] = 1.0 + eps()
         else
             finestgrid[1] = -eps()
-            finestgrid[2:n-1] = y[2:n-1] .- eps()
-            finestgrid[n] = 0.5 * (y[n] - y[n-1])
-            finestgrid[n+1] = 1.0 + eps()
+            finestgrid[2:end-1] = y[2:n-1]
+            finestgrid[end] = 1.0 + eps()
         end
         N_cum[2:end] = cumsum(bin_irregular(y, finestgrid, right))
     elseif grid == "regular"
