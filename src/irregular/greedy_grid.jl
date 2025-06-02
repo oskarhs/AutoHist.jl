@@ -8,7 +8,7 @@ function greedy_grid(N_cum::AbstractVector{<:Real}, finestgrid::AbstractVector{<
             if finestgrid[i] < finestgrid[j]
                 # Log-likelihood contribution 
                 @inbounds loglik_old = (N_cum[j] - N_cum[i]) * log((N_cum[j]-N_cum[i])/(n*(finestgrid[j]-finestgrid[i])))
-                @turbo for l = (i+1):(j-1)
+                @inbounds for l = (i+1):(j-1)
                     if isapprox(N_cum[l], N_cum[i]) || isapprox(N_cum[j], N_cum[l])
                         incr[l] = 0.0
                     else
