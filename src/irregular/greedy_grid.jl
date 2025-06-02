@@ -9,18 +9,8 @@ function greedy_grid(N_cum::AbstractVector{<:Real}, finestgrid::AbstractVector{<
                 # Log-likelihood contribution
                 @inbounds loglik_old = ifelse(isapprox(N_cum[i], N_cum[j], atol=1e-4), 0.0, (N_cum[j] - N_cum[i]) * log((N_cum[j]-N_cum[i])/(n*(finestgrid[j]-finestgrid[i]))))
                 @inbounds for l = (i+1):(j-1)
-                    loglik_new = ifelse(isapprox(N_cum[l], N_cum[i], atol=1e-4) || finestgrid[l] ≤ finestgrid[i], 0.0, (N_cum[l] - N_cum[i]) * log((N_cum[l]-N_cum[i])/(n*(finestgrid[l]-finestgrid[i]))))
-                    #@assert N_cum[j] ≥ N_cum[l]
-                    @assert finestgrid[j] > finestgrid[l] "$finestgrid"
-                    loglik_new += ifelse(isapprox(N_cum[j], N_cum[l], atol=1e-4) || finestgrid[j] ≤ finestgrid[l], 0.0, (N_cum[j] - N_cum[l]) * log((N_cum[j]-N_cum[l])/(n*(finestgrid[j]-finestgrid[l]))))
-#=                     if isapprox(N_cum[l], N_cum[i]) || isapprox(N_cum[j], N_cum[l])
-                        incr[l] = -loglik_old
-                    else
-                        loglik_new = (N_cum[l] - N_cum[i]) * log((N_cum[l]-N_cum[i])/(n*(finestgrid[l]-finestgrid[i]))) +
-                                (N_cum[j] - N_cum[l]) * log((N_cum[j]-N_cum[l])/(n*(finestgrid[j]-finestgrid[l])))
-                        incr[l] = loglik_new - loglik_old
-                    end
-=#                  
+                    loglik_new = ifelse(isapprox(N_cum[l], N_cum[i], atol=1e-4), 0.0, (N_cum[l] - N_cum[i]) * log((N_cum[l]-N_cum[i])/(n*(finestgrid[l]-finestgrid[i]))))
+                    loglik_new += ifelse(isapprox(N_cum[j], N_cum[l], atol=1e-4), 0.0, (N_cum[j] - N_cum[l]) * log((N_cum[j]-N_cum[l])/(n*(finestgrid[j]-finestgrid[l]))))        
                     incr[l] = loglik_new - loglik_old
                 end
             end
