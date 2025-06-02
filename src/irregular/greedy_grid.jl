@@ -5,13 +5,17 @@ function greedy_grid(N_cum::AbstractVector{<:Real}, finestgrid::AbstractVector{<
     n = N_cum[end]
     compute_loglik_increments! = let N_cum = N_cum, finestgrid=finestgrid, n = n
         function (incr, i, j)
-            @inbounds if finestgrid[i] < finestgrid[j]
+            if finestgrid[i] < finestgrid[j]
                 # Log-likelihood contribution 
                 @inbounds loglik_old = (N_cum[j] - N_cum[i]) * log((N_cum[j]-N_cum[i])/(n*(finestgrid[j]-finestgrid[i])))
                 @turbo for l = (i+1):(j-1)
-                    loglik_new = (N_cum[l] - N_cum[i]) * log((N_cum[l]-N_cum[i])/(n*(finestgrid[l]-finestgrid[i]))) +
-                            (N_cum[j] - N_cum[l]) * log((N_cum[j]-N_cum[l])/(n*(finestgrid[j]-finestgrid[l])))
-                    incr[l] = loglik_new - loglik_old
+                    if isapprox(N_cum[l], N_cum[i]) || isapprox(N_cum[j], N_cum[l])
+                        incr[l] = 0.0
+                    else
+                        loglik_new = (N_cum[l] - N_cum[i]) * log((N_cum[l]-N_cum[i])/(n*(finestgrid[l]-finestgrid[i]))) +
+                                (N_cum[j] - N_cum[l]) * log((N_cum[j]-N_cum[l])/(n*(finestgrid[j]-finestgrid[l])))
+                        incr[l] = loglik_new - loglik_old
+                    end
                 end
             end
         end
