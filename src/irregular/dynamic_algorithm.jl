@@ -1,27 +1,20 @@
 # The dynamical programming algorithm of Kanazawa (1988)
 function dynamic_algorithm(phi::Function, k_max::Int)
     cum_weight = Matrix{Float64}(undef, k_max, k_max)
-    ancestor = Matrix{Int64}(undef, k_max, k_max)
+    ancestor = Array{Int64}(undef, k_max, k_max)
     ancestor[:, 1] .= 0
     ancestor[1,:] .= 0
     weight = Matrix{Float64}(undef, k_max+1, k_max+1)
 
-    #function optimal_path!(ancestor::AbstractVector{Int}, cum_weight::AbstractArray{Float64}, k::Int)
     function optimal_path!(ancestor, cum_weight, k)
-        ancestor0 = Vector{Int64}(undef, k_max-k+1) # these don't have to be reallocated
-        cum_weight0 = Vector{Float64}(undef, k_max-k+1)
-        obj = Vector{Float64}(undef, k_max-k+1)
+        ancestor0 = Array{Int64}(undef, k_max-k+1) # these don't have to be reallocated
+        cum_weight0 = Array{Float64}(undef, k_max-k+1)
 
-        @inbounds @simd for i = k:k_max
+        @inbounds for i = k:k_max
             obj = @views cum_weight[(k-1):(i-1), k-1] .+ weight[k:i, i+1]
             ancestor0[i-k+1] = argmax(obj)
             cum_weight0[i-k+1] = obj[ancestor0[i-k+1]]
         end
-#=         for i in k:k_max
-            obj[1:(i-k+1)] = @views cum_weight[(k-1):(i-1), k-1] .+ weight[k:i, i+1]
-            ancestor0[i-k+1] = argmax(@views obj[1:(i-k+1)])
-            cum_weight0[i-k+1] = @views(obj[1:(i-k+1)])[ancestor0[i-k+1]]
-        end =#
         @inbounds ancestor[k:k_max, k] = ancestor0 .+ (k-2)
         @inbounds cum_weight[k:k_max, k] = cum_weight0
     end
