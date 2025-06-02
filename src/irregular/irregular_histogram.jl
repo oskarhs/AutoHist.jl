@@ -86,10 +86,11 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::String="bayes", gr
         end
         N_cum[2:end] = cumsum(bin_irregular(y, finestgrid, right))
     elseif grid == "regular"
-        N_cum[2:end] = cumsum(bin_regular(y, 0.0, 1.0, maxbins, right))
+        #N_cum[2:end] = cumsum(bin_regular(y, 0.0, 1.0, maxbins, right))
         finestgrid[1:end] = LinRange(0.0, 1.0, maxbins+1)
         finestgrid[1] = -eps()
         finestgrid[end] = 1.0+eps()
+        N_cum[2:end] = cumsum(bin_irregular(y, finestgrid, right))
     elseif grid == "quantile"
         sort!(y)
         finestgrid[1] = -eps()
