@@ -35,12 +35,13 @@ Both the regular and the irregular procedure support a large number of criteria 
     - Rozenholc et al. penalty B: "penB"
     - Normalized Maximum Likelihood: "nml"
 
+A more detailed description along with references for each method can be found on the [methods page](methods.md).
+
+Example usage with different rules:
 ```julia
-julia> histogram_irregular(x; rule="penR")
+julia> histogram_irregular(x; rule="penr")
 julia> histogram_regular(x; rule="aic")
 ```
-
-WIP: Add another page where each method is described in greater detail.
 
 ## Features 
 In addition to providing automatic histogram construction, this library will at a later point in time include several convenience functions for histograms. These include functions to determine the number and the location of the modes of a histogram, and functions to compute numerical estimation error made with piecewise continuous densities in mind.
