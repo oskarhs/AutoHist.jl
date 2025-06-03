@@ -48,6 +48,9 @@ A list of the supported methods, along with their corresponding keywords can be 
     - Birgé and Rozenholc's criterion, "br"
     - Normalized Maximum Likelihood, "nml"
     - Minimum Description Length, "mdl"
+    - Sturges rule, "sturges"
+    - Freedman and Diaconis' rule, "fd"
+    - Scott's (normal) rule, "scott", "scott-normal"
 - Irregular Histograms:
     - Irregular random histogram, "bayes"
     - L2 cross-validation, "l2cv"

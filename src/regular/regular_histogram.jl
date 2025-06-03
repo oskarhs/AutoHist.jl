@@ -29,8 +29,51 @@ julia> H2 = histogram_regular(x; logprior=k->-log(k), a=k->0.5*k)
 """
 function histogram_regular(x::AbstractVector{<:Real}; rule::String="bayes", right::Bool=true, maxbins::Int=1000, support::Tuple{Real,Real}=(-Inf,Inf), logprior::Function=k->0.0, a::Union{Real,Function}=1.0)
     rule = lowercase(rule)
-    if !(rule in ["aic", "bic", "br", "bayes", "mdl", "sc", "klcv", "nml", "l2cv"])
+    if !(rule in ["aic", "bic", "br", "bayes", "mdl", "sc", "klcv", "nml", "l2cv", "sturges", "fd"])
         rule = "bayes"
+    end
+    n = length(x)
+
+    if support[1] == -Inf
+        xmin = minimum(x) 
+    else
+        xmin = support[1]
+    end
+    if support[2] == Inf
+        xmax = maximum(x)
+    else 
+        xmax = support[2]
+    end
+
+    if rule == "sturges" # Sturges' rule
+        k = max(ceil(Int64, log2(length(n))) + 1, maxbins)
+        N = bin_regular(x, xmin, xmax, k, right)
+        if right
+            H = Histogram(LinRange(xmin, xmax, k+1), k/(xmax-xmin) * N / n, :right, true)
+        else
+            H = Histogram(LinRange(xmin, xmax, k+1), k/(xmax-xmin) * N / n, :left, true)
+        end
+        return H
+    elseif rule == "fd" # Freedman and Diaconis' rule
+        h_fd = 2.0*iqr(x)/n^(1.0/3.0)
+        k = ceil(Int64, (xmax - xmin)/h_fd)
+        N = bin_regular(x, xmin, xmax, k, right)
+        if right
+            H = Histogram(LinRange(xmin, xmax, k+1), k/(xmax-xmin) * N / n, :right, true)
+        else
+            H = Histogram(LinRange(xmin, xmax, k+1), k/(xmax-xmin) * N / n, :left, true)
+        end
+        return H
+    elseif rule in ["scott", "scott-normal"] # Scott's normal reference rule
+        h_scott = std(x)*((24.0*sqrt(π))/n)^(1.0/3.0)
+        k = ceil(Int64, (xmax-xmin)/h_scott) # Scott
+        N = bin_regular(x, xmin, xmax, k, right)
+        if right
+            H = Histogram(LinRange(xmin, xmax, k+1), k/(xmax-xmin) * N / n, :right, true)
+        else
+            H = Histogram(LinRange(xmin, xmax, k+1), k/(xmax-xmin) * N / n, :left, true)
+        end
+        return H
     end
     if rule == "bayes"
         if !isa(a, Function) # create constant function if typeof(a) <: Real
@@ -44,7 +87,6 @@ function histogram_regular(x::AbstractVector{<:Real}; rule::String="bayes", righ
         end
     end
 
-    n = length(x)
     if maxbins < 1
         maxbins = 10^3 # Default maximal number of bins
     end
@@ -53,16 +95,6 @@ function histogram_regular(x::AbstractVector{<:Real}; rule::String="bayes", righ
     criterion = Array{Float64}(undef, k_max) # Criterion to be maximized depending on the specified rule
 
     # Scale data to the interval [0,1]:
-    if support[1] == -Inf
-        xmin = minimum(x) 
-    else
-        xmin = support[1]
-    end
-    if support[2] == Inf
-        xmax = maximum(x)
-    else 
-        xmax = support[2]
-    end
     z = @. (x - xmin) / (xmax - xmin)
 
     if rule == "aic"
