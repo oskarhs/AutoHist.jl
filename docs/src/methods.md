@@ -2,14 +2,14 @@
 
 Before we describe the methods included here in more detail, we introduce some notation. For ease of exposition, we present all methods covered here in the context of estimating the density of a sample ``x_1, x_2, \ldots, x_n`` on the unit interval, but note that extending the procedures presented here to other compact intervals. For some further background on histograms, we reccomend the excellent review by Birgé and Rozenholc (2006).
 
-We let ``\mathcal{I} = (\mathcal{I}_1, \mathcal{I}_2, \ldots, \mathcal{I}_k)`` denote a partition of ``[0,1]`` into ``k`` intervals and write ``|\mathcal{C}|`` for the length of an interval ``\mathcal{C}``. We can then write a histogram density estimate by
+We let ``\mathcal{I} = (\mathcal{I}_1, \mathcal{I}_2, \ldots, \mathcal{I}_k)`` denote a partition of ``[0,1]`` into ``k`` intervals and write ``|\mathcal{I}_j|`` for the length of interval ``\mathcal{I}_j``. We can then write a histogram density estimate by
 
 ```math
 \widehat{f}(x) = \sum_{j=1}^k \frac{\widehat{\theta}_j}{|\mathcal{I}_j|}\mathbf{1}_{\mathcal{I}_j}(x), \quad x\in [0,1],
 ```
 where ``\mathbf{1}_{\mathcal{I}_j}`` is the indicator function, ``\widehat{\theta}_j \geq 0`` for all ``j`` and ``\sum_{j=1}^k \widehat{\theta}_j = 1``.
 
-For most of the methods considered here, the estimated bin probabilities are the maximum likelihood estimates ``\widehat{\theta}_j = N_j/n``, where ``N_j = \sum_{i=1}^n \mathbb{1}_{\mathcal{I}_j}(x_i)`` is number of observations landing in interval ``\mathcal{I}_j`` . The exception to this rule is the Bayesian approach of Simensen et al. (2025), which uses the Bayes estimator ``\widehat{\theta}_j = (5/k + N_j)/(5+n)`` instead.
+For most of the methods considered here, the estimated bin probabilities are the maximum likelihood estimates ``\widehat{\theta}_j = N_j/n``, where ``N_j = \sum_{i=1}^n \mathbb{1}_{\mathcal{I}_j}(x_i)`` is number of observations landing in interval ``\mathcal{I}_j`` . The exception to this rule is the Bayesian approach of Simensen et al. (2025), which uses the Bayes estimator ``\widehat{\theta}_j = (5|\mathcal{I}_j| + N_j)/(5+n)`` instead.
 
 The goal of an automatic histogram procedure is to find a partition ``\mathcal{I}`` based on the sample alone which produces a reasonable density estimate. Regular histogram procedures only consider regular partitions, where all intervals in the partition are of equal length, so that one only needs to determine the number ``k`` of bins. Irregular histograms allow for partitions with intervals of unequal length, and try to determine both the number of bins and the locations of the cutpoints between the intervals. In all the irregular procedures covered here, we attempt to find best partition according to a criterion among all partitions with endpoints belonging to a given discrete mesh.
 
