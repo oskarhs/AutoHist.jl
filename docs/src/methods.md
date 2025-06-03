@@ -1,6 +1,6 @@
 # Supported Methods
 
-Before we describe the methods included here in more detail, we introduce some notation. For ease of exposition, we present all methods covered here in the context of estimating the density of a sample ``x_1, x_2, \ldots, x_n`` on the unit interval, but note that extending the procedures presented here to other compact intervals. For some further background on histograms, we reccomend the excellent review by Birgé and Rozenholc (2006).
+Before we describe the methods included here in more detail, we introduce some notation. For ease of exposition, we present all methods covered here in the context of estimating the density of a sample ``x_1, x_2, \ldots, x_n`` on the unit interval, but note that extending the procedures presented here to other compact intervals is possible through a suitable affine transformation. For some further background on histograms, we reccomend the excellent review by Birgé and Rozenholc (2006).
 
 We let ``\mathcal{I} = (\mathcal{I}_1, \mathcal{I}_2, \ldots, \mathcal{I}_k)`` denote a partition of ``[0,1]`` into ``k`` intervals and write ``|\mathcal{I}_j|`` for the length of interval ``\mathcal{I}_j``. We can then write a histogram density estimate by
 
