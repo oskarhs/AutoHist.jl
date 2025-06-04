@@ -70,7 +70,7 @@ function histogram_regular(x::AbstractVector{<:Real}; rule::String="bayes", righ
         if !(level in [0, 1, 2, 3, 4, 5])
             level = 2
         end
-        k = min(wand_num_bins(x, level, :minim, 401, (xmin, xmax)), maxbins) # add functionality for specifying level later
+        k = min(wand_num_bins(x, level, scalest, 401, (xmin, xmax)), maxbins) # add functionality for specifying level later
         k
     else 
         if rule == "bayes"
