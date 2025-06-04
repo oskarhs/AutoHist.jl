@@ -7,7 +7,7 @@ import StatsBase: Histogram, fit
     x = collect(LinRange(0,1,11))
 
     for rule in ["bayes", "aic", "bic", "br", "mdl", "nml", "l2cv", "klcv",
-                 "sturges", "fd", "scott"]
+                 "sturges", "fd", "scott", "wand"]
         for right in [false, true]
             H = histogram_regular(x; rule=rule, right=right)
             @test typeof(H) <: Histogram

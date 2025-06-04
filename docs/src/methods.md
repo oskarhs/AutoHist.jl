@@ -139,6 +139,13 @@ The number ``k`` of bins is computed according to the formula
 ```
 where ``\hat{\sigma}`` is the sample standard deviation. Scott's normal reference rule was first proposed by Scott (1979).
 
+#### Wand's rule
+A more sophisticated version of Scott's rule, Wand's rule proceeds by determining the bin width ``h`` as
+```math
+    h = \big(\frac{6}{\hat{C}(f_0) n}\big)^{1/3},
+```
+where ``\hat{C}(f_0)`` is an estimate of a functional ``C(f_0)``. The corresponding number of bins ``k = \lceil h^{-1}\rceil``. The full details on this method are given in Wand (1997).
+
 ## References
 Simensen, O. H., Christensen, D. & Hjort, N. L. (2025). Random Irregular Histograms. _arXiv preprint_. doi: [10.48550/ARXIV.2505.22034](https://doi.org/10.48550/ARXIV.2505.22034)
 
@@ -166,7 +173,10 @@ Sturges, H. A. (1926). The choice of a class interval. _Journal of the American 
 
 Freedman, D. and Diaconis, P. (1981) On the histogram as a density estimator: L2 theory.
 _Zeitschrift für Wahrscheinlichkeitstheorie und verwandte Gebiete_, **57**, 453–476.
-doi: [10.1007/BF01025868](https//doi.org/10.1007/BF01025868).
+doi: [10.1007/BF01025868](https://doi.org/10.1007/BF01025868).
 
 Scott, D. W. (1979). On optimal and data-based histograms. _Biometrika_, **66**, 605–610,
-doi: [10.1093/biomet/66.3.605](https/doi.org/10.1093/biomet/66.3.605).
+doi: [10.1093/biomet/66.3.605](https://doi.org/10.1093/biomet/66.3.605).
+
+Wand, M. P. (1997). Data-based choice of histogram bin width. The American Statistician, **51**, 59–64.
+doi: [10.2307/2684697](https://doi.org/10.2307/2684697)

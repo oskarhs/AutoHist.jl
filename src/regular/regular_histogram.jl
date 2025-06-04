@@ -29,7 +29,8 @@ julia> H2 = histogram_regular(x; logprior=k->-log(k), a=k->0.5*k)
 """
 function histogram_regular(x::AbstractVector{<:Real}; rule::String="bayes", right::Bool=true, maxbins::Int=1000, support::Tuple{Real,Real}=(-Inf,Inf), logprior::Function=k->0.0, a::Union{Real,Function}=1.0)
     rule = lowercase(rule)
-    if !(rule in ["aic", "bic", "br", "bayes", "mdl", "sc", "klcv", "nml", "l2cv", "sturges", "fd", "scott"])
+    if !(rule in ["aic", "bic", "br", "bayes", "mdl", "sc", "klcv", "nml", "l2cv",
+                  "sturges", "fd", "scott", "wand"])
         rule = "bayes"
     end
     n = length(x)
@@ -45,104 +46,92 @@ function histogram_regular(x::AbstractVector{<:Real}; rule::String="bayes", righ
         xmax = support[2]
     end
 
-    if rule == "sturges" # Sturges' rule
+    k_opt = if rule == "sturges" # Sturges' rule
         k = max(ceil(Int64, log2(length(n))) + 1, maxbins)
-        N = bin_regular(x, xmin, xmax, k, right)
-        if right
-            H = Histogram(LinRange(xmin, xmax, k+1), k/(xmax-xmin) * N / n, :right, true)
-        else
-            H = Histogram(LinRange(xmin, xmax, k+1), k/(xmax-xmin) * N / n, :left, true)
-        end
-        return H
+        k
     elseif rule == "fd" # Freedman and Diaconis' rule
         h_fd = 2.0*iqr(x)/n^(1.0/3.0)
         k = ceil(Int64, (xmax - xmin)/h_fd)
-        N = bin_regular(x, xmin, xmax, k, right)
-        if right
-            H = Histogram(LinRange(xmin, xmax, k+1), k/(xmax-xmin) * N / n, :right, true)
-        else
-            H = Histogram(LinRange(xmin, xmax, k+1), k/(xmax-xmin) * N / n, :left, true)
-        end
-        return H
-    elseif rule in ["scott", "scott-normal"] # Scott's normal reference rule
+        k
+    elseif rule == "scott" # Scott's normal reference rule
         h_scott = std(x)*((24.0*sqrt(π))/n)^(1.0/3.0)
         k = ceil(Int64, (xmax-xmin)/h_scott) # Scott
-        N = bin_regular(x, xmin, xmax, k, right)
-        if right
-            H = Histogram(LinRange(xmin, xmax, k+1), k/(xmax-xmin) * N / n, :right, true)
-        else
-            H = Histogram(LinRange(xmin, xmax, k+1), k/(xmax-xmin) * N / n, :left, true)
-        end
-        return H
-    end
-    if rule == "bayes"
-        if !isa(a, Function) # create constant function if typeof(a) <: Real
-            if a ≤ 0.0
-                a_func = k -> 1.0
+        k
+    elseif rule == "wand" # Wand's rule (using 2 steps)
+        level = 2
+        k = wand_num_bins(x, level, :minim, 401, (xmin, xmax)) # add functionality for specifying level later
+        k
+    else 
+        if rule == "bayes"
+            if !isa(a, Function) # create constant function if typeof(a) <: Real
+                if a ≤ 0.0
+                    a_func = k -> 1.0
+                else 
+                    a_func = k -> a
+                end
             else 
-                a_func = k -> a
+                a_func = k -> ifelse(a(k) > 0.0, a(k), 1.0)
             end
-        else 
-            a_func = k -> ifelse(a(k) > 0.0, a(k), 1.0)
         end
-    end
-
-    if maxbins < 1
-        maxbins = 10^3 # Default maximal number of bins
-    end
-    k_max = min(ceil(Int, 4.0*n / log(n)^2), maxbins)
-
-    criterion = Array{Float64}(undef, k_max) # Criterion to be maximized depending on the specified rule
-
-    # Scale data to the interval [0,1]:
-    z = @. (x - xmin) / (xmax - xmin)
-
-    if rule == "aic"
-        Threads.@threads for k = 1:k_max
-            N = bin_regular(z, 0.0, 1.0, k, right)
-            @inbounds criterion[k] = compute_AIC(N, k, n) # Note: negative of AIC is computed
+    
+        if maxbins < 1
+            maxbins = 10^3 # Default maximal number of bins
         end
-    elseif rule == "bic"
-        Threads.@threads for k = 1:k_max
-            N = bin_regular(z, 0.0, 1.0, k, right)
-            @inbounds criterion[k] = compute_BIC(N, k, n) # Note: negative of BIC is computed
+        k_max = min(ceil(Int, 4.0*n / log(n)^2), maxbins)
+    
+        criterion = Array{Float64}(undef, k_max) # Criterion to be maximized depending on the specified rule
+    
+        # Scale data to the interval [0,1]:
+        z = @. (x - xmin) / (xmax - xmin)
+    
+        if rule == "aic"
+            Threads.@threads for k = 1:k_max
+                N = bin_regular(z, 0.0, 1.0, k, right)
+                @inbounds criterion[k] = compute_AIC(N, k, n) # Note: negative of AIC is computed
+            end
+        elseif rule == "bic"
+            Threads.@threads for k = 1:k_max
+                N = bin_regular(z, 0.0, 1.0, k, right)
+                @inbounds criterion[k] = compute_BIC(N, k, n) # Note: negative of BIC is computed
+            end
+        elseif rule == "br"
+            Threads.@threads for k = 1:k_max
+                N = bin_regular(z, 0.0, 1.0, k, right)
+                @inbounds criterion[k] = compute_BR(N, k, n)
+            end
+        elseif rule == "bayes"
+            Threads.@threads for k = 1:k_max
+                aₖ = a_func(k)
+                N = bin_regular(z, 0.0, 1.0, k, right)
+                @inbounds criterion[k] = logposterior_k(N, k, ones(k)/k, aₖ, n, logprior)
+            end
+        elseif rule == "mdl"
+            Threads.@threads for k = 1:k_max
+                N = bin_regular(z, 0.0, 1.0, k, right)
+                @inbounds criterion[k] = compute_MDL(N, k, n)
+            end
+        elseif rule == "klcv"
+            Threads.@threads for k = 1:k_max
+                N = bin_regular(z, 0.0, 1.0, k, right)
+                @inbounds criterion[k] = compute_KLCV(N, k, n)
+            end
+        elseif rule == "l2cv"
+            Threads.@threads for k = 1:k_max
+                N = bin_regular(z, 0.0, 1.0, k, right)
+                @inbounds criterion[k] = compute_L2CV(N, k, n)
+            end
+        elseif rule == "nml"
+            Threads.@threads for k = 1:k_max
+                N = bin_regular(z, 0.0, 1.0, k, right)
+                @inbounds criterion[k] = compute_NML(N, k, n)
+            end
         end
-    elseif rule == "br"
-        Threads.@threads for k = 1:k_max
-            N = bin_regular(z, 0.0, 1.0, k, right)
-            @inbounds criterion[k] = compute_BR(N, k, n)
-        end
-    elseif rule == "bayes"
-        Threads.@threads for k = 1:k_max
-            aₖ = a_func(k)
-            N = bin_regular(z, 0.0, 1.0, k, right)
-            @inbounds criterion[k] = logposterior_k(N, k, ones(k)/k, aₖ, n, logprior)
-        end
-    elseif rule == "mdl"
-        Threads.@threads for k = 1:k_max
-            N = bin_regular(z, 0.0, 1.0, k, right)
-            @inbounds criterion[k] = compute_MDL(N, k, n)
-        end
-    elseif rule == "klcv"
-        Threads.@threads for k = 1:k_max
-            N = bin_regular(z, 0.0, 1.0, k, right)
-            @inbounds criterion[k] = compute_KLCV(N, k, n)
-        end
-    elseif rule == "l2cv"
-        Threads.@threads for k = 1:k_max
-            N = bin_regular(z, 0.0, 1.0, k, right)
-            @inbounds criterion[k] = compute_L2CV(N, k, n)
-        end
-    elseif rule == "nml"
-        Threads.@threads for k = 1:k_max
-            N = bin_regular(z, 0.0, 1.0, k, right)
-            @inbounds criterion[k] = compute_NML(N, k, n)
-        end
+        k_opt = argmax(criterion)
+        k_opt
     end
 
     # Create a StatsBase.Histogram object with the chosen number of bins
-    k_opt = argmax(criterion)
-    N = bin_regular(z, 0.0, 1.0, k_opt, right)
+    N = bin_regular(x, xmin, xmax, k_opt, right)
     if right
         H_opt = Histogram(LinRange(xmin, xmax, k_opt+1), N, :right, true)
     else

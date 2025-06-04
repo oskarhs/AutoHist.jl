@@ -9,8 +9,8 @@ function benchmark_autohist()
     n = 10^6
     x = rand(rng, Normal(), n)
 
-    @btime histogram_regular($x, rule="aic")
-    H = histogram_regular(x, rule="aic")
+    @btime histogram_regular($x, rule="wand")
+    H = histogram_regular(x, rule="wand")
 
     @btime histogram_irregular($x; grid="data")
     H2 = histogram_irregular(x; grid="data")
