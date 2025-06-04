@@ -47,9 +47,9 @@ function histogram_regular(x::AbstractVector{<:Real}; rule::String="bayes", righ
         xmin = support[1]   # use known lower bound 
     end
     if support[2] == Inf
-        xmax = maximum(x)
+        xmax = maximum(x)   # estimate upper bounds of support if unknown
     else 
-        xmax = support[2]
+        xmax = support[2]   # use known upper bound
     end
 
     k_opt = if rule == "sturges" # Sturges' rule
@@ -61,14 +61,14 @@ function histogram_regular(x::AbstractVector{<:Real}; rule::String="bayes", righ
         k
     elseif rule == "scott" # Scott's normal reference rule
         h_scott = std(x)*((24.0*sqrt(π))/n)^(1.0/3.0)
-        k = min(ceil(Int64, (xmax-xmin)/h_scott), maxbins) # Scott
+        k = min(ceil(Int64, (xmax-xmin)/h_scott), maxbins)
         k
     elseif rule == "wand" # Wand's rule (using 2 steps)
-        if !(scalest in [:minim, :stdev, :iqr])
-            scalest = :minim
+        if !(scalest in [:minim, :stdev, :iqr])     # check that supplied scale-estimate is a valid option
+            scalest = :minim                        # else, use default (:minim)
         end
-        if !(level in [0, 1, 2, 3, 4, 5])
-            level = 2
+        if !(level in [0, 1, 2, 3, 4, 5])           # check that supplied level is a valid option
+            level = 2                               # else, use default (2)
         end
         k = min(wand_num_bins(x, level, scalest, 401, (xmin, xmax)), maxbins) # add functionality for specifying level later
         k
