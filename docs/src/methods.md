@@ -21,6 +21,8 @@ Consists of maximizing the log-marginal likelihood conditional on the partition 
 ```math
     \sum_{j=1}^k \big\{\log \Gamma(a_j + N_j) - \log \Gamma(a_j) - N_j\log|\mathcal{I}_j|\big\} + \log p_n(k) - \log \binom{k_n-1}{k-1}
 ```
+Here ``p_n(k)`` is the prior distribution on the number ``k`` of bins, which can be controlled by supplying a function to the `logprior` keyword argument. The default value is ``p_n(k) \propto 1``. Here, ``a_j = a/k``, for a scalar ``a > 0`` which can be controlled by the user through the keyword argument `a`.
+
 This approach to irregular histograms was pioneered by Simensen et al. (2025).
 
 #### penb:
@@ -66,7 +68,7 @@ Consists of maximizing the log-marginal likelihood for given ``k``,
 ```math
    n\log (k) + \sum_{j=1}^k \big\{\log \Gamma(a_j + N_j) - \log \Gamma(a_j)\big\} + \log p_n(k).
 ```
-Here ``p_n(k)`` is the prior distribution on the number ``k`` of bins.
+Here ``p_n(k)`` is the prior distribution on the number ``k`` of bins, which can be controlled by supplying a function to the ``logprior`` keyword argument. The default value is ``p_n(k) \propto 1``. Here, ``a_j = a/k``, for a scalar ``a > 0``, possibly depending on ``k``. The value of ``a`` can be set by supplying a fixed, positive scalar or a function ``a(k)`` to the keyword argument `a`.
 
 The particular choices ``a_j = 0.5`` and ``p_n(k)\propto 1`` were suggested by Knuth (2019).
 
@@ -145,6 +147,9 @@ A more sophisticated version of Scott's rule, Wand's rule proceeds by determinin
     h = \big(\frac{6}{\hat{C}(f_0) n}\big)^{1/3},
 ```
 where ``\hat{C}(f_0)`` is an estimate of a functional ``C(f_0)``. The corresponding number of bins ``k = \lceil h^{-1}\rceil``. The full details on this method are given in Wand (1997).
+The density estimate is computed based on a scale estimate, which can be controlled through the `scale` keyword argument. Possible choices are `:stdev`, `:iqr` which uses an estimate based on the sample standard deviation or the sample interquartile range as a scale estimate. The default choice `:minim` uses the minimum of the above estimates.
+The `level` keyword controls the number of stages of functional estimation used to compute ``\hat{C}``, and can take values `0, 1, 2, 3, 4, 5`, with the default value being `level=2`. The choice `level=0` corresponds to Scott's rule under the chosen scale estimate.
+
 
 ## References
 Simensen, O. H., Christensen, D. & Hjort, N. L. (2025). Random Irregular Histograms. _arXiv preprint_. doi: [10.48550/ARXIV.2505.22034](https://doi.org/10.48550/ARXIV.2505.22034)
