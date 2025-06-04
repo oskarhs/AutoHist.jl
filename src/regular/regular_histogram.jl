@@ -47,19 +47,19 @@ function histogram_regular(x::AbstractVector{<:Real}; rule::String="bayes", righ
     end
 
     k_opt = if rule == "sturges" # Sturges' rule
-        k = max(ceil(Int64, log2(length(n))) + 1, maxbins)
+        k = min(ceil(Int64, log2(length(n))) + 1, maxbins)
         k
     elseif rule == "fd" # Freedman and Diaconis' rule
         h_fd = 2.0*iqr(x)/n^(1.0/3.0)
-        k = ceil(Int64, (xmax - xmin)/h_fd)
+        k = min(ceil(Int64, (xmax - xmin)/h_fd), maxbins)
         k
     elseif rule == "scott" # Scott's normal reference rule
         h_scott = std(x)*((24.0*sqrt(π))/n)^(1.0/3.0)
-        k = ceil(Int64, (xmax-xmin)/h_scott) # Scott
+        k = min(ceil(Int64, (xmax-xmin)/h_scott), maxbins) # Scott
         k
     elseif rule == "wand" # Wand's rule (using 2 steps)
         level = 2
-        k = wand_num_bins(x, level, :minim, 401, (xmin, xmax)) # add functionality for specifying level later
+        k = min(wand_num_bins(x, level, :minim, 401, (xmin, xmax)), maxbins) # add functionality for specifying level later
         k
     else 
         if rule == "bayes"
