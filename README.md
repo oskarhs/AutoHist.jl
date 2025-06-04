@@ -48,6 +48,10 @@ A list of the supported methods, along with their corresponding keywords can be 
     - Birgé and Rozenholc's criterion, "br"
     - Normalized Maximum Likelihood, "nml"
     - Minimum Description Length, "mdl"
+    - Sturges rule, "sturges"
+    - Freedman and Diaconis' rule, "fd"
+    - Scott's rule, "scott"
+    - Wand's rule, "wand"
 - Irregular Histograms:
     - Irregular random histogram, "bayes"
     - L2 cross-validation, "l2cv"
@@ -71,8 +75,8 @@ For regular histograms, we provide a multithreaded implementation, which will be
 ## References
 <a name="simensen2025random"></a> Simensen, O. H., Christensen, D. & Hjort, N. L. (2025). Random Irregular Histograms. _arXiv preprint_. doi: [10.48550/ARXIV.2505.22034](https://doi.org/10.48550/ARXIV.2505.22034)
 
-<a name="rozenholc2010combining"></a> Rozenholc, Y., Mildenberger, T., & Gather, U. (2010). Combining regular and irregular histograms by penalized likelihood. _Computational Statistics & Data Analysis_, 54, 3313–3323. doi: [10.1016/j.csda.2010.04.021](https://doi.org/10.1016/j.csda.2010.04.021)
+<a name="rozenholc2010combining"></a> Rozenholc, Y., Mildenberger, T., & Gather, U. (2010). Combining regular and irregular histograms by penalized likelihood. _Computational Statistics & Data Analysis_, **54**, 3313–3323. doi: [10.1016/j.csda.2010.04.021](https://doi.org/10.1016/j.csda.2010.04.021)
 
-<a name="kanazawa1988optimal"></a> Kanazawa, Y. (1988). An optimal variable cell histogram. _Communications in Statistics-Theory and Methods_, 17, 1401–1422. doi: [10.1080/03610928808829688](https://doi.org/10.1080/03610928808829688)
+<a name="kanazawa1988optimal"></a> Kanazawa, Y. (1988). An optimal variable cell histogram. _Communications in Statistics-Theory and Methods_, **17**, 1401–1422. doi: [10.1080/03610928808829688](https://doi.org/10.1080/03610928808829688)
 
-<a name="birge2006bins"></a> Birgé, L., & Rozenholc, Y. (2006). How many bins should be put in a regular histogram. _ESAIM: Probability and Statistics_, 10, 24–45. doi: [10.1051/ps:2006001](https://doi.org/10.1051/ps:2006001)
+<a name="birge2006bins"></a> Birgé, L., & Rozenholc, Y. (2006). How many bins should be put in a regular histogram. _ESAIM: Probability and Statistics_, **10**, 24–45. doi: [10.1051/ps:2006001](https://doi.org/10.1051/ps:2006001)

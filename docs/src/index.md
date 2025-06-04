@@ -35,6 +35,10 @@ Both the regular and the irregular procedure support a large number of criteria 
     - Birgé and Rozenholc's criterion, "br"
     - Normalized Maximum Likelihood, "nml"
     - Minimum Description Length, "mdl"
+    - Sturges' rule, "sturges"
+    - Freedman and Diaconis' rule, "fd"
+    - Scott's rule, "scott"
+    - Wand's rule, "wand"
 - Irregular Histograms:
     - Irregular random histogram, "bayes" (default)
     - L2 cross-validation, "l2cv"

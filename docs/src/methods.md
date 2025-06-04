@@ -1,6 +1,6 @@
 # Supported Methods
 
-Before we describe the methods included here in more detail, we introduce some notation. For ease of exposition, we present all methods covered here in the context of estimating the density of a sample ``x_1, x_2, \ldots, x_n`` on the unit interval, but note that extending the procedures presented here to other compact intervals is possible through a suitable affine transformation. For some further background on histograms, we reccomend the excellent review by Birgé and Rozenholc (2006).
+Before we describe the methods included here in more detail, we introduce some notation. For ease of exposition, we present all methods covered here in the context of estimating the density of a sample ``\boldsymbol{x} = (x_1, x_2, \ldots, x_n)`` on the unit interval, but note that extending the procedures presented here to other compact intervals is possible through a suitable affine transformation. For some further background on histograms, we reccomend the excellent review by Birgé and Rozenholc (2006).
 
 We let ``\mathcal{I} = (\mathcal{I}_1, \mathcal{I}_2, \ldots, \mathcal{I}_k)`` denote a partition of ``[0,1]`` into ``k`` intervals and write ``|\mathcal{I}_j|`` for the length of interval ``\mathcal{I}_j``. We can then write a histogram density estimate by
 
@@ -26,13 +26,13 @@ This approach to irregular histograms was pioneered by Simensen et al. (2025).
 #### penb:
 Consists of maximizing a penalized log-likelihood,
 ```math
-    n\log (n) + \sum_{j=1}^k N_j \log (N_j/|\mathcal{I}_j|) - \log \binom{k_n-1}{k-1} - k - \log^{2.5}(k).
+    \sum_{j=1}^k N_j \log (N_j/|\mathcal{I}_j|) - \log \binom{k_n-1}{k-1} - k - \log^{2.5}(k).
 ```
 This approach was suggested by Rozenholc et al. (2010).
 #### penr:
 Consists of maximizing a penalized log-likelihood,
 ```math
-    n\log (n) + \sum_{j=1}^k N_j \log (N_j/|\mathcal{I}_j|) - \frac{1}{2n}\sum_{j=1}^k \frac{N_j}{|\mathcal{I}_j} - \log \binom{k_n-1}{k-1} - \log^{2.5}(k).
+    \sum_{j=1}^k N_j \log (N_j/|\mathcal{I}_j|) - \frac{1}{2n}\sum_{j=1}^k \frac{N_j}{|\mathcal{I}_j} - \log \binom{k_n-1}{k-1} - \log^{2.5}(k).
 ```
 This criterion was also suggested by Rozenholc et al. (2010).
 #### l2cv:
@@ -73,18 +73,18 @@ The particular choices ``a_j = 0.5`` and ``p_n(k)\propto 1`` were suggested by K
 #### aic:
 Consists of maximizing a penalized log-likelihood,
 ```math
-    n\log (n) + \sum_{j=1}^k N_j \log (N_j/n) - k.
+    n\log (k) + \sum_{j=1}^k N_j \log (N_j/n) - k.
 ```
 The aic criterion was proposed by Taylor (1987) for histograms.
 #### bic:
 Consists of maximizing a penalized log-likelihood,
 ```math
-    n\log (n) + \sum_{j=1}^k N_j \log (N_j/n) - \frac{k}{2}\log(n).
+    n\log (k) + \sum_{j=1}^k N_j \log (N_j/n) - \frac{k}{2}\log(n).
 ```
 #### br:
 Consists of maximizing a penalized log-likelihood,
 ```math
-    n\log (n) + \sum_{j=1}^k N_j \log (N_j/n) - k - \log^{2.5}(k).
+    n\log (k) + \sum_{j=1}^k N_j \log (N_j/n) - k - \log^{2.5}(k).
 ```
 This criterion was proposed by Birgé and Rozenholc (2006).
 #### l2cv:
@@ -113,30 +113,70 @@ Consists of maximization of a penalized likelihood,
 ```math
 \begin{aligned}
     &\sum_{j=1}^k N_j\log \frac{N_j}{|\mathcal{I}_j|} - \frac{k-1}{2}\log(n/2) - \log\frac{\sqrt{\pi}}{\Gamma(k/2)} - n^{-1/2}\frac{\sqrt{2}k\Gamma(k/2)}{3\Gamma(k/2-1/2)} \\
-    &- n^{-1}\left(\frac{3+k(k-2)(2k+1)}{36} - \frac{\Gamma(k/2)^2 k^2}{9\Gamma(k/2-1/2)^2} \right)
+    &- n^{-1}\left(\frac{3+k(k-2)(2k+1)}{36} - \frac{\Gamma(k/2)^2 k^2}{9\Gamma(k/2-1/2)^2} \right).
 \end{aligned}
 ```
 This is a regular variant of the normalized maximum likelihood criterion considered by Kontkanen and Myllymäki (2007).
 
+#### Sturges' rule:
+The number ``k`` of bins is computed according to the formula
+```math
+    k = \lceil \log_2(n) \rceil + 1.
+```
+This classical rule, due to Sturges (1926), is the default for determining the number of bins in R.
+
+#### Freedman and Diaconis' rule:
+The number ``k`` of bins is computed according to the formula
+```math
+    k = \big\lceil\frac{n^{1/3}}{2\mathrm{IQR}(\boldsymbol{x})}\big\rceil,
+```
+where ``\mathrm{IQR}(\boldsymbol{x})`` is the sample interquartile range. This rule dates back to Freedman and Diaconis (1982) and is the default bin selection rule used by the `histogram()` function from Plots.jl.
+
+#### Scott's rule:
+The number ``k`` of bins is computed according to the formula
+```math
+    k = \big\lceil \hat{\sigma}^{-1}(24\sqrt{\pi})^{-1/3}n^{1/3}\big\rceil,
+```
+where ``\hat{\sigma}`` is the sample standard deviation. Scott's normal reference rule was first proposed by Scott (1979).
+
+#### Wand's rule
+A more sophisticated version of Scott's rule, Wand's rule proceeds by determining the bin width ``h`` as
+```math
+    h = \big(\frac{6}{\hat{C}(f_0) n}\big)^{1/3},
+```
+where ``\hat{C}(f_0)`` is an estimate of a functional ``C(f_0)``. The corresponding number of bins ``k = \lceil h^{-1}\rceil``. The full details on this method are given in Wand (1997).
+
 ## References
 Simensen, O. H., Christensen, D. & Hjort, N. L. (2025). Random Irregular Histograms. _arXiv preprint_. doi: [10.48550/ARXIV.2505.22034](https://doi.org/10.48550/ARXIV.2505.22034)
 
-Taylor, C. C. (1987). Akaike’s information criterion and the histogram. _Biometrika_. 74, 636–639.
+Taylor, C. C. (1987). Akaike’s information criterion and the histogram. _Biometrika_, **74**, 636–639.
 doi: [10.1093/biomet/74.3.636](https://doi.org/10.1093/biomet/74.3.636)
 
-Rozenholc, Y., Mildenberger, T., & Gather, U. (2010). Combining regular and irregular histograms by penalized likelihood. _Computational Statistics & Data Analysis_. 54, 3313–3323. doi: [10.1016/j.csda.2010.04.021](https://doi.org/10.1016/j.csda.2010.04.021)
+Rozenholc, Y., Mildenberger, T., & Gather, U. (2010). Combining regular and irregular histograms by penalized likelihood. _Computational Statistics & Data Analysis_, **54**, 3313–3323. doi: [10.1016/j.csda.2010.04.021](https://doi.org/10.1016/j.csda.2010.04.021)
 
-Birgé, L., & Rozenholc, Y. (2006). How many bins should be put in a regular histogram. _ESAIM: Probability and Statistics_. 10, 24–45. doi: [10.1051/ps:2006001](https://doi.org/10.1051/ps:2006001)
+Birgé, L., & Rozenholc, Y. (2006). How many bins should be put in a regular histogram. _ESAIM: Probability and Statistics_, **10**, 24–45. doi: [10.1051/ps:2006001](https://doi.org/10.1051/ps:2006001)
 
-Rudemo, M. (1982). Empirical choice of histograms and kernel density estimators. _Scandinavian Journal of Statistics_. 9, 65-78
+Rudemo, M. (1982). Empirical choice of histograms and kernel density estimators. _Scandinavian Journal of Statistics_, **9**, 65-78
 
 Hall, P. (1990). Akaike’s information criterion and Kullback–Leibler loss for histogram density estimation.
-_Probability Theory and Related Fields_. 85, 449–467. doi: [10.1007/BF01203164](https://doi.org/10.1007/BF01203164)
+_Probability Theory and Related Fields_, **85**, 449–467. doi: [10.1007/BF01203164](https://doi.org/10.1007/BF01203164)
 
-Hall, P. and Hannan, E. J. (1988). On stochastic complexity and nonparametric density estimation. _Biometrika_.
-75, 705–714. doi: [10.1093/biomet/75.4.705](https://doi.org/10.1093/biomet/75.4.705)
+Hall, P. and Hannan, E. J. (1988). On stochastic complexity and nonparametric density estimation.
+_Biometrika_, **75**, 705–714. doi: [10.1093/biomet/75.4.705](https://doi.org/10.1093/biomet/75.4.705)
 
-Knuth, K. H. (2019). Optimal data-based binning for histograms and histogram-based probability density
-models. _Digital Signal Processing_ 95. doi: [10.1016/j.dsp.2019.102581](https://doi.org/10.1016/j.dsp.2019.102581)
+Knuth, K. H. (2019). Optimal data-based binning for histograms and histogram-based probability density models.
+_Digital Signal Processing_, **95**, doi: [10.1016/j.dsp.2019.102581](https://doi.org/10.1016/j.dsp.2019.102581)
 
-P. Kontkanen and P. Myllymäki. (2007). Mdl histogram density estimation. _Proceedings of the Eleventh International Conference on Artificial Intelligence and Statistics_, 2, 219–226
+Kontkanen, P. and Myllymäki, P. (2007). Mdl histogram density estimation. _Proceedings of the Eleventh International Conference on Artificial Intelligence and Statistics_, **2**, 219–226
+
+Sturges, H. A. (1926). The choice of a class interval. _Journal of the American Statistical Association_, **21**, 65–66. doi: [10.1080/01621459.1926.10502161](https://doi.org/10.1080/01621459.1926.10502161).
+
+Freedman, D. and Diaconis, P. (1981) On the histogram as a density estimator: L2 theory.
+_Zeitschrift für Wahrscheinlichkeitstheorie und verwandte Gebiete_, **57**, 453–476.
+doi: [10.1007/BF01025868](https://doi.org/10.1007/BF01025868).
+
+Scott, D. W. (1979). On optimal and data-based histograms. _Biometrika_, **66**, 605–610,
+doi: [10.1093/biomet/66.3.605](https://doi.org/10.1093/biomet/66.3.605).
+
+Wand, M. P. (1997). Data-based choice of histogram bin width. The American Statistician, **51**, 59–64.
+doi: [10.2307/2684697](https://doi.org/10.2307/2684697)

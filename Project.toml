@@ -5,18 +5,20 @@ version = "0.2.1"
 
 [deps]
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
+FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
 LoopVectorization = "bdcacae8-1622-11e9-2a5c-532679323890"
 SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 
 [compat]
-julia = "1.6.7"
 Distributions = "v0.25.118"
+FFTW = "v1.0.0"
 LoopVectorization = "v0.12.172"
 SpecialFunctions = "v2.5.0"
-StatsBase = "v0.34.4"
 Statistics = "v1.6.7"
+StatsBase = "v0.34.4"
+julia = "1.6.7"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
