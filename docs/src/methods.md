@@ -18,7 +18,7 @@ The goal of an automatic histogram procedure is to find a partition ``\mathcal{I
 The following section describes how each value of the `rule` keyword supported by the `histogram_irregular` function selects the optimal histogram partition. In each case, the best partition is selected among the subset of partitions which have cut points belonging to a discrete set of ``k_n`` possible cut points.
 
 #### bayes:
-Consists of maximizing the log-marginal likelihood conditional on the partition ``\mathcal{I} = (\mathcal{I}_1, \ldots, \mathcal{I}_k])``,
+Consists of maximizing the log-marginal likelihood conditional on the partition ``\mathcal{I} = (\mathcal{I}_1, \ldots, \mathcal{I}_k)``,
 ```math
     \sum_{j=1}^k \big\{\log \Gamma(a_j + N_j) - \log \Gamma(a_j) - N_j\log|\mathcal{I}_j|\big\} + \log p_n(k) - \log \binom{k_n-1}{k-1}
 ```
@@ -145,7 +145,7 @@ where ``\hat{\sigma}`` is the sample standard deviation. Scott's normal referenc
 #### Wand's rule
 A more sophisticated version of Scott's rule, Wand's rule proceeds by determining the bin width ``h`` as
 ```math
-    h = \big(\frac{6}{\hat{C}(f_0) n}\big)^{1/3},
+    h = \Big(\frac{6}{\hat{C}(f_0) n}\Big)^{1/3},
 ```
 where ``\hat{C}(f_0)`` is an estimate of a functional ``C(f_0)``. The corresponding number of bins ``k = \lceil h^{-1}\rceil``. The full details on this method are given in Wand (1997).
 The density estimate is computed based on a scale estimate, which can be controlled through the `scale` keyword argument. Possible choices are `:stdev`, `:iqr` which uses an estimate based on the sample standard deviation or the sample interquartile range as a scale estimate. The default choice `:minim` uses the minimum of the above estimates.
