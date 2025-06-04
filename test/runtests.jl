@@ -13,14 +13,16 @@ import StatsBase: Histogram, fit
             @test typeof(H) <: Histogram
         end
     end
-    for right in [false, true]
-        for scalest in [:minim, :iqr, :stdev]
+    for scalest in [:minim, :iqr, :stdev]
+        for level in [0,1,2,3,4,5]
             for right in [false, true]
-                H = histogram_regular(x; rule="wand", right=right)
+                H = histogram_regular(x; rule="wand", right=right, scalest=scalest, level=level)
                 @test typeof(H) <: Histogram
             end
         end
     end
+    H = histogram_regular(x; rule="wand")
+    @test typeof(H) <: Histogram
 
     for rule in ["pena", "penb", "penr", "bayes", "klcv", "l2cv", "nml"]
         H = histogram_irregular(x; rule=rule)
