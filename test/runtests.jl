@@ -7,12 +7,21 @@ import StatsBase: Histogram, fit
     x = collect(LinRange(0,1,11))
 
     for rule in ["bayes", "aic", "bic", "br", "mdl", "nml", "l2cv", "klcv",
-                 "sturges", "fd", "scott", "wand"]
+                 "sturges", "fd", "scott"]
         for right in [false, true]
             H = histogram_regular(x; rule=rule, right=right)
             @test typeof(H) <: Histogram
         end
     end
+    for right in [false, true]
+        for scalest in [:minim, :iqr, :stdev]
+            for right in [false, true]
+                H = histogram_regular(x; rule="wand", right=right)
+                @test typeof(H) <: Histogram
+            end
+        end
+    end
+
     for rule in ["pena", "penb", "penr", "bayes", "klcv", "l2cv", "nml"]
         H = histogram_irregular(x; rule=rule)
         @test typeof(H) <: Histogram
