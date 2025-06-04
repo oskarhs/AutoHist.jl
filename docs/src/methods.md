@@ -1,8 +1,9 @@
 # Supported Methods
+This page provides background on each histogram method supported through the `rule` argument. Our presentation is intended to be rather brief, and we do as such not cover the theoretical underpinnings of each method in any detail. For some further background on automatic histogram procedures and the theory behind them, we recommend the excellent reviews contained in the articles of Birgé and Rozenholc (2006) and Davies et al. (2009).
 
-Before we describe the methods included here in more detail, we introduce some notation. For ease of exposition, we present all methods covered here in the context of estimating the density of a sample ``\boldsymbol{x} = (x_1, x_2, \ldots, x_n)`` on the unit interval, but note that extending the procedures presented here to other compact intervals is possible through a suitable affine transformation. For some further background on histograms, we reccomend the excellent review by Birgé and Rozenholc (2006).
+For ease of exposition, we present all methods covered here in the context of estimating the density of a sample ``\boldsymbol{x} = (x_1, x_2, \ldots, x_n)`` on the unit interval, but note that extending the procedures presented here to other compact intervals is possible through a suitable affine transformation. In particular, if a density estimate with support ``[a,b]`` is desired, we can scale the data to the unit interval through ``z_i = (x_i - a)/(b-a)``, and apply the methods on this transformed sample and rescale the resulting density estimate to `[a,b]`. In cases where the support of the density is unknown, we can use the choices ``a = x_{(1)}`` and ``b = x_{(2)}``. Cases where only the lower or upper bound is known can be handled similarly. The transformation used to construct the histogram can be controlled through the `support` keyword, where the default argument ``support=(-Inf, Inf)`` uses the order statistics-based approach described above.
 
-We let ``\mathcal{I} = (\mathcal{I}_1, \mathcal{I}_2, \ldots, \mathcal{I}_k)`` denote a partition of ``[0,1]`` into ``k`` intervals and write ``|\mathcal{I}_j|`` for the length of interval ``\mathcal{I}_j``. We can then write a histogram density estimate by
+Before we describe the methods included here in more detail, we introduce some notation. We let ``\mathcal{I} = (\mathcal{I}_1, \mathcal{I}_2, \ldots, \mathcal{I}_k)`` denote a partition of ``[0,1]`` into ``k`` intervals and write ``|\mathcal{I}_j|`` for the length of interval ``\mathcal{I}_j``. We can then write a histogram density estimate by
 
 ```math
 \widehat{f}(x) = \sum_{j=1}^k \frac{\widehat{\theta}_j}{|\mathcal{I}_j|}\mathbf{1}_{\mathcal{I}_j}(x), \quad x\in [0,1],
@@ -68,7 +69,7 @@ Consists of maximizing the log-marginal likelihood for given ``k``,
 ```math
    n\log (k) + \sum_{j=1}^k \big\{\log \Gamma(a_j + N_j) - \log \Gamma(a_j)\big\} + \log p_n(k).
 ```
-Here ``p_n(k)`` is the prior distribution on the number ``k`` of bins, which can be controlled by supplying a function to the ``logprior`` keyword argument. The default value is ``p_n(k) \propto 1``. Here, ``a_j = a/k``, for a scalar ``a > 0``, possibly depending on ``k``. The value of ``a`` can be set by supplying a fixed, positive scalar or a function ``a(k)`` to the keyword argument `a`.
+Here ``p_n(k)`` is the prior distribution on the number ``k`` of bins, which can be controlled by supplying a function to the `logprior` keyword argument. The default value is ``p_n(k) \propto 1``. Here, ``a_j = a/k``, for a scalar ``a > 0``, possibly depending on ``k``. The value of ``a`` can be set by supplying a fixed, positive scalar or a function ``a(k)`` to the keyword argument `a`.
 
 The particular choices ``a_j = 0.5`` and ``p_n(k)\propto 1`` were suggested by Knuth (2019).
 
@@ -185,3 +186,5 @@ doi: [10.1093/biomet/66.3.605](https://doi.org/10.1093/biomet/66.3.605).
 
 Wand, M. P. (1997). Data-based choice of histogram bin width. The American Statistician, **51**, 59–64.
 doi: [10.2307/2684697](https://doi.org/10.2307/2684697)
+
+Davies, P. L., Gather, U., Nordman, D., and Weinert, H. (2009). A comparison of automatic histogram constructions. _ESAIM: Probability and Statistics_, **13**, 181–196. doi: [10.1051/ps:2008005](https://doi.org/10.1051/ps:2008005).
