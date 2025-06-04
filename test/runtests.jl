@@ -103,6 +103,7 @@ end
 
     @test H1 == histogram_regular(x)
     @test H2 == histogram_irregular(x)
+    @test histogram_regular(x; rule="wand", scalest=:nonsense, level=-1) == histogram_regular(x; rule="wand")
 end
 
 @testset "a as function" begin
