@@ -29,7 +29,7 @@ julia> H2 = histogram_regular(x; logprior=k->-log(k), a=k->0.5*k)
 """
 function histogram_regular(x::AbstractVector{<:Real}; rule::String="bayes", right::Bool=true, maxbins::Int=1000, support::Tuple{Real,Real}=(-Inf,Inf), logprior::Function=k->0.0, a::Union{Real,Function}=1.0)
     rule = lowercase(rule)
-    if !(rule in ["aic", "bic", "br", "bayes", "mdl", "sc", "klcv", "nml", "l2cv", "sturges", "fd"])
+    if !(rule in ["aic", "bic", "br", "bayes", "mdl", "sc", "klcv", "nml", "l2cv", "sturges", "fd", "scott"])
         rule = "bayes"
     end
     n = length(x)

@@ -37,7 +37,7 @@ Both the regular and the irregular procedure support a large number of criteria 
     - Minimum Description Length, "mdl"
     - Sturges' rule, "sturges"
     - Freedman and Diaconis' rule, "fd"
-    - Scott's (normal) rule, "scott", "scott-normal"
+    - Scott's rule, "scott"
 - Irregular Histograms:
     - Irregular random histogram, "bayes" (default)
     - L2 cross-validation, "l2cv"

@@ -50,7 +50,7 @@ A list of the supported methods, along with their corresponding keywords can be 
     - Minimum Description Length, "mdl"
     - Sturges rule, "sturges"
     - Freedman and Diaconis' rule, "fd"
-    - Scott's (normal) rule, "scott", "scott-normal"
+    - Scott's rule, "scott"
 - Irregular Histograms:
     - Irregular random histogram, "bayes"
     - L2 cross-validation, "l2cv"
