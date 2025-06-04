@@ -1,7 +1,7 @@
 # Supported Methods
 This page provides background on each histogram method supported through the `rule` argument. Our presentation is intended to be rather brief, and we do as such not cover the theoretical underpinnings of each method in any detail. For some further background on automatic histogram procedures and the theory behind them, we recommend the excellent reviews contained in the articles of Birgé and Rozenholc (2006) and Davies et al. (2009).
 
-For ease of exposition, we present all methods covered here in the context of estimating the density of a sample ``\boldsymbol{x} = (x_1, x_2, \ldots, x_n)`` on the unit interval, but note that extending the procedures presented here to other compact intervals is possible through a suitable affine transformation. In particular, if a density estimate with support ``[a,b]`` is desired, we can scale the data to the unit interval through ``z_i = (x_i - a)/(b-a)``, and apply the methods on this transformed sample and rescale the resulting density estimate to `[a,b]`. In cases where the support of the density is unknown, we can use the choices ``a = x_{(1)}`` and ``b = x_{(2)}``. Cases where only the lower or upper bound is known can be handled similarly. The transformation used to construct the histogram can be controlled through the `support` keyword, where the default argument ``support=(-Inf, Inf)`` uses the order statistics-based approach described above.
+For ease of exposition, we present all methods covered here in the context of estimating the density of a sample ``\boldsymbol{x} = (x_1, x_2, \ldots, x_n)`` on the unit interval, but note that extending the procedures presented here to other compact intervals is possible through a suitable affine transformation. In particular, if a density estimate with support ``[a,b]`` is desired, we can scale the data to the unit interval through ``z_i = (x_i - a)/(b-a)``, and apply the methods on this transformed sample and rescale the resulting density estimate to `[a,b]`. In cases where the support of the density is unknown, a natural choice is ``a = x_{(1)}`` and ``b = x_{(2)}``. Cases where only the lower or upper bound is known can be handled similarly. The transformation used to construct the histogram can be controlled through the `support` keyword, where the default argument `support=(-Inf, Inf)` uses the order statistics-based approach described above.
 
 Before we describe the methods included here in more detail, we introduce some notation. We let ``\mathcal{I} = (\mathcal{I}_1, \mathcal{I}_2, \ldots, \mathcal{I}_k)`` denote a partition of ``[0,1]`` into ``k`` intervals and write ``|\mathcal{I}_j|`` for the length of interval ``\mathcal{I}_j``. We can then write a histogram density estimate by
 
@@ -10,7 +10,7 @@ Before we describe the methods included here in more detail, we introduce some n
 ```
 where ``\mathbf{1}_{\mathcal{I}_j}`` is the indicator function, ``\widehat{\theta}_j \geq 0`` for all ``j`` and ``\sum_{j=1}^k \widehat{\theta}_j = 1``.
 
-For most of the methods considered here, the estimated bin probabilities are the maximum likelihood estimates ``\widehat{\theta}_j = N_j/n``, where ``N_j = \sum_{i=1}^n \mathbb{1}_{\mathcal{I}_j}(x_i)`` is number of observations landing in interval ``\mathcal{I}_j`` . The exception to this rule is the Bayesian approach of Simensen et al. (2025), which uses the Bayes estimator ``\widehat{\theta}_j = (5|\mathcal{I}_j| + N_j)/(5+n)`` instead.
+For most of the methods considered here, the estimated bin probabilities are the maximum likelihood estimates ``\widehat{\theta}_j = N_j/n``, where ``N_j = \sum_{i=1}^n \mathbb{1}_{\mathcal{I}_j}(x_i)`` is number of observations landing in interval ``\mathcal{I}_j`` . The exception to this rule is the Bayesian approach of Simensen et al. (2025), which uses the Bayes estimator ``\widehat{\theta}_j = (a_j + N_j)/(a+n)`` for ``(a_1, \ldots, a_k) \in (0,\infty)`` and ``a = \sum_{j=1}^k a_j`` instead.
 
 The goal of an automatic histogram procedure is to find a partition ``\mathcal{I}`` based on the sample alone which produces a reasonable density estimate. Regular histogram procedures only consider regular partitions, where all intervals in the partition are of equal length, so that one only needs to determine the number ``k`` of bins. Irregular histograms allow for partitions with intervals of unequal length, and try to determine both the number of bins and the locations of the cutpoints between the intervals. In all the irregular procedures covered here, we attempt to find best partition according to a criterion among all partitions with endpoints belonging to a given discrete mesh.
 
@@ -35,7 +35,7 @@ This approach was suggested by Rozenholc et al. (2010).
 #### penr:
 Consists of maximizing a penalized log-likelihood,
 ```math
-    \sum_{j=1}^k N_j \log (N_j/|\mathcal{I}_j|) - \frac{1}{2n}\sum_{j=1}^k \frac{N_j}{|\mathcal{I}_j} - \log \binom{k_n-1}{k-1} - \log^{2.5}(k).
+    \sum_{j=1}^k N_j \log (N_j/|\mathcal{I}_j|) - \frac{1}{2n}\sum_{j=1}^k \frac{N_j}{|\mathcal{I}_j|} - \log \binom{k_n-1}{k-1} - \log^{2.5}(k).
 ```
 This criterion was also suggested by Rozenholc et al. (2010).
 #### l2cv:
@@ -184,7 +184,7 @@ doi: [10.1007/BF01025868](https://doi.org/10.1007/BF01025868).
 Scott, D. W. (1979). On optimal and data-based histograms. _Biometrika_, **66**, 605–610,
 doi: [10.1093/biomet/66.3.605](https://doi.org/10.1093/biomet/66.3.605).
 
-Wand, M. P. (1997). Data-based choice of histogram bin width. The American Statistician, **51**, 59–64.
+Wand, M. P. (1997). Data-based choice of histogram bin width. _The American Statistician_, **51**, 59–64.
 doi: [10.2307/2684697](https://doi.org/10.2307/2684697)
 
 Davies, P. L., Gather, U., Nordman, D., and Weinert, H. (2009). A comparison of automatic histogram constructions. _ESAIM: Probability and Statistics_, **13**, 181–196. doi: [10.1051/ps:2008005](https://doi.org/10.1051/ps:2008005).
