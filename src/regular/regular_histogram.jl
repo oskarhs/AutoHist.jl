@@ -29,7 +29,9 @@ julia> H2 = histogram_regular(x; logprior=k->-log(k), a=k->0.5*k)
 ```
 ...
 """
-function histogram_regular(x::AbstractVector{<:Real}; rule::Symbol=:bayes, closed::Symbol=:right, maxbins::Int=1000, support::Tuple{Real,Real}=(-Inf,Inf), logprior::Function=k->0.0, a::Union{Real,Function}=1.0, scalest::Symbol=:minim, level::Int=2)
+function histogram_regular( x::AbstractVector{<:Real}; rule::Symbol=:bayes, closed::Symbol=:right, maxbins::Int=1000,
+                            support::Tuple{Real,Real}=(-Inf,Inf), logprior::Function=k->0.0, a::Union{Real,Function}=1.0,
+                            scalest::Symbol=:minim, level::Int=2)
     if !(rule in [:aic, :bic, :br, :bayes, :mdl, :klcv, :nml, :l2cv, :sturges, :fd, :scott, :wand])
         rule = :bayes
     end

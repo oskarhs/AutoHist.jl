@@ -106,7 +106,7 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::Symbol=:bayes, gri
         mesh = finestgrid
     end
 
-    # Set objective for the dynamic programming according to the suppplied rule
+    # Set objective for the dynamic programming part according to the suppplied rule
     if rule in [:pena, :penb, :nml]
         phi = let N_cum = N_cum, mesh = mesh
             f(i,j) = phi_penB(i, j, N_cum, mesh)
