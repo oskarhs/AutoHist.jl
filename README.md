@@ -36,29 +36,7 @@ julia> plot(H2)
 The keyword argument `rule` determines the method used to construct the histogram for both of the histogram functions. The rule used to construct the histogram can be changed by setting `rule` equal to a string indicating the method to be used.
 
 The default method is the Bayesian approach of [Simensen et al. (2025)](#simensen2025random), corresponding to keyword `rule="bayes"`.
-
-A list of the supported methods, along with their corresponding keywords can be found below. A detailed description of the supported methods can be found in the [methods documentation](https://oskarhs.github.io/AutoHist.jl/dev/methods/).
-
-- Regular Histograms:
-    - Regular random histogram, "bayes"
-    - L2 cross-validation, "l2cv"
-    - Kullback-Leibler cross-validation: "klcv"
-    - AIC, "aic"
-    - BIC, "bic"
-    - Birgé and Rozenholc's criterion, "br"
-    - Normalized Maximum Likelihood, "nml"
-    - Minimum Description Length, "mdl"
-    - Sturges rule, "sturges"
-    - Freedman and Diaconis' rule, "fd"
-    - Scott's rule, "scott"
-    - Wand's rule, "wand"
-- Irregular Histograms:
-    - Irregular random histogram, "bayes"
-    - L2 cross-validation, "l2cv"
-    - Kullback-Leibler cross-validation: "klcv"
-    - Rozenholc et al. penalty R: "penR"
-    - Rozenholc et al. penalty B: "penB"
-    - Normalized Maximum Likelihood: "nml"
+A detailed description of the supported methods can be found in the [methods documentation](https://oskarhs.github.io/AutoHist.jl/dev/methods/).
 
 ## Implementation
 

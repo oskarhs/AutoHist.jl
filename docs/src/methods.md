@@ -1,7 +1,7 @@
 # Supported Methods
-This page provides background on each histogram method supported through the `rule` argument. Our presentation is intended to be rather brief, and we do as such not cover the theoretical underpinnings of each method in any detail. For some further background on automatic histogram procedures and the theory behind them, we recommend the excellent reviews contained in the articles of Birgé and Rozenholc (2006) and Davies et al. (2009).
+This page provides background on each histogram method supported through the `rule` argument. Our presentation is intended to be rather brief, and we do as such not cover the theoretical underpinnings of each method in great detail. For some further background on automatic histogram procedures and the theory behind them, we recommend the excellent reviews contained in the articles of Birgé and Rozenholc (2006) and Davies et al. (2009).
 
-For ease of exposition, we present all methods covered here in the context of estimating the density of a sample ``\boldsymbol{x} = (x_1, x_2, \ldots, x_n)`` on the unit interval, but note that extending the procedures presented here to other compact intervals is possible through a suitable affine transformation. In particular, if a density estimate with support ``[a,b]`` is desired, we can scale the data to the unit interval through ``z_i = (x_i - a)/(b-a)``, and apply the methods on this transformed sample and rescale the resulting density estimate to `[a,b]`. In cases where the support of the density is unknown, a natural choice is ``a = x_{(1)}`` and ``b = x_{(2)}``. Cases where only the lower or upper bound is known can be handled similarly. The transformation used to construct the histogram can be controlled through the `support` keyword, where the default argument `support=(-Inf, Inf)` uses the order statistics-based approach described above.
+For ease of exposition, we present all methods covered here in the context of estimating the density of a sample ``\boldsymbol{x} = (x_1, x_2, \ldots, x_n)`` on the unit interval, but note that extending the procedures presented here to other compact intervals is possible through a suitable affine transformation. In particular, if a density estimate with support ``[a,b]`` is desired, we can scale the data to the unit interval through ``z_i = (x_i - a)/(b-a)``, and apply the methods on this transformed sample and rescale the resulting density estimate to ``[a,b]``. In cases where the support of the density is unknown, a natural choice is ``a = x_{(1)}`` and ``b = x_{(2)}``. Cases where only the lower or upper bound is known can be handled similarly. The transformation used to construct the histogram can be controlled through the `support` keyword, where the default argument `support=(-Inf, Inf)` uses the order statistics-based approach described above.
 
 Before we describe the methods included here in more detail, we introduce some notation. We let ``\mathcal{I} = (\mathcal{I}_1, \mathcal{I}_2, \ldots, \mathcal{I}_k)`` denote a partition of ``[0,1]`` into ``k`` intervals and write ``|\mathcal{I}_j|`` for the length of interval ``\mathcal{I}_j``. We can then write a histogram density estimate by
 
@@ -10,12 +10,12 @@ Before we describe the methods included here in more detail, we introduce some n
 ```
 where ``\mathbf{1}_{\mathcal{I}_j}`` is the indicator function, ``\widehat{\theta}_j \geq 0`` for all ``j`` and ``\sum_{j=1}^k \widehat{\theta}_j = 1``.
 
-For most of the methods considered here, the estimated bin probabilities are the maximum likelihood estimates ``\widehat{\theta}_j = N_j/n``, where ``N_j = \sum_{i=1}^n \mathbb{1}_{\mathcal{I}_j}(x_i)`` is number of observations landing in interval ``\mathcal{I}_j`` . The exception to this rule is are the two Bayesian approaches, which uses the Bayes estimator ``\widehat{\theta}_j = (a_j + N_j)/(a+n)`` for ``(a_1, \ldots, a_k) \in (0,\infty)`` and ``a = \sum_{j=1}^k a_j`` instead.
+For most of the methods considered here, the estimated bin probabilities are the maximum likelihood estimates ``\widehat{\theta}_j = N_j/n``, where ``N_j = \sum_{i=1}^n \mathbb{1}_{\mathcal{I}_j}(x_i)`` is number of observations landing in interval ``\mathcal{I}_j`` . The exception to this rule is are the two Bayesian approaches, which uses the Bayes estimator ``\widehat{\theta}_j = (a_j + N_j)/(a+n)`` for ``(a_1, \ldots, a_k) \in (0,\infty)^k`` and ``a = \sum_{j=1}^k a_j`` instead.
 
 The goal of an automatic histogram procedure is to find a partition ``\mathcal{I}`` based on the sample alone which produces a reasonable density estimate. Regular histogram procedures only consider regular partitions, where all intervals in the partition are of equal length, so that one only needs to determine the number ``k`` of bins. Irregular histograms allow for partitions with intervals of unequal length, and try to determine both the number of bins and the locations of the cutpoints between the intervals. In all the irregular procedures covered here, we attempt to find best partition according to a criterion among all partitions with endpoints belonging to a given discrete mesh.
 
 ## Irregular histograms
-The following section describes how each value of the `rule` keyword supported by the `histogram_irregular` function selects the optimal histogram partition. In each case, the best partition is selected among the subset of partitions which have cut points belonging to a discrete set of ``k_n`` possible cut points.
+The following section describes how each value of the `rule` keyword supported by the `histogram_irregular` function selects the optimal histogram partition. In each case, the best partition is selected among the subset of interval partitions of the unit interval that have cut points belonging to a discrete set of cardinality ``k_n-1``.
 
 #### bayes:
 Consists of maximizing the log-marginal likelihood conditional on the partition ``\mathcal{I} = (\mathcal{I}_1, \ldots, \mathcal{I}_k)``,
@@ -62,7 +62,7 @@ Consists of maximization of a penalized likelihood,
 This a variant of this criterion first suggested by Kontkanen and Myllymäki (2007). The above criterion uses an asymptotic expansion of their proposed penalty term, as their proposed penalty can be quite expensive to evaluate.
 
 ## Regular histograms
-The following section details how each value of the `rule` keyword supported by the `histogram_regular` function selects the number ``k`` of bins to draw a histogram automatically based on a random sample. In the following, ``\mathcal{I} = (\mathcal{I}_1, \mathcal{I}_2, \ldots, \mathcal{I}_k)`` is the corresponding partition of ``[0,1]`` consisting of ``k`` equal-length bins.
+The following section details how each value of the `rule` keyword supported by the `histogram_regular` function selects the number ``k`` of bins to draw a histogram automatically based on a random sample. In the following, ``\mathcal{I} = (\mathcal{I}_1, \mathcal{I}_2, \ldots, \mathcal{I}_k)`` is the corresponding partition of ``[0,1]`` consisting of ``k`` equal-length bins. In cases where the value of the number of bins is computed by maximizing an expression, we look for the best regular partition among all regular partitions consisting of no more than ``k_n`` bins.
 
 #### bayes:
 Consists of maximizing the log-marginal likelihood for given ``k``,
@@ -101,14 +101,14 @@ Consists of maximizing a Kullback-Leibler leave-one-out cross-validation criteri
 ```math
     n\log(k) + \sum_{j=1}^k N_j\log (N_j-1),
 ```
-where the maximmization is over all partitions with ``N_j \geq 2`` for all ``j``.
+where the maximmization is over all regular partitions with ``N_j \geq 2`` for all ``j``.
 This approach was first studied by Hall (1990).
 #### mdl:
 Consists of finding the model providing the shortest encoding of the data, which is equivalent to maximization of
 ```math
     n\log(k) + \sum_{j=1}^k \big(N_j-\frac{1}{2}\big)\log\big(N_j-\frac{1}{2}\big) - \big(n-\frac{k}{2}\big)\log\big(n-\frac{k}{2}\big) - \frac{k}{2}\log(n),
 ```
-where the maximmization is over all partitions with ``N_j \geq 1`` for all ``j``.
+where the maximmization is over all regular partitions with ``N_j \geq 1`` for all ``j``.
 The minimum description length principle was first applied to histogram estimation by Hall and Hannan (1988).
 
 #### nml:

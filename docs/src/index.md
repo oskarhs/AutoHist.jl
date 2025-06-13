@@ -27,32 +27,32 @@ plot(p1, p2, layout=(1, 2), size=(600, 300))
 Both the regular and the irregular procedure support a large number of criteria to select the histogram partition. The keyword argument `rule` controls the criterion used to choose the best partition, and includes the following criteria:
 
 - Regular Histograms:
-    - Regular random histogram, "bayes" (default)
-    - L2 cross-validation, "l2cv"
-    - Kullback-Leibler cross-validation: "klcv"
-    - AIC, "aic"
-    - BIC, "bic"
-    - Birgé and Rozenholc's criterion, "br"
-    - Normalized Maximum Likelihood, "nml"
-    - Minimum Description Length, "mdl"
-    - Sturges' rule, "sturges"
-    - Freedman and Diaconis' rule, "fd"
-    - Scott's rule, "scott"
-    - Wand's rule, "wand"
+    - Regular random histogram, :bayes (default)
+    - L2 cross-validation, :l2cv
+    - Kullback-Leibler cross-validation: :klcv
+    - AIC, :aic
+    - BIC, :bic
+    - Birgé and Rozenholc's criterion, :br
+    - Normalized Maximum Likelihood, :nml
+    - Minimum Description Length, :mdl
+    - Sturges' rule, :sturges
+    - Freedman and Diaconis' rule, :fd
+    - Scott's rule, :scott
+    - Wand's rule, :wand
 - Irregular Histograms:
-    - Irregular random histogram, "bayes" (default)
-    - L2 cross-validation, "l2cv"
-    - Kullback-Leibler cross-validation: "klcv"
-    - Rozenholc et al. penalty R: "penR"
-    - Rozenholc et al. penalty B: "penB"
-    - Normalized Maximum Likelihood: "nml"
+    - Irregular random histogram, :bayes (default)
+    - L2 cross-validation, :l2cv
+    - Kullback-Leibler cross-validation: :klcv
+    - Rozenholc et al. penalty R: :penR
+    - Rozenholc et al. penalty B: :penB
+    - Normalized Maximum Likelihood: :nml
 
 A more detailed description along with references for each method can be found on the [methods page](methods.md).
 
 Example usage with different rules:
 ```julia
-histogram_irregular(x; rule="penr")
-histogram_regular(x; rule="aic")
+histogram_irregular(x; rule=:penr)
+histogram_regular(x; rule=:aic)
 ```
 
 ## Features 

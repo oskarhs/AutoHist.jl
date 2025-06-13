@@ -6,31 +6,31 @@ import StatsBase: Histogram, fit
 @testset "return type" begin
     x = collect(LinRange(0,1,11))
 
-    for rule in ["bayes", "aic", "bic", "br", "mdl", "nml", "l2cv", "klcv",
-                 "sturges", "fd", "scott"]
-        for right in [false, true]
-            H = histogram_regular(x; rule=rule, right=right)
+    for rule in [:bayes, :aic, :bic, :br, :mdl, :nml, :l2cv, :klcv,
+                 :sturges, :fd, :scott]
+        for closed in [:left, :right]
+            H = histogram_regular(x; rule=rule, closed=closed)
             @test typeof(H) <: Histogram
         end
     end
     for scalest in [:minim, :iqr, :stdev]
         for level in [0,1,2,3,4,5]
-            for right in [false, true]
-                H = histogram_regular(x; rule="wand", right=right, scalest=scalest, level=level)
+            for closed in [:left, :right]
+                H = histogram_regular(x; rule=:wand, closed=closed, scalest=scalest, level=level)
                 @test typeof(H) <: Histogram
             end
         end
     end
-    H = histogram_regular(x; rule="wand")
+    H = histogram_regular(x; rule=:wand)
     @test typeof(H) <: Histogram
 
-    for rule in ["pena", "penb", "penr", "bayes", "klcv", "l2cv", "nml"]
+    for rule in [:pena, :penb, :penr, :bayes, :klcv, :l2cv, :nml]
         H = histogram_irregular(x; rule=rule)
         @test typeof(H) <: Histogram
     end
-    for grid in ["regular", "data", "quantile"] # test grid, right-left open interval combinations
-        for right in [false, true]
-            H = histogram_irregular(x; grid=grid, right=right)
+    for grid in [:regular, :data, :quantile] # test grid, right-left open interval combinations
+        for closed in [:left, :right]
+            H = histogram_irregular(x; grid=grid, closed=closed)
             @test typeof(H) <: Histogram
         end
     end
@@ -40,10 +40,10 @@ end
 
 @testset "left open and right open intervals" begin
     x = collect(LinRange(0,1,11))
-    H1 = histogram_regular(x; right=true)
-    H2 = histogram_regular(x; right=false)
-    H3 = histogram_irregular(x; right=true)
-    H4 = histogram_irregular(x; right=false)
+    H1 = histogram_regular(x; closed=:right)
+    H2 = histogram_regular(x; closed=:left)
+    H3 = histogram_irregular(x; closed=:right)
+    H4 = histogram_irregular(x; closed=:left)
 
     @test H1.closed == :right
     @test H2.closed == :left
@@ -98,12 +98,15 @@ end
     # The arguments are of the right type, but are set to nonsensical values.
     # In this case, the function should use the default parameter values instead.
     x = randn(10^3)
-    H1 = histogram_regular(x; rule="nonsense", a=-1.0, maxbins=-100)
-    H2 = histogram_irregular(x; rule="nonsense", grid="nonsense", a=-1.0)
+    H1 = histogram_regular(x; rule=:nonsense, a=-1.0, maxbins=-100)
+    H2 = histogram_irregular(x; rule=:nonsense, grid=:nonsense, a=-1.0)
 
     @test H1 == histogram_regular(x)
     @test H2 == histogram_irregular(x)
-    @test histogram_regular(x; rule="wand", scalest=:nonsense, level=-1) == histogram_regular(x; rule="wand")
+    @test histogram_regular(x; rule=:wand, scalest=:nonsense, level=-1) == histogram_regular(x; rule=:wand)
+    @test histogram_irregular(x; closed=:nonsense) == histogram_irregular(x)
+    @test histogram_regular(x; closed=:nonsense) == histogram_regular(x)
+
 end
 
 @testset "a as function" begin
@@ -118,8 +121,8 @@ end
 @testset "min length" begin
     n = 10^3
     x = randn(n)
-    H1 = histogram_irregular(x; rule="klcv", use_min_length=true)
-    H2 = histogram_irregular(x; rule="l2cv", use_min_length=true)
+    H1 = histogram_irregular(x; rule=:klcv, use_min_length=true)
+    H2 = histogram_irregular(x; rule=:l2cv, use_min_length=true)
 
     min_length = (maximum(x) - minimum(x))*log(n)^(1.5)/n
 
