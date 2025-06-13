@@ -12,11 +12,11 @@ Returns a StatsBase.Histogram object with regular bins, with the optimal bin num
 - `rule`: The criterion used to determine the optimal number of bins. Defaults to the method Bayesian method of Simensen et al. (2025)
 - `closed`: Symbol indicating whether the drawn intervals should be right-inclusive or not. Possible values are `:right` (default) and `:left`.
 - `maxbins`: The maximal number of bins to be considered by the optimization criterion. Ignored if the specified argument is not a positive integer. Defaults to `maxbins=1000`
-- `support`: Tuple specifying the the support of the histogram estimate. If the first element is -Inf, then `minimum(x)` is taken as the leftmost cutpoint. Likewise, if the second element is `Inf`, then the rightmost cutpoint is `maximum(x)`. Default value is `(-Inf, Inf)`, which estimates the support of the data.
-- `logprior`: Unnormalized logprior distribution of the number k of bins. Only used in the case where the supplied rule is `"bayes"`. Defaults to a uniform prior.
+- `support`: Tuple specifying the the support of the histogram estimate. If the first element is `-Inf`, then `minimum(x)` is taken as the leftmost cutpoint. Likewise, if the second element is `Inf`, then the rightmost cutpoint is `maximum(x)`. Default value is `(-Inf, Inf)`, which estimates the support of the data.
+- `logprior`: Unnormalized logprior distribution of the number k of bins. Only used in the case where the supplied rule is `:bayes`. Defaults to a uniform prior.
 - `a`: Specifies Dirichlet concentration parameter in the Bayesian histogram model. Can either be a fixed positive number or a function computing aₖ for different values of k. Defaults to `1.0` if not supplied. Uses default if suppled value is negative.
-- `scalest`: Estimate of scale parameter used in computing Wands' rule. Only used if `rule` is set to `"wand"`. Possible values are `:minim` `:stdved` and `:iqr`. Default value is `scalest=:minim`.
-- `level`: Specifies the level used for the Kernel functional estimate in Wands' rule. Only used if `rule=="wand"`. Possible values are 0,1,2,3,4 and 5. Default value is `level=2`.
+- `scalest`: Estimate of scale parameter used in computing Wands' rule. Only used if `rule` is set to `:wand`. Possible values are `:minim` `:stdved` and `:iqr`. Default value is `scalest=:minim`.
+- `level`: Specifies the level used for the Kernel functional estimate in Wands' rule. Only used if `rule==:wand`. Possible values are 0,1,2,3,4 and 5. Default value is `level=2`.
 
 # Returns
 - `H`: StatsBase.Histogram object with weights corresponding to densities, e.g. `isdensity` is set to true.

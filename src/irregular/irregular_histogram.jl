@@ -9,14 +9,14 @@ Returns a StatsBase.Histogram object with the optimal partition corresponding to
 
 # Keyword arguments
 - `rule`: The criterion used to determine the optimal number of bins. Defaults to the Bayesian method of Simensen et al. (2025).
-- `grid`: Symbol indicating how the finest possible mesh should be constructed. Options are `:data"`, which uses each unique data point as a grid point, `:regular` (default) which constructs a fine regular grid, and `:quantile` which constructs the grid based on the sample quantiles.
+- `grid`: Symbol indicating how the finest possible mesh should be constructed. Options are `:data`, which uses each unique data point as a grid point, `:regular` (default) which constructs a fine regular grid, and `:quantile` which constructs the grid based on the sample quantiles.
 - `closed`: Symbol indicating whether the drawn intervals should be right-inclusive or not. Possible values are `:right` (default) and `:left`.
 - `greedy`: Boolean indicating whether or not the greedy binning strategy of Rozenholc et al. (2006) should be used prior to running the dynamical programming algorithm. Defaults to `true`. The algorithm can be quite slow for large datasets when this keyword is set to `false`.
 - `maxbins`: The maximal number of bins to be considered by the optimization criterion, only used if grid is set to "regular" or "quantile". Defaults to `maxbins=min(4*n/log(n)^2, 1000)`. If the specified argument is not a positive integer, the default value is used.
 - `support`: Tuple specifying the the support of the histogram estimate. If the first element is -Inf, then `minimum(x)` is taken as the leftmost cutpoint. Likewise, if the second elemen is `Inf`, then the rightmost cutpoint is `maximum(x)`. Default value is `(-Inf, Inf)`, which estimates the support of the data.
 - `use_min_length`: Boolean indicating whether or not to impose a restriction on the minimum bin length of the histogram. If set to true, the smallest allowed bin length is set to `(maximum(x)-minimum(x))/n*log(n)^(1.5)`.
-- `logprior`: Unnormalized logprior distribution for the number k of bins. Defaults to a uniform prior. Only used in when `rule` keyword is set to `"bayes"`.
-- `a`: Dirichlet concentration parameter in the Bayesian irregular histogram model. Set to the default value (5.0) if the supplied value is not a positive real number. Only used when `rule` is set to `"bayes"`.
+- `logprior`: Unnormalized logprior distribution for the number k of bins. Defaults to a uniform prior. Only used in when `rule` keyword is set to `:bayes`.
+- `a`: Dirichlet concentration parameter in the Bayesian irregular histogram model. Set to the default value (5.0) if the supplied value is not a positive real number. Only used when `rule` is set to `:bayes`.
 
 # Returns
 - `H`: StatsBase.Histogram object with weights corresponding to densities, e.g. `:isdensity` is set to true.
