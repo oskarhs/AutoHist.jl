@@ -1,3 +1,4 @@
+using Plots; gr()
 using AutoHist, Distributions
 using Test
 
@@ -134,4 +135,13 @@ end
     x = [-1.0, 1.0]
     @test_throws DomainError histogram_irregular(x; support=(-0.5, Inf))
     @test_throws DomainError histogram_irregular(x; support=(-Inf, 0.5))
+end
+
+@testset "AutomaticHistogram plot" begin
+    breaks = [0.0, 0.4, 0.6, 1.0]
+    counts = [2, 5, 10]
+    density = counts ./ ((breaks[2:end] - breaks[1:end-1])*sum(counts))
+
+    h = AutomaticHistogram(breaks, density, counts, :irregular, :right, 1.0)
+    @test typeof(plot(h)) == Plots.Plot{Plots.GRBackend}
 end

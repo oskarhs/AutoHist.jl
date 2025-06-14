@@ -9,6 +9,15 @@ FFTW = "7a1cc6ca-52ef-59f5-83cd-3a7055c09341"
 SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
+Requires = "ae029012-a4dd-5104-9daa-d747884805df"
+StatsAPI = "82ae8749-77ed-4fe6-ae5f-f523153014b0"
+RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
+
+[weakdeps]
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
+
+[extensions]
+PlotsExt = "Plots"
 
 [compat]
 Distributions = "v0.25.118"
@@ -16,10 +25,15 @@ FFTW = "v1.0.0"
 SpecialFunctions = "v2.5.0"
 Statistics = "v1.6.7"
 StatsBase = "v0.34.4"
+Plots = "v1.0.0"
+Requires = "v1.3.0"
+StatsAPI = "v1.0.0"
+RecipesBase = "v1.0.0"
 julia = "1.6.7"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 
 [targets]
 test = ["Test"]

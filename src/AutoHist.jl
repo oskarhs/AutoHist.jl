@@ -1,11 +1,13 @@
 module AutoHist
 
+export AutomaticHistogram
 export histogram_regular, histogram_irregular
 
 using StatsBase, Base.Threads
 import Statistics: quantile
 import SpecialFunctions: loggamma, logabsbinomial, gamma
 import FFTW: fft, ifft
+import StatsAPI: fit, loglikelihood
 
 include("utils.jl")
 
@@ -17,5 +19,13 @@ include(joinpath("irregular", "dynamic_algorithm.jl"))
 
 include(joinpath("regular", "regular_histogram.jl"))
 include(joinpath("irregular", "irregular_histogram.jl"))
+
+include("AutomaticHistogram.jl")
+
+@static if !isdefined(Base, :get_extension)
+    using Requires
+
+    @require Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80" include(joinpath("..", "ext", "PlotsExt.jl"))
+end
 
 end
