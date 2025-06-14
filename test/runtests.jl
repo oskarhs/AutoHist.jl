@@ -96,26 +96,25 @@ end
 
 @testset "erroneous to default" begin
     # The arguments are of the right type, but are set to nonsensical values.
-    # In this case, the function should use the default parameter values instead.
+    # In this case, the function should throw an appropriate error
     x = randn(10^3)
-    H1 = histogram_regular(x; rule=:nonsense, a=-1.0, maxbins=-100)
-    H2 = histogram_irregular(x; rule=:nonsense, grid=:nonsense, a=-1.0)
 
-    @test H1 == histogram_regular(x)
-    @test H2 == histogram_irregular(x)
-    @test histogram_regular(x; rule=:wand, scalest=:nonsense, level=-1) == histogram_regular(x; rule=:wand)
-    @test histogram_irregular(x; closed=:nonsense) == histogram_irregular(x)
-    @test histogram_regular(x; closed=:nonsense) == histogram_regular(x)
+    @test_throws ArgumentError histogram_regular(x; rule=:nonsense, maxbins=-100)
+    @test_throws DomainError histogram_regular(x; rule=:bayes, a=-1.0)
+    @test_throws DomainError histogram_regular(x; rule=:bayes, a=k->-2.0*k)
+    @test_throws DomainError histogram_irregular(x; a=-1.0)
+    @test_throws ArgumentError histogram_irregular(x; rule=:nonsense)
+    @test_throws ArgumentError histogram_irregular(x; grid=:nonsense)
+    @test_throws ArgumentError histogram_regular(x; rule=:wand, scalest=:nonsense)
+    @test_throws ArgumentError histogram_irregular(x; closed=:nonsense)
+    @test_throws ArgumentError histogram_regular(x; closed=:nonsense)
 
 end
 
 @testset "a as function" begin
     x = randn(10^3)
-    H1 = histogram_regular(x; a = k->8.0)
-    H2 = histogram_regular(x; a = k->-1.0) # should return a = 1.0 for all k where a(k) is negative
 
-    @test H1 == histogram_regular(x; a=8.0)
-    @test H2 == histogram_regular(x; a=1.0)
+    @test histogram_regular(x; a = k->8.0) == histogram_regular(x; a=8.0)
 end
 
 @testset "min length" begin
@@ -128,4 +127,10 @@ end
 
     @test minimum(H1.edges[1][2:end] - H1.edges[1][1:end-1]) ≥ min_length
     @test minimum(H2.edges[1][2:end] - H2.edges[1][1:end-1]) ≥ min_length
+end
+
+@testset "throws error misspecified support" begin
+    x = [-1.0, 1.0]
+    @test_throws DomainError histogram_irregular(x; support=(-0.5, Inf))
+    @test_throws DomainError histogram_irregular(x; support=(-Inf, 0.5))
 end

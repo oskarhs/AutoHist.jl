@@ -33,30 +33,34 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::Symbol=:bayes, gri
                             closed::Symbol=:right, greedy::Bool=true, maxbins::Int=-1, support::Tuple{Real,Real}=(-Inf,Inf),
                             use_min_length::Bool=false, logprior::Function=k->0.0, a::Real=5.0)
     if !(rule in [:pena, :penb, :penr, :bayes, :klcv, :l2cv, :nml])
-        rule = :bayes # Set penalty to default
+        throw(ArgumentError("The supplied rule, :$rule, is not supported. The rule kwarg must be one of :pena, :penb, :penr, :bayes, :klcv, :l2cv or :nml"))
     end
-    if rule == :bayes
-        if a ≤ 0.0
-            a = 5.0
-        end
+    if rule == :bayes && a ≤ 0.0
+        throw(DomainError("Supplied value of a must be positive."))
     end
     if !(closed in [:right, :left]) # if supplied symbol is nonsense, just use default
-        closed = :right
+        throw(ArgumentError("The supplied value of the closed keyword, :$closed, is invalid. Valid values are :left or :right."))
     end
 
     if !(grid in [:data, :regular, :quantile])
-        grid = :regular
+        throw(ArgumentError("The supplied grid, :$grid, is not supported. The grid kwarg must be one of :data, :regular or :quantile"))
     end
 
-    if support[1] == -Inf
-        xmin = minimum(x) 
-    else
-        xmin = support[1]
+    xmin, xmax = extrema(x)
+
+    if support[1] > -Inf   # estimate lower bound of support if unknown,
+        if xmin > support[1]
+            xmin = support[1]   # use known lower bound
+        else 
+            throw(DomainError("The supplied lower bound is greater than the smallest value of the sample."))
+        end
     end
-    if support[2] == Inf
-        xmax = maximum(x)
-    else 
-        xmax = support[2]
+    if support[2] < Inf
+        if xmax < support[2]
+            xmax = support[2]   # use known upper bound
+        else 
+            throw(DomainError("The supplied upper bound is smaller than the smallest value of the sample."))
+        end
     end
     y = @. (x - xmin) / (xmax - xmin)
     n = length(x)
