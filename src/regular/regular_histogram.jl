@@ -77,7 +77,7 @@ function histogram_regular( x::AbstractVector{<:Real}; rule::Symbol=:bayes, clos
             throw(ArgumentError("Supplied scalest value, :$scalest, is not supported. Use one of :minim, :stdev or :iqr."))
         end
         if !(level in [0, 1, 2, 3, 4, 5])           # check that supplied level is a valid option
-            level = 2                               # else, use default (2)
+            throw(ArgumentError("Supplied level, $level, is not supported. Use one of 0, 1, 2, 3, 4 or 5."))
         end
         k = min(wand_num_bins(x, level, scalest, 401, (xmin, xmax)), maxbins) # add functionality for specifying level later
         k
