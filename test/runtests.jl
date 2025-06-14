@@ -94,7 +94,7 @@ end
     @test sum(dens2 .* (edges2[2:end] - edges2[1:end-1])) ≈ 1.0
 end
 
-@testset "erroneous to default" begin
+@testset "erroneous kwargs throw error" begin
     # The arguments are of the right type, but are set to nonsensical values.
     # In this case, the function should throw an appropriate error
     x = randn(10^3)
@@ -106,9 +106,10 @@ end
     @test_throws ArgumentError histogram_irregular(x; rule=:nonsense)
     @test_throws ArgumentError histogram_irregular(x; grid=:nonsense)
     @test_throws ArgumentError histogram_regular(x; rule=:wand, scalest=:nonsense)
+    @test_throws ArgumentError histogram_regular(x; rule=:wand, level=100)
     @test_throws ArgumentError histogram_irregular(x; closed=:nonsense)
     @test_throws ArgumentError histogram_regular(x; closed=:nonsense)
-
+    
 end
 
 @testset "a as function" begin

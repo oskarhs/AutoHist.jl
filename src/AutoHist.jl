@@ -2,7 +2,7 @@ module AutoHist
 
 export histogram_regular, histogram_irregular
 
-using StatsBase, Base.Threads, LoopVectorization
+using StatsBase, Base.Threads
 import Statistics: quantile
 import SpecialFunctions: loggamma, logabsbinomial, gamma
 import FFTW: fft, ifft
