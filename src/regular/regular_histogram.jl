@@ -155,13 +155,15 @@ function histogram_regular( x::AbstractVector{<:Real}; rule::Symbol=:bayes, clos
     end
 
     # Create a StatsBase.Histogram object with the chosen number of bins
-    N = bin_regular(x, xmin, xmax, k_opt, closed == :right)
-    H_opt = Histogram(LinRange(xmin, xmax, k_opt+1), N, closed, true)
+    N = convert.(Int64, bin_regular(x, xmin, xmax, k_opt, closed == :right))
+    a_opt = 0.0
     if rule == :bayes
         a_opt = aₖ[k_opt]
-        H_opt.weights = k_opt/(xmax-xmin) * (N .+ a_opt/k_opt) / (a_opt + n) # Estimated density
-    else
-        H_opt.weights = k_opt/(xmax-xmin) * N / n # Estimated density
     end
-    return H_opt
+    dens = k_opt/(xmax-xmin) * (N .+ a_opt/k_opt) / (a_opt + n) # Estimated density
+    h = AutomaticHistogram(LinRange(xmin, xmax, k_opt+1), dens, N, :regular, closed, ifelse(a_opt > 0.0, a_opt, NaN))
+    return h
+
+    #H_opt = Histogram(LinRange(xmin, xmax, k_opt+1), dens, closed, true)
+    #return H_opt
 end

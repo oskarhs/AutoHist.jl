@@ -173,14 +173,27 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::Symbol=:bayes, gri
 
     bin_edges_norm = compute_bounds(ancestor, mesh, k_opt)
     bin_edges = @. xmin + (xmax - xmin) * bin_edges_norm
-    N = bin_irregular(x, bin_edges, closed == :right)
-    H = Histogram(bin_edges, N, closed, true)
+
+    N = convert.(Int64, bin_irregular(x, bin_edges, closed == :right))
+    a_opt = 0.0
+    if rule == :bayes
+        a_opt = a
+    end
+    p0 = bin_edges_norm[2:end] - bin_edges_norm[1:end-1]
+    dens = (N .+ a_opt*p0) ./ ((n + a_opt)*(bin_edges[2:end] - bin_edges[1:end-1]))
+    h = AutomaticHistogram(bin_edges, dens, N, :irregular, closed, ifelse(a_opt > 0.0, a_opt, NaN))
+    return h
+    
+    #H = Histogram(bin_edges, dens, closed, true)
+    
+#=     N = bin_irregular(x, bin_edges, closed == :right)
+    H = Histogram(bin_edges, dens, closed, true)
     p0 = bin_edges_norm[2:end] - bin_edges_norm[1:end-1]
     if rule == :bayes
         H.weights = (H.weights .+ a*p0) ./ ((n + a)*(bin_edges[2:end] - bin_edges[1:end-1]))
     else
         H.weights = H.weights ./ (n * (bin_edges[2:end] - bin_edges[1:end-1]) )
     end
-    H.isdensity = true
-    return H
+    H.isdensity = true =#
+    #return H
 end

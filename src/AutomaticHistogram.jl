@@ -25,6 +25,7 @@ end
 
 AutomaticHistogram(breaks::AbstractVector{Float64}, density::AbstractVector{Float64}, counts::AbstractVector{Int}, type::Symbol, closed::Symbol) = AutomaticHistogram(breaks, density, counts, type, NaN)
 
+Base.:(==)(h1::AutomaticHistogram, h2::AutomaticHistogram) = all(getfield(h1, f) == getfield(h2, f) for f in fieldnames(AutomaticHistogram))
 
 """
     fit(AutomaticHistogram, x::AbstractVector{x<:Real})

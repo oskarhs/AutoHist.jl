@@ -11,32 +11,32 @@ import StatsBase: Histogram, fit
                  :sturges, :fd, :scott]
         for closed in [:left, :right]
             H = histogram_regular(x; rule=rule, closed=closed)
-            @test typeof(H) <: Histogram
+            @test typeof(H) <: AutomaticHistogram
         end
     end
     for scalest in [:minim, :iqr, :stdev]
         for level in [0,1,2,3,4,5]
             for closed in [:left, :right]
                 H = histogram_regular(x; rule=:wand, closed=closed, scalest=scalest, level=level)
-                @test typeof(H) <: Histogram
+                @test typeof(H) <: AutomaticHistogram
             end
         end
     end
     H = histogram_regular(x; rule=:wand)
-    @test typeof(H) <: Histogram
+    @test typeof(H) <: AutomaticHistogram
 
     for rule in [:pena, :penb, :penr, :bayes, :klcv, :l2cv, :nml]
         H = histogram_irregular(x; rule=rule)
-        @test typeof(H) <: Histogram
+        @test typeof(H) <: AutomaticHistogram
     end
     for grid in [:regular, :data, :quantile] # test grid, right-left open interval combinations
         for closed in [:left, :right]
             H = histogram_irregular(x; grid=grid, closed=closed)
-            @test typeof(H) <: Histogram
+            @test typeof(H) <: AutomaticHistogram
         end
     end
     H = histogram_irregular(x; greedy=false) # check that greedy != false works
-    @test typeof(H) <: Histogram
+    @test typeof(H) <: AutomaticHistogram
 end
 
 @testset "left open and right open intervals" begin
@@ -56,43 +56,65 @@ end
     n = 100
     x = [-5.0, 4.5]
     H1 = histogram_regular(x)
-    edges1 = H1.edges[1]
+    #= edges1 = H1.edges[1]
     H2 = histogram_irregular(x)
     edges2 = H2.edges[1]
-
     @test isapprox(edges1[1], minimum(x); atol=1e-10)
     @test isapprox(edges1[end], maximum(x); atol=1e-10)
     @test isapprox(edges2[1], minimum(x); atol=1e-10)
-    @test isapprox(edges2[end], maximum(x); atol=1e-10)
+    @test isapprox(edges2[end], maximum(x); atol=1e-10) =#
+
+    breaks1 = H1.breaks
+    H2 = histogram_irregular(x)
+    breaks2 = H2.breaks
+    @test isapprox(breaks1[1], minimum(x); atol=1e-10)
+    @test isapprox(breaks1[end], maximum(x); atol=1e-10)
+    @test isapprox(breaks2[1], minimum(x); atol=1e-10)
+    @test isapprox(breaks2[end], maximum(x); atol=1e-10)
 end
 
 @testset "given support" begin
     n = 100
     x = rand(n)
-    H1 = histogram_regular(x; support=(0.0, 1.0))
+    #= H1 = histogram_regular(x; support=(0.0, 1.0))
     edges1 = H1.edges[1]
     H2 = histogram_irregular(x; support=(0.0, 1.0))
     edges2 = H2.edges[1]
-
     @test isapprox(edges1[1], 0.0; atol=1e-10)
     @test isapprox(edges1[end], 1.0; atol=1e-10)
     @test isapprox(edges2[1], 0.0; atol=1e-10)
-    @test isapprox(edges2[end], 1.0; atol=1e-10)
+    @test isapprox(edges2[end], 1.0; atol=1e-10) =#
+
+    h1 = histogram_regular(x; support=(0.0, 1.0))
+    breaks1 = h1.breaks
+    h2 = histogram_irregular(x; support=(0.0, 1.0))
+    breaks2 = h2.breaks
+    @test isapprox(breaks1[1], 0.0; atol=1e-10)
+    @test isapprox(breaks1[end], 1.0; atol=1e-10)
+    @test isapprox(breaks2[1], 0.0; atol=1e-10)
+    @test isapprox(breaks2[end], 1.0; atol=1e-10)
 end
 
 @testset "is density" begin
     n = 100
     x = randn(n)
-
-    H1 = histogram_regular(x)
+#=     H1 = histogram_regular(x)
     edges1 = H1.edges[1]
     dens1 = H1.weights
     H2 = histogram_irregular(x)
     edges2 = H2.edges[1]
     dens2 = H2.weights
-
     @test sum(dens1 .* (edges1[2:end] - edges1[1:end-1])) ≈ 1.0
-    @test sum(dens2 .* (edges2[2:end] - edges2[1:end-1])) ≈ 1.0
+    @test sum(dens2 .* (edges2[2:end] - edges2[1:end-1])) ≈ 1.0 =#
+
+    h1 = histogram_regular(x)
+    breaks1 = h1.breaks
+    dens1 = h1.density
+    h2 = histogram_irregular(x)
+    breaks2 = h2.breaks
+    dens2 = h2.density
+    @test sum(dens1 .* (breaks1[2:end] - breaks1[1:end-1])) ≈ 1.0
+    @test sum(dens2 .* (breaks2[2:end] - breaks2[1:end-1])) ≈ 1.0
 end
 
 @testset "erroneous kwargs throw error" begin
@@ -127,8 +149,10 @@ end
 
     min_length = (maximum(x) - minimum(x))*log(n)^(1.5)/n
 
-    @test minimum(H1.edges[1][2:end] - H1.edges[1][1:end-1]) ≥ min_length
-    @test minimum(H2.edges[1][2:end] - H2.edges[1][1:end-1]) ≥ min_length
+    #= @test minimum(H1.edges[1][2:end] - H1.edges[1][1:end-1]) ≥ min_length
+    @test minimum(H2.edges[1][2:end] - H2.edges[1][1:end-1]) ≥ min_length =#
+    @test minimum(H1.breaks[2:end] - H1.breaks[1:end-1]) ≥ min_length
+    @test minimum(H2.breaks[2:end] - H2.breaks[1:end-1]) ≥ min_length
 end
 
 @testset "throws error misspecified support" begin
@@ -144,4 +168,12 @@ end
 
     h = AutomaticHistogram(breaks, density, counts, :irregular, :right, 1.0)
     @test typeof(plot(h)) == Plots.Plot{Plots.GRBackend}
+end
+
+@testset "AutomaticHistogram equality" begin
+    breaks = [0.0, 0.4, 0.6, 1.0]
+    counts = [2, 5, 10]
+    density = counts ./ ((breaks[2:end] - breaks[1:end-1])*sum(counts))
+
+    @test AutomaticHistogram(breaks, density, counts, :irregular, :right, 1.0) == AutomaticHistogram(breaks, density, counts, :irregular, :right, 1.0)
 end

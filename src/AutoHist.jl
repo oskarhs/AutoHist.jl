@@ -22,10 +22,12 @@ include(joinpath("irregular", "irregular_histogram.jl"))
 
 include("AutomaticHistogram.jl")
 
-@static if !isdefined(Base, :get_extension)
-    using Requires
+function __init__()
+    @static if !isdefined(Base, :get_extension)
+        using Requires
 
-    @require Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80" include(joinpath("..", "ext", "PlotsExt.jl"))
+        @require Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80" include(joinpath("..", "ext", "PlotsExt.jl"))
+    end
 end
 
 end
