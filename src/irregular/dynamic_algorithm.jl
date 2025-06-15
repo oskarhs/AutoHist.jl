@@ -51,7 +51,11 @@ end
 function phi_penB(i::Int, j::Int, N_cum::AbstractArray{<:Real}, grid::AbstractArray{<:Real})
     @inbounds N_bin = N_cum[j] - N_cum[i]
     @inbounds len_bin = grid[j] - grid[i]
-    contrib = N_bin * log(N_bin / len_bin) # Contribution of the given bin to log-likelihood
+    if N_bin > 0.0
+        contrib = N_bin * log(N_bin / len_bin) # Contribution of the given bin to log-likelihood
+    else
+        contrib = 0.0 # Contribution of the given bin to log-likelihood
+    end
     return contrib
 end
 
@@ -67,7 +71,11 @@ end
 function phi_penR(i::Int, j::Int, N_cum::AbstractArray{<:Real}, grid::AbstractArray{<:Real}, n::Real)
     @inbounds N_bin = N_cum[j] - N_cum[i]
     @inbounds len_bin = grid[j] - grid[i]
-    contrib = N_bin * log(N_bin / len_bin) - 0.5 * N_bin / (n*len_bin)
+    if N_bin > 0.0
+        contrib = N_bin * log(N_bin / len_bin) - 0.5 * N_bin / (n*len_bin) # Contribution of the given bin to log-likelihood
+    else
+        contrib = 0.0 # Contribution of the given bin to log-likelihood
+    end
     return contrib
 end
 

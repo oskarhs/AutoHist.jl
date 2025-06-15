@@ -144,15 +144,15 @@ end
 @testset "min length" begin
     n = 10^3
     x = randn(n)
-    H1 = histogram_irregular(x; rule=:klcv, use_min_length=true)
-    H2 = histogram_irregular(x; rule=:l2cv, use_min_length=true)
+    h1 = histogram_irregular(x; rule=:klcv, use_min_length=true)
+    h2 = histogram_irregular(x; rule=:l2cv, use_min_length=true)
 
     min_length = (maximum(x) - minimum(x))*log(n)^(1.5)/n
 
     #= @test minimum(H1.edges[1][2:end] - H1.edges[1][1:end-1]) ≥ min_length
     @test minimum(H2.edges[1][2:end] - H2.edges[1][1:end-1]) ≥ min_length =#
-    @test minimum(H1.breaks[2:end] - H1.breaks[1:end-1]) ≥ min_length
-    @test minimum(H2.breaks[2:end] - H2.breaks[1:end-1]) ≥ min_length
+    @test minimum(h1.breaks[2:end] - h1.breaks[1:end-1]) ≥ min_length
+    @test minimum(h2.breaks[2:end] - h2.breaks[1:end-1]) ≥ min_length
 end
 
 @testset "throws error misspecified support" begin

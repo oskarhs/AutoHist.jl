@@ -27,6 +27,16 @@ AutomaticHistogram(breaks::AbstractVector{Float64}, density::AbstractVector{Floa
 
 Base.:(==)(h1::AutomaticHistogram, h2::AutomaticHistogram) = all(getfield(h1, f) == getfield(h2, f) for f in fieldnames(AutomaticHistogram))
 
+function Base.show(io::IO, h::AutomaticHistogram)
+    println(io, typeof(h))
+    println(io, "breaks: ", h.breaks)
+    println(io, "density: ", h.density)
+    println(io, "counts: ", h.counts)
+    println(io, "type: ", h.type)
+    println(io, "closed: ", h.closed)
+    println(io, "a: ", h.a)
+end
+
 """
     fit(AutomaticHistogram, x::AbstractVector{x<:Real})
 
