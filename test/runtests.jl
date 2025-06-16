@@ -159,6 +159,8 @@ end
     x = [-1.0, 1.0]
     @test_throws DomainError histogram_irregular(x; support=(-0.5, Inf))
     @test_throws DomainError histogram_irregular(x; support=(-Inf, 0.5))
+    @test_throws DomainError histogram_regular(x; support=(-0.5, Inf))
+    @test_throws DomainError histogram_regular(x; support=(-Inf, 0.5))
 end
 
 @testset "AutomaticHistogram plot and string" begin

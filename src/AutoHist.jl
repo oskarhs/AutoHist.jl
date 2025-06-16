@@ -11,6 +11,9 @@ import Statistics: quantile
 import SpecialFunctions: loggamma, logabsbinomial, gamma
 import FFTW: fft, ifft
 import StatsAPI: fit, loglikelihood
+if !isdefined(Base, :get_extension)
+    using Requires
+end
 
 include("utils.jl")
 
@@ -27,8 +30,6 @@ include("AutomaticHistogram.jl")
 
 function __init__()
     @static if !isdefined(Base, :get_extension)
-        using Requires
-
         @require Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80" include(joinpath("..", "ext", "PlotsExt.jl"))
     end
 end
