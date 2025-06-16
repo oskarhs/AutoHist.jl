@@ -12,14 +12,20 @@ h_irr = histogram_irregular(x)              # compute an automatic irregular his
 h_reg = histogram_regular(x)                # compute an automatic regular histogram
 ```
 
-Both `histogram_irregular` and `histogram_regular` return a [StatsBase.Histogram](https://juliastats.org/StatsBase.jl/stable/empirical/#StatsBase.Histogram), with weights normalized so that the resulting histograms are probability densities. This allows us to easily plot the two histograms resulting from the above code snippet:
+Both `histogram_irregular` and `histogram_regular` return a [AutoHist.AutomaticHistogram](api.md), with weights normalized so that the resulting histograms are probability densities. Alternatively, irregular and regular automatic histograms can be fitted to data using the `fit` method by controlling the `type` keyword argument.
+```@example index; continued=true
+h_irr = fit(AutomaticHistogram, x; type=:irregular)     # equivalent to h_irr = histogram_irregular(x)
+h_reg = fit(AutomaticHistogram, x; type=:regular)       # equivalent to h_reg = histogram_regular(x)
+```
+
+AutomaticHistogram objects are compatible with Plots.jl, which allows us to easily plot the two histograms resulting from the above code snippet:
 
 ```@example index
 using Plots; gr()
 # Plot the resulting histograms
-p1 = plot(h_irr, xlabel="x", ylabel="Density", label="Irregular", alpha=0.4, color="red")
-p2 = plot(h_reg, xlabel="x", label="Regular", alpha=0.4, color="blue")
-plot(p1, p2, layout=(1, 2), size=(600, 300))
+p_irr = plot(h_irr, xlabel="x", ylabel="Density", label="Irregular", alpha=0.4, color="red")
+p_reg = plot(h_reg, xlabel="x", label="Regular", alpha=0.4, color="blue")
+plot(p_irr, p_reg, layout=(1, 2), size=(600, 300))
 ```
 
 
