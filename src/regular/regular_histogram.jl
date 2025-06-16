@@ -41,7 +41,7 @@ function histogram_regular( x::AbstractVector{<:Real}; rule::Symbol=:bayes, clos
     n = length(x)
 
     if maxbins < 1          # maximal number of bins must be positive
-        maxbins = 10^3      # Default maximal number of bins
+        throw(BoundsError("Maximal number of bins must be positive."))
     end
 
     xmin, xmax = extrema(x)
