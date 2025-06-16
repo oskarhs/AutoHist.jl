@@ -1,7 +1,7 @@
 """
     AutomaticHistogram
 
-A type for representing a histogram where the histogram partition has been chosen automatically based on the sample.
+A type for representing a histogram where the histogram partition has been chosen automatically based on the sample. Can be fitted to data using the `fit`, `histogram_irregular` or `histogram_regular` methods.
 
 ...
 # Fields
@@ -13,6 +13,12 @@ A type for representing a histogram where the histogram partition has been chose
 - `a`: Value of the Dirichlet concentration parameter corresponding to the chosen partition. Only of relevance if a Bayesian method was used to fit the histogram, and is otherwise set to `NaN`.
 
 # Examples
+```
+julia> x = [0.037, 0.208, 0.189, 0.656, 0.45, 0.846, 0.986, 0.751, 0.249, 0.447]
+julia> h1 = fit(AutomaticHistogram, x)      # fits an irregular histogram
+julia> h2 = fit(AutomaticHistogram, x; rule=:wand, scalest=:stdev, level=4)
+julia> h3 = histogram_irregular(x; grid=:quantile, support=(0.0, 1.0), logprior=k->-log(k), a=sqrt(10))
+```
 """
 struct AutomaticHistogram 
     breaks::AbstractVector{Float64}

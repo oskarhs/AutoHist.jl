@@ -2,7 +2,7 @@
     histogram_regular(x::AbstractVector{<:Real}; rule::Symbol=:bayes, closed::Symbol=:right, maxbins::Int=1000, support::Tuple{Real,Real}=(-Inf,Inf), logprior::Function=k->0.0, a::Union{Real,Function}=1.0, level::Int=2, scalest::Symbol=:minim)
 
 Create a regular histogram based on an asymptotic risk estimate, or optimization criteria from Bayesian probability, penalized likelihood or LOOCV.
-Returns a StatsBase.Histogram object with regular bins, with the optimal bin number corresponding to the supplied criterion.
+Returns a AutomaticHistogram object with regular bins, with the optimal bin number corresponding to the supplied criterion.
 
 ...
 # Arguments
@@ -19,13 +19,13 @@ Returns a StatsBase.Histogram object with regular bins, with the optimal bin num
 - `level`: Specifies the level used for the Kernel functional estimate in Wands' rule. Only used if `rule==:wand`. Possible values are 0,1,2,3,4 and 5. Default value is `level=2`.
 
 # Returns
-- `H`: StatsBase.Histogram object with weights corresponding to densities, e.g. `isdensity` is set to true.
+- `h`: AutomaticHistogram object with weights corresponding to densities, e.g. `isdensity` is set to true.
 
 # Examples
 ```
 julia> x = [0.037, 0.208, 0.189, 0.656, 0.45, 0.846, 0.986, 0.751, 0.249, 0.447]
-julia> H1 = histogram_regular(x)
-julia> H2 = histogram_regular(x; logprior=k->-log(k), a=k->0.5*k)
+julia> h1 = histogram_regular(x)
+julia> h2 = histogram_regular(x; logprior=k->-log(k), a=k->0.5*k)
 ```
 ...
 """

@@ -2,7 +2,7 @@
     histogram_irregular(x::AbstractVector{<:Real}; rule::Symbol=:bayes, grid::Symbol=:regular, closed::Symbol=:right, greedy::Bool=true, maxbins::Int=-1, support::Tuple{Real,Real}=(-Inf,Inf), use_min_length::Bool=false, logprior::Function=k->0.0, a::Real=1.0)
 
 Create an irregular histogram based on optimization of a criterion based on Bayesian probability, penalized likelihood or LOOCV.
-Returns a StatsBase.Histogram object with the optimal partition corresponding to the supplied rule.
+Returns an AutomaticHistogram object with the optimal partition corresponding to the supplied rule.
 
 # Arguments
 - `x`: 1D vector of data for which a histogram is to be constructed.
@@ -19,13 +19,13 @@ Returns a StatsBase.Histogram object with the optimal partition corresponding to
 - `a`: Dirichlet concentration parameter in the Bayesian irregular histogram model. Set to the default value (5.0) if the supplied value is not a positive real number. Only used when `rule` is set to `:bayes`.
 
 # Returns
-- `H`: StatsBase.Histogram object with weights corresponding to densities, e.g. `:isdensity` is set to true.
+- `h`: AutomaticHistogram object with weights corresponding to densities, e.g. `:isdensity` is set to true.
 
 # Examples
 ```
 julia> x = [0.037, 0.208, 0.189, 0.656, 0.45, 0.846, 0.986, 0.751, 0.249, 0.447]
-julia> H1 = histogram_irregular(x)
-julia> H2 = histogram_irregular(x; grid=:quantile, support=(0.0, 1.0), logprior=k->-log(k), a=sqrt(10))
+julia> h1 = histogram_irregular(x)
+julia> h2 = histogram_irregular(x; grid=:quantile, support=(0.0, 1.0), logprior=k->-log(k), a=sqrt(10))
 ```
 ...
 """
