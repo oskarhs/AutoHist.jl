@@ -1,9 +1,10 @@
 module AutoHist
 
 export AutomaticHistogram
-export fit, convert, loglikelihood, logmarginallikelihood
+export fit, convert, loglikelihood, logmarginallikelihood, minimum, maximum, extrema
 export histogram_regular, histogram_irregular
 
+import StatsBase: modes
 using StatsBase, Base.Threads
 import Statistics: quantile
 import SpecialFunctions: loggamma, logabsbinomial, gamma

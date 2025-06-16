@@ -161,21 +161,19 @@ end
     @test_throws DomainError histogram_irregular(x; support=(-Inf, 0.5))
 end
 
-@testset "AutomaticHistogram plot" begin
+@testset "AutomaticHistogram plot, string and equality" begin
     breaks = [0.0, 0.4, 0.6, 1.0]
     counts = [2, 5, 10]
     density = counts ./ ((breaks[2:end] - breaks[1:end-1])*sum(counts))
 
     h = AutomaticHistogram(breaks, density, counts, :irregular, :right, 1.0)
-    @test typeof(plot(h)) == Plots.Plot{Plots.GRBackend}
-end
+    @test typeof(plot(h)) == Plots.Plot{Plots.GRBackend}                            # check that Plots extension works
+    @test h == AutomaticHistogram(breaks, density, counts, :irregular, :right, 1.0) # check that equality works
 
-@testset "AutomaticHistogram equality" begin
-    breaks = [0.0, 0.4, 0.6, 1.0]
-    counts = [2, 5, 10]
-    density = counts ./ ((breaks[2:end] - breaks[1:end-1])*sum(counts))
-
-    @test AutomaticHistogram(breaks, density, counts, :irregular, :right, 1.0) == AutomaticHistogram(breaks, density, counts, :irregular, :right, 1.0)
+    io = IOBuffer() # just checks that we can call the show method
+    show(io, h)
+    output = String(take!(io))
+    @test typeof(output) == String
 end
 
 @testset "AutomaticHistogram fit" begin
@@ -187,8 +185,8 @@ end
     kwargs1 = Dict(:rule => :penb, :grid => :quantile)
     kwargs2 = Dict(:rule => :wand, :scalest => :iqr, :level => 4)
 
-    @test fit(AutomaticHistogram, x; kwargs1) == histogram_regular(x; kwargs1)
-    @test fit(AutomaticHistogram, x; kwargs2) == histogram_regular(x; kwargs2)
+    @test fit(AutomaticHistogram, x; kwargs1...) == histogram_irregular(x; kwargs1...)
+    @test fit(AutomaticHistogram, x; kwargs2...) == histogram_regular(x; kwargs2...)
 
     @test_throws ArgumentError fit(AutomaticHistogram, x; rule=:nonsense)               # test error handling
     @test_throws ArgumentError fit(AutomaticHistogram, x; rule=:l2cv, type=:nonsense)
@@ -207,7 +205,7 @@ end
 @testset "AutomaticHistogram extrema" begin
     x = rand(10^3)
     support = (0.0, 1.0)
-    h = fit(AutomaticHistogram, x; rule=:nonsense) 
+    h = fit(AutomaticHistogram, x; rule=:aic, support=support) 
 
     @test isapprox(minimum(h), support[1]; atol=1e-10)
     @test isapprox(maximum(h), support[2]; atol=1e-10)

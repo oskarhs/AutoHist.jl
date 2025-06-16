@@ -29,9 +29,9 @@ struct AutomaticHistogram
     a::Float64
 end
 
-AutomaticHistogram(breaks::AbstractVector{Float64}, density::AbstractVector{Float64}, counts::AbstractVector{Int}, type::Symbol, closed::Symbol) = AutomaticHistogram(breaks, density, counts, type, NaN)
+AutomaticHistogram(breaks::AbstractVector{Float64}, density::AbstractVector{Float64}, counts::AbstractVector{Int}, type::Symbol, closed::Symbol) = AutomaticHistogram(breaks, density, counts, type, closed, NaN)
 
-Base.:(==)(h1::AutomaticHistogram, h2::AutomaticHistogram) = all(getfield(h1, f) == getfield(h2, f) for f in fieldnames(AutomaticHistogram))
+Base.:(==)(h1::AutomaticHistogram, h2::AutomaticHistogram) = all(isequal(getfield(h1, f), getfield(h2, f)) for f in fieldnames(AutomaticHistogram))
 
 function Base.show(io::IO, h::AutomaticHistogram)
     println(io, typeof(h))
@@ -128,6 +128,7 @@ The value of the log-marginal likelihood is
 where where Nⱼ is the bin count for bin j.
 """
 function logmarginallikelihood(h::AutomaticHistogram, a::Real)
+    k = length(h.counts)
     logmarglik = loggamma(a) - loggamma(a+sum(h.counts))
     @inbounds for j in eachindex(h.counts)
         if h.counts[j] > 0
@@ -142,7 +143,7 @@ function logmarginallikelihood(h::AutomaticHistogram)
     if isnan(h.a)
         throw(ArgumentError("If h was not fit with rule=:bayes, the value of a must be explicitly specified to compute the log-marginal likelihood."))
     end
-    return loglikelihood(h, h.a)
+    return logmarginallikelihood(h, h.a)
 end
 
 """
@@ -166,7 +167,7 @@ Return the minimum and the maximum of the support of `h` as a 2-tuple.
 """
 Base.extrema(h::AutomaticHistogram) = (h.breaks[1], h.breaks[end])
 
-"""
+#= """
     modes(h::AutomaticHistogram)
 
 Return the location of the modes of `h` as a Vector, sorted in increasing order.
@@ -174,6 +175,7 @@ Return the location of the modes of `h` as a Vector, sorted in increasing order.
 ...
 Formally, the modes of the histogram `h` are defined as the midpoints of an interval I, where the density of `h` is constant on I, and the density of `h` is strictly smaller than this value in the histogram bins adjacent to I. Note that according this definition, I is in general a nonempty union of intervals in the histogram partition.
 """
-function modes(h::AutomaticHistogram)
+function StatsBase.modes(h::AutomaticHistogram)
     # implementation here (see peak_id_loss from loss_functions.jl)
-end
+    return nothing
+end =#

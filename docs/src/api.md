@@ -21,7 +21,7 @@ Additional methods
 ```@docs
 loglikelihood(::AutomaticHistogram)
 logmarginallikelihood
-convert(::Histogram, h::AutomaticHistogram)
+convert(::Type{Histogram}, h::AutomaticHistogram)
 minimum(::AutomaticHistogram)
 maximum(::AutomaticHistogram)
 extrema(::AutomaticHistogram)

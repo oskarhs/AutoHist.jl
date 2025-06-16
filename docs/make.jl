@@ -1,4 +1,4 @@
-using Documenter, AutoHist
+using Documenter, AutoHist, StatsBase
 
 makedocs(
     sitename="AutoHist.jl",
