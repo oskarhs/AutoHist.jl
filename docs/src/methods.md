@@ -1,28 +1,30 @@
 # Supported Methods
 This page provides background on each histogram method supported through the `rule` argument. Our presentation is intended to be rather brief, and we do as such not cover the theoretical underpinnings of each method in great detail. For some further background on automatic histogram procedures and the theory behind them, we recommend the excellent reviews contained in the articles of Birgé and Rozenholc (2006) and Davies et al. (2009).
 
-For ease of exposition, we present all methods covered here in the context of estimating the density of a sample ``\boldsymbol{x} = (x_1, x_2, \ldots, x_n)`` on the unit interval, but note that extending the procedures presented here to other compact intervals is possible through a suitable affine transformation. In particular, if a density estimate with support ``[a,b]`` is desired, we can scale the data to the unit interval through ``z_i = (x_i - a)/(b-a)``, and apply the methods on this transformed sample and rescale the resulting density estimate to ``[a,b]``. In cases where the support of the density is unknown, a natural choice is ``a = x_{(1)}`` and ``b = x_{(2)}``. Cases where only the lower or upper bound is known can be handled similarly. The transformation used to construct the histogram can be controlled through the `support` keyword, where the default argument `support=(-Inf, Inf)` uses the order statistics-based approach described above.
+For ease of exposition, we present all methods covered here in the context of estimating the density of a sample ``\boldsymbol{x} = (x_1, x_2, \ldots, x_n)`` on the unit interval, but note that extending the procedures presented here to other compact intervals is possible through a suitable affine transformation. In particular, if a density estimate with support ``[a,b]`` is desired, we can scale the data to the unit interval through ``z_i = (x_i - a)/(b-a)``, and apply the methods on this transformed sample and rescale the resulting density estimate to ``[a,b]``. In cases where the support of the density is unknown, a natural choice is ``a = x_{(1)}`` and ``b = x_{(n)}``. Cases where only the lower or upper bound is known can be handled similarly. The transformation used to construct the histogram can be controlled through the `support` keyword, where the default argument `support=(-Inf, Inf)` uses the order statistics-based approach described above.
 
-Before we describe the methods included here in more detail, we introduce some notation. We let ``\mathcal{I} = (\mathcal{I}_1, \mathcal{I}_2, \ldots, \mathcal{I}_k)`` denote a partition of ``[0,1]`` into ``k`` intervals and write ``|\mathcal{I}_j|`` for the length of interval ``\mathcal{I}_j``. We can then write a histogram density estimate by
+Before we describe the methods included here in more detail, we introduce some notation. We let ``\mathcal{I} = (\mathcal{I}_1, \mathcal{I}_2, \ldots, \mathcal{I}_k)`` denote a partition of ``[0,1]`` into ``k`` intervals and write ``|\mathcal{I}_j|`` for the length of interval ``\mathcal{I}_j``. The intervals in the partition ``\mathcal{I}`` can be either right- or left-closed. Whether a left- or right-closed partition is used to draw the histogram is controlled by the keyword argument `closed`, with options `:left` and `:right` (default). This choice is somewhat arbitrary, but is unlikely to matter much in practical applications.
+
+Based on a partition ``\mathcal{I}``, we can write down the corresponding histogram density estimate by
 
 ```math
 \widehat{f}(x) = \sum_{j=1}^k \frac{\widehat{\theta}_j}{|\mathcal{I}_j|}\mathbf{1}_{\mathcal{I}_j}(x), \quad x\in [0,1],
 ```
-where ``\mathbf{1}_{\mathcal{I}_j}`` is the indicator function, ``\widehat{\theta}_j \geq 0`` for all ``j`` and ``\sum_{j=1}^k \widehat{\theta}_j = 1``.
+where ``\mathbf{1}_{\mathcal{I}_j}`` is the indicator function, ``\widehat{\theta}_j \geq 0`` for all ``j`` and ``\sum_{j=1}^k \widehat{\theta}_j = 1``. 
 
 For most of the methods considered here, the estimated bin probabilities are the maximum likelihood estimates ``\widehat{\theta}_j = N_j/n``, where ``N_j = \sum_{i=1}^n \mathbb{1}_{\mathcal{I}_j}(x_i)`` is number of observations landing in interval ``\mathcal{I}_j`` . The exception to this rule is are the two Bayesian approaches, which uses the Bayes estimator ``\widehat{\theta}_j = (a_j + N_j)/(a+n)`` for ``(a_1, \ldots, a_k) \in (0,\infty)^k`` and ``a = \sum_{j=1}^k a_j`` instead.
 
 The goal of an automatic histogram procedure is to find a partition ``\mathcal{I}`` based on the sample alone which produces a reasonable density estimate. Regular histogram procedures only consider regular partitions, where all intervals in the partition are of equal length, so that one only needs to determine the number ``k`` of bins. Irregular histograms allow for partitions with intervals of unequal length, and try to determine both the number of bins and the locations of the cutpoints between the intervals. In all the irregular procedures covered here, we attempt to find best partition according to a criterion among all partitions with endpoints belonging to a given discrete mesh.
 
 ## Irregular histograms
-The following section describes how each value of the `rule` keyword supported by the `histogram_irregular` function selects the optimal histogram partition. In each case, the best partition is selected among the subset of interval partitions of the unit interval that have cut points belonging to a discrete set of cardinality ``k_n-1``.
+The following section describes how each value of the `rule` keyword supported by the `histogram_irregular` function selects the optimal histogram partition. In each case, the best partition is selected among the subset of interval partitions of the unit interval that have cut points belonging to a discrete set of cardinality ``k_n-1``. The construction of the candidate cut point set can be controlled through the `grid` keyword argument, with options `:regular` (default), `data` and `quantile`.
 
 #### bayes:
 Consists of maximizing the log-marginal likelihood conditional on the partition ``\mathcal{I} = (\mathcal{I}_1, \ldots, \mathcal{I}_k)``,
 ```math
     \sum_{j=1}^k \big\{\log \Gamma(a_j + N_j) - \log \Gamma(a_j) - N_j\log|\mathcal{I}_j|\big\} + \log p_n(k) - \log \binom{k_n-1}{k-1}
 ```
-Here ``p_n(k)`` is the prior distribution on the number ``k`` of bins, which can be controlled by supplying a function to the `logprior` keyword argument. The default value is ``p_n(k) \propto 1``. Here, ``a_j = a/k``, for a scalar ``a > 0`` which can be controlled by the user through the keyword argument `a`.
+Here ``p_n(k)`` is the prior distribution on the number ``k`` of bins, which can be controlled by supplying a function to the `logprior` keyword argument. The default value is ``p_n(k) \propto 1``. Here, ``a_j = a/k``, for a scalar ``a > 0`` which can be controlled by the user through the keyword argument `a` (default `a=5.0`).
 
 This approach to irregular histograms was pioneered by Simensen et al. (2025).
 
@@ -147,7 +149,7 @@ A more sophisticated version of Scott's rule, Wand's rule proceeds by determinin
 ```math
     h = \Big(\frac{6}{\hat{C}(f_0) n}\Big)^{1/3},
 ```
-where ``\hat{C}(f_0)`` is an estimate of a functional ``C(f_0)``. The corresponding number of bins ``k = \lceil h^{-1}\rceil``. The full details on this method are given in Wand (1997).
+where ``\hat{C}(f_0)`` is an estimate of the functional ``C(f_0) = \int \big\{f_0'(x)\big\}^2\mspace{2mu}\mathrm{d}x``. The corresponding number of bins ``k = \lceil h^{-1}\rceil``. The full details on this method are given in Wand (1997).
 The density estimate is computed based on a scale estimate, which can be controlled through the `scale` keyword argument. Possible choices are `:stdev`, `:iqr` which uses an estimate based on the sample standard deviation or the sample interquartile range as a scale estimate. The default choice `:minim` uses the minimum of the above estimates.
 The `level` keyword controls the number of stages of functional estimation used to compute ``\hat{C}``, and can take values `0, 1, 2, 3, 4, 5`, with the default value being `level=2`. The choice `level=0` corresponds to Scott's rule under the chosen scale estimate.
 

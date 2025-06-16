@@ -2,7 +2,7 @@
     histogram_regular(x::AbstractVector{<:Real}; rule::Symbol=:bayes, closed::Symbol=:right, maxbins::Int=1000, support::Tuple{Real,Real}=(-Inf,Inf), logprior::Function=k->0.0, a::Union{Real,Function}=1.0, level::Int=2, scalest::Symbol=:minim)
 
 Create a regular histogram based on an asymptotic risk estimate, or optimization criteria from Bayesian probability, penalized likelihood or LOOCV.
-Returns a StatsBase.Histogram object with regular bins, with the optimal bin number corresponding to the supplied criterion.
+Returns a AutomaticHistogram object with regular bins, with the optimal bin number corresponding to the supplied criterion.
 
 ...
 # Arguments
@@ -12,29 +12,31 @@ Returns a StatsBase.Histogram object with regular bins, with the optimal bin num
 - `rule`: The criterion used to determine the optimal number of bins. Defaults to the method Bayesian method of Simensen et al. (2025)
 - `closed`: Symbol indicating whether the drawn intervals should be right-inclusive or not. Possible values are `:right` (default) and `:left`.
 - `maxbins`: The maximal number of bins to be considered by the optimization criterion. Ignored if the specified argument is not a positive integer. Defaults to `maxbins=1000`
-- `support`: Tuple specifying the the support of the histogram estimate. If the first element is -Inf, then `minimum(x)` is taken as the leftmost cutpoint. Likewise, if the second element is `Inf`, then the rightmost cutpoint is `maximum(x)`. Default value is `(-Inf, Inf)`, which estimates the support of the data.
-- `logprior`: Unnormalized logprior distribution of the number k of bins. Only used in the case where the supplied rule is `"bayes"`. Defaults to a uniform prior.
+- `support`: Tuple specifying the the support of the histogram estimate. If the first element is `-Inf`, then `minimum(x)` is taken as the leftmost cutpoint. Likewise, if the second element is `Inf`, then the rightmost cutpoint is `maximum(x)`. Default value is `(-Inf, Inf)`, which estimates the support of the data.
+- `logprior`: Unnormalized logprior distribution of the number k of bins. Only used in the case where the supplied rule is `:bayes`. Defaults to a uniform prior.
 - `a`: Specifies Dirichlet concentration parameter in the Bayesian histogram model. Can either be a fixed positive number or a function computing aₖ for different values of k. Defaults to `1.0` if not supplied. Uses default if suppled value is negative.
-- `scalest`: Estimate of scale parameter used in computing Wands' rule. Only used if `rule` is set to `"wand"`. Possible values are `:minim` `:stdved` and `:iqr`. Default value is `scalest=:minim`.
-- `level`: Specifies the level used for the Kernel functional estimate in Wands' rule. Only used if `rule=="wand"`. Possible values are 0,1,2,3,4 and 5. Default value is `level=2`.
+- `scalest`: Estimate of scale parameter used in computing Wands' rule. Only used if `rule` is set to `:wand`. Possible values are `:minim` `:stdved` and `:iqr`. Default value is `scalest=:minim`.
+- `level`: Specifies the level used for the Kernel functional estimate in Wands' rule. Only used if `rule==:wand`. Possible values are 0,1,2,3,4 and 5. Default value is `level=2`.
 
 # Returns
-- `H`: StatsBase.Histogram object with weights corresponding to densities, e.g. `isdensity` is set to true.
+- `h`: AutomaticHistogram object with weights corresponding to densities, e.g. `isdensity` is set to true.
 
 # Examples
 ```
 julia> x = [0.037, 0.208, 0.189, 0.656, 0.45, 0.846, 0.986, 0.751, 0.249, 0.447]
-julia> H1 = histogram_regular(x)
-julia> H2 = histogram_regular(x; logprior=k->-log(k), a=k->0.5*k)
+julia> h1 = histogram_regular(x)
+julia> h2 = histogram_regular(x; logprior=k->-log(k), a=k->0.5*k)
 ```
 ...
 """
-function histogram_regular(x::AbstractVector{<:Real}; rule::Symbol=:bayes, closed::Symbol=:right, maxbins::Int=1000, support::Tuple{Real,Real}=(-Inf,Inf), logprior::Function=k->0.0, a::Union{Real,Function}=1.0, scalest::Symbol=:minim, level::Int=2)
+function histogram_regular( x::AbstractVector{<:Real}; rule::Symbol=:bayes, closed::Symbol=:right, maxbins::Int=1000,
+                            support::Tuple{Real,Real}=(-Inf,Inf), logprior::Function=k->0.0, a::Union{Real,Function}=1.0,
+                            scalest::Symbol=:minim, level::Int=2)
     if !(rule in [:aic, :bic, :br, :bayes, :mdl, :klcv, :nml, :l2cv, :sturges, :fd, :scott, :wand])
-        rule = :bayes
+        throw(ArgumentError("The supplied rule, :$rule, is not supported. The rule kwarg must be one of :aic, :bic, :br, :bayes, :mdl, :klcv, :nml, :l2cv, :sturges, :fd, :scott or :wand"))
     end
     if !(closed in [:right, :left]) # if supplied symbol is nonsense, just use default
-        closed = :right
+        throw(ArgumentError("The supplied value of the closed keyword, :$closed, is invalid. Valid values are :left or :right."))
     end
     n = length(x)
 
@@ -42,15 +44,21 @@ function histogram_regular(x::AbstractVector{<:Real}; rule::Symbol=:bayes, close
         maxbins = 10^3      # Default maximal number of bins
     end
 
-    if support[1] == -Inf   # estimate lower bound of support if unknown
-        xmin = minimum(x) 
-    else
-        xmin = support[1]   # use known lower bound 
+    xmin, xmax = extrema(x)
+
+    if support[1] > -Inf   # estimate lower bound of support if unknown,
+        if xmin > support[1]
+            xmin = support[1]   # use known lower bound
+        else 
+            throw(DomainError("The supplied lower bound is greater than the smallest value of the sample."))
+        end
     end
-    if support[2] == Inf
-        xmax = maximum(x)   # estimate upper bounds of support if unknown
-    else 
-        xmax = support[2]   # use known upper bound
+    if support[2] < Inf
+        if xmax < support[2]
+            xmax = support[2]   # use known upper bound
+        else 
+            throw(DomainError("The supplied upper bound is smaller than the smallest value of the sample."))
+        end
     end
 
     k_opt = if rule == :sturges # Sturges' rule
@@ -66,28 +74,36 @@ function histogram_regular(x::AbstractVector{<:Real}; rule::Symbol=:bayes, close
         k
     elseif rule == :wand # Wand's rule (using 2 steps)
         if !(scalest in [:minim, :stdev, :iqr])     # check that supplied scale-estimate is a valid option
-            scalest = :minim                        # else, use default (:minim)
+            throw(ArgumentError("Supplied scalest value, :$scalest, is not supported. Use one of :minim, :stdev or :iqr."))
         end
         if !(level in [0, 1, 2, 3, 4, 5])           # check that supplied level is a valid option
-            level = 2                               # else, use default (2)
+            throw(ArgumentError("Supplied level, $level, is not supported. Use one of 0, 1, 2, 3, 4 or 5."))
         end
         k = min(wand_num_bins(x, level, scalest, 401, (xmin, xmax)), maxbins) # add functionality for specifying level later
         k
     else 
+        k_max = min(ceil(Int, 4.0*n / log(n)^2), maxbins)
+
         if rule == :bayes
+            aₖ = Array{Float64}(undef, k_max)
             if !isa(a, Function) # create constant function if typeof(a) <: Real
                 if a ≤ 0.0
-                    a_func = k -> 1.0
+                    throw(DomainError("Supplied value of a must be positive."))
                 else 
-                    a_func = k -> a
+                    aₖ[1:end] .= a
                 end
             else 
-                a_func = k -> ifelse(a(k) > 0.0, a(k), 1.0)
+                for k = 1:k_max
+                    a_curr = a(k)
+                    if a_curr ≤ 0.0
+                        throw(DomainError("Supplied function a(k) must return strictly positive values."))
+                    else
+                        aₖ[k] = a_curr
+                    end
+                end
             end
         end
-    
-        k_max = min(ceil(Int, 4.0*n / log(n)^2), maxbins)
-    
+
         criterion = Array{Float64}(undef, k_max) # Criterion to be maximized depending on the specified rule
     
         # Scale data to the interval [0,1]:
@@ -110,9 +126,8 @@ function histogram_regular(x::AbstractVector{<:Real}; rule::Symbol=:bayes, close
             end
         elseif rule == :bayes
             Threads.@threads for k = 1:k_max
-                aₖ = a_func(k)
                 N = bin_regular(z, 0.0, 1.0, k, closed == :right)
-                @inbounds criterion[k] = logposterior_k(N, k, ones(k)/k, aₖ, n, logprior)
+                @inbounds criterion[k] = logposterior_k(N, k, ones(k)/k, aₖ[k], n, logprior)
             end
         elseif rule == :mdl
             Threads.@threads for k = 1:k_max
@@ -140,13 +155,15 @@ function histogram_regular(x::AbstractVector{<:Real}; rule::Symbol=:bayes, close
     end
 
     # Create a StatsBase.Histogram object with the chosen number of bins
-    N = bin_regular(x, xmin, xmax, k_opt, closed == :right)
-    H_opt = Histogram(LinRange(xmin, xmax, k_opt+1), N, closed, true)
+    N = convert.(Int64, bin_regular(x, xmin, xmax, k_opt, closed == :right))
+    a_opt = 0.0
     if rule == :bayes
-        aₖ = a_func(k_opt)
-        H_opt.weights = k_opt/(xmax-xmin) * (N .+ aₖ/k_opt) / (aₖ + n) # Estimated density
-    else
-        H_opt.weights = k_opt/(xmax-xmin) * N / n # Estimated density
+        a_opt = aₖ[k_opt]
     end
-    return H_opt
+    dens = k_opt/(xmax-xmin) * (N .+ a_opt/k_opt) / (a_opt + n) # Estimated density
+    h = AutomaticHistogram(LinRange(xmin, xmax, k_opt+1), dens, N, :regular, closed, ifelse(a_opt > 0.0, a_opt, NaN))
+    return h
+
+    #H_opt = Histogram(LinRange(xmin, xmax, k_opt+1), dens, closed, true)
+    #return H_opt
 end
