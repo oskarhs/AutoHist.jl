@@ -59,6 +59,12 @@ Fit a histogram to a one-dimensional vector x with an automatic and data-based s
 
 # Returns
 - `h`: An object of type `AutomaticHistogram`, corresponding to the fitted histogram.
+
+```
+julia> x = randn(10^3)
+julia> h1 = fit(AutomaticHistogram, x)                                      # fits an irregular histogram
+julia> h2 = fit(AutomaticHistogram, x; rule=:wand, scalest=:stdev, level=4) # fits a regular histogram
+```
 """
 function fit(::Type{AutomaticHistogram}, x::AbstractVector{<:Real}; rule=:bayes, type=:irregular, kwargs...)
     if rule in [:aic, :bic, :br, :mdl, :sturges, :fd, :scott, :wand]
