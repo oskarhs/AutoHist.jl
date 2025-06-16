@@ -106,8 +106,8 @@ The value of the log-likelihood is
 where Nⱼ, dⱼ are the bin counts and estimated densities for bin j.
 """
 function loglikelihood(h::AutomaticHistogram)
-    llik = -n*log(n)
-    for j in eachindex(h.density)
+    llik = 0.0
+    @inbounds for j in eachindex(h.density)
         if h.counts[j] > 0
             llik += h.counts[j]*log(h.density[j])
         end
@@ -129,7 +129,7 @@ where where Nⱼ is the bin count for bin j.
 """
 function logmarginallikelihood(h::AutomaticHistogram, a::Real)
     logmarglik = loggamma(a) - loggamma(a+sum(h.counts))
-    for j in eachindex(h.counts)
+    @inbounds for j in eachindex(h.counts)
         if h.counts[j] > 0
             len_bin = h.breaks[j+1] - h.breaks[j]
             logmarglik += loggamma(h.counts[j] + a/k) - loggamma(a/k) - h.counts[j]*len_bin

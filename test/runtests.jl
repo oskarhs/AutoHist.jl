@@ -191,7 +191,17 @@ end
     @test fit(AutomaticHistogram, x; kwargs2) == histogram_regular(x; kwargs2)
 end
 
-@testset "AutomaticHistogram fit throws error" begin
+@testset "AutomaticHistogram loglik, logmarglik" begin
+    breaks = [0.0, 0.4, 0.6, 1.0]
+    counts = [2, 5, 10]
+    density = counts ./ ((breaks[2:end] - breaks[1:end-1])*sum(counts))
+
+    @test_throws ArgumentError logmarginallikelihood(AutomaticHistogram(breaks, density, counts, :irregular, :right))
+    @test logmarginallikelihood(AutomaticHistogram(breaks, density, counts, :irregular, :right, 1.0)) == logmarginallikelihood(AutomaticHistogram(breaks, density, counts, :irregular, :right), 1.0)
+    @test !isnan(loglikelihood(AutomaticHistogram(breaks, density, counts, :irregular, :right)))
+end
+
+@testset "AutomaticHistogram throws error" begin
     x = randn(10^3)
 
     @test_throws ArgumentError fit(AutomaticHistogram, x; rule=:nonsense)
