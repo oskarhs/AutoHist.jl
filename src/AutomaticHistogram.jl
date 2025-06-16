@@ -66,7 +66,7 @@ julia> h1 = fit(AutomaticHistogram, x)                                      # fi
 julia> h2 = fit(AutomaticHistogram, x; rule=:wand, scalest=:stdev, level=4) # fits a regular histogram
 ```
 """
-function fit(::Type{AutomaticHistogram}, x::AbstractVector{<:Real}; rule=:bayes, type=:irregular, kwargs...)
+function fit(::Type{AutomaticHistogram}, x::AbstractVector{<:Real}; rule::Symbol=:bayes, type::Symbol=:irregular, kwargs...)
     if rule in [:aic, :bic, :br, :mdl, :sturges, :fd, :scott, :wand]
         type = :regular
     elseif rule in [:pena, :penb, :penr]
@@ -144,3 +144,24 @@ function logmarginallikelihood(h::AutomaticHistogram)
     end
     return loglikelihood(h, h.a)
 end
+
+"""
+    minimum(h::AutomaticHistogram)
+
+Return the minimum of the support of `h`.
+"""
+Base.minimum(h::AutomaticHistogram) = h.breaks[1]
+
+"""
+    maximum(h::AutomaticHistogram)
+
+Return the maximum of the support of `h`.
+"""
+Base.maximum(h::AutomaticHistogram) = h.breaks[end]
+
+"""
+    extrema(h::AutomaticHistogram)
+
+Return the minimum and the maximum of the support of `h` as a 2-tuple.
+"""
+Base.extrema(h::AutomaticHistogram) = (h.breaks[1], h.breaks[end])

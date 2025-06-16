@@ -197,3 +197,13 @@ end
     @test_throws ArgumentError fit(AutomaticHistogram, x; rule=:nonsense)
     @test_throws ArgumentError fit(AutomaticHistogram, x; rule=:l2cv, type=:nonsense)
 end
+
+@testset "AutomaticHistogram extrema" begin
+    x = rand(10^3)
+    support = (0.0, 1.0)
+    h = fit(AutomaticHistogram, x; rule=:nonsense) 
+
+    @test isapprox(minimum(h), support[1]; atol=1e-10)
+    @test isapprox(maximum(h), support[2]; atol=1e-10)
+    @test isapprox(extrema(h)[1], support[1]; atol=1e-10) && isapprox(extrema(h)[2], support[2]; atol=1e-10)
+end
