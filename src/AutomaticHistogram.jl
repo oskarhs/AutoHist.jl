@@ -165,3 +165,15 @@ Base.maximum(h::AutomaticHistogram) = h.breaks[end]
 Return the minimum and the maximum of the support of `h` as a 2-tuple.
 """
 Base.extrema(h::AutomaticHistogram) = (h.breaks[1], h.breaks[end])
+
+"""
+    modes(h::AutomaticHistogram)
+
+Return the location of the modes of `h` as a Vector, sorted in increasing order.
+
+...
+Formally, the modes of the histogram `h` are defined as the midpoints of an interval I, where the density of `h` is constant on I, and the density of `h` is strictly smaller than this value in the adjacent bins.
+"""
+function modes(h::AutomaticHistogram)
+    # implementation here (see peak_id_loss from loss_functions.jl)
+end
