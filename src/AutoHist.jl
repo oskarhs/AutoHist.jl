@@ -1,6 +1,7 @@
 module AutoHist
 
 export AutomaticHistogram
+export fit, convert, loglikelihood, logmarginallikelihood
 export histogram_regular, histogram_irregular
 
 using StatsBase, Base.Threads
