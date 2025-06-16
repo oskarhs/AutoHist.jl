@@ -149,7 +149,7 @@ A more sophisticated version of Scott's rule, Wand's rule proceeds by determinin
 ```math
     h = \Big(\frac{6}{\hat{C}(f_0) n}\Big)^{1/3},
 ```
-where ``\hat{C}(f_0)`` is an estimate of the functional ``C(f_0) = \int \big\{f_0'(x)\big\}^2\mspace{2mu}\mathrm{d}x``. The corresponding number of bins ``k = \lceil h^{-1}\rceil``. The full details on this method are given in Wand (1997).
+where ``\hat{C}(f_0)`` is an estimate of the functional ``C(f_0) = \\int \\big\\{f_0'(x)\\big\\}^2\\mspace{2mu}\\mathrm{d}x``. The corresponding number of bins ``k = \lceil h^{-1}\rceil``. The full details on this method are given in Wand (1997).
 The density estimate is computed based on a scale estimate, which can be controlled through the `scale` keyword argument. Possible choices are `:stdev`, `:iqr` which uses an estimate based on the sample standard deviation or the sample interquartile range as a scale estimate. The default choice `:minim` uses the minimum of the above estimates.
 The `level` keyword controls the number of stages of functional estimation used to compute ``\hat{C}``, and can take values `0, 1, 2, 3, 4, 5`, with the default value being `level=2`. The choice `level=0` corresponds to Scott's rule under the chosen scale estimate.
 
