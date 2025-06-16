@@ -50,7 +50,7 @@ Our implementation uses the dynamical programming algorithm of [Kanazawa (1988)]
 For regular histograms, we provide a multithreaded implementation, which will be automatically used when Julia is launched with more than one thread.
 
 ## To do
-- Add a new type for automatically constructed histograms that allows for the evaluation of loglikelihoods and similar quantities of interest.
+- Add an extension that allows for the numeric evaluation of statistical distances (lp, Hellinger, Kullback--Leibler) between an AutomaticHistogram and a given object which implements a pdf method.
 
 ## References
 <a name="simensen2025random"></a> Simensen, O. H., Christensen, D. & Hjort, N. L. (2025). Random Irregular Histograms. _arXiv preprint_. doi: [10.48550/ARXIV.2505.22034](https://doi.org/10.48550/ARXIV.2505.22034)

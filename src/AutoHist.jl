@@ -1,7 +1,8 @@
 module AutoHist
 
 export AutomaticHistogram
-export fit, convert, loglikelihood, logmarginallikelihood, minimum, maximum, extrema
+export fit
+export convert, loglikelihood, logmarginallikelihood, minimum, maximum, extrema, modes
 export histogram_regular, histogram_irregular
 
 import StatsBase: modes

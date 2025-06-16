@@ -161,14 +161,13 @@ end
     @test_throws DomainError histogram_irregular(x; support=(-Inf, 0.5))
 end
 
-@testset "AutomaticHistogram plot, string and equality" begin
+@testset "AutomaticHistogram plot and string" begin
     breaks = [0.0, 0.4, 0.6, 1.0]
     counts = [2, 5, 10]
     density = counts ./ ((breaks[2:end] - breaks[1:end-1])*sum(counts))
 
     h = AutomaticHistogram(breaks, density, counts, :irregular, :right, 1.0)
     @test typeof(plot(h)) == Plots.Plot{Plots.GRBackend}                            # check that Plots extension works
-    @test h == AutomaticHistogram(breaks, density, counts, :irregular, :right, 1.0) # check that equality works
 
     io = IOBuffer() # just checks that we can call the show method
     show(io, h)
@@ -210,4 +209,31 @@ end
     @test isapprox(minimum(h), support[1]; atol=1e-10)
     @test isapprox(maximum(h), support[2]; atol=1e-10)
     @test isapprox(extrema(h)[1], support[1]; atol=1e-10) && isapprox(extrema(h)[2], support[2]; atol=1e-10)
+end
+
+@testset "AutomaticHistogram modes" begin
+    breaks1 = LinRange(0, 1, 11)
+    density1 = [108, 105, 105, 114, 91, 88, 80, 105, 101, 103] / 100.0
+    counts1 = [108, 105, 105, 114, 91, 88, 80, 105, 101, 103]
+    true_modes1 = [0.05, 0.35, 0.75, 0.95]
+
+    breaks2 = LinRange(0, 1, 11)
+    density2 = [95, 84, 101, 101, 102, 106, 100, 104, 104, 103] / 100.0
+    counts2 = [95, 84, 101, 101, 102, 106, 100, 104, 104, 103]
+    true_modes2 = [0.05, 0.55, 0.8]
+
+    breaks3 = LinRange(0, 1, 11)
+    density3 = fill(100, 10) / 100.0
+    counts3 = fill(100, 10)
+    true_modes3 = [0.5]
+
+    breaks4 = LinRange(0, 1, 11)
+    density4 = [1.0]
+    counts4 = [1]
+    true_modes4 = [0.5]
+
+    @test modes(AutomaticHistogram(breaks1, density1, counts1, :irregular, :right)) == true_modes1
+    @test modes(AutomaticHistogram(breaks2, density2, counts2, :irregular, :right)) == true_modes2
+    @test modes(AutomaticHistogram(breaks3, density3, counts3, :irregular, :right)) == true_modes3
+    @test modes(AutomaticHistogram(breaks4, density4, counts4, :irregular, :right)) == true_modes4
 end

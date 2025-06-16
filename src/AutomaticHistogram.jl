@@ -44,7 +44,7 @@ function Base.show(io::IO, h::AutomaticHistogram)
 end
 
 """
-    fit(AutomaticHistogram, x::AbstractVector{x<:Real})
+    fit(AutomaticHistogram, x::AbstractVector{x<:Real}; rule=:bayes, type=:irregular, kwargs...)
 
 Fit a histogram to a one-dimensional vector x with an automatic and data-based selection of the histogram partition.
 
@@ -100,7 +100,6 @@ Base.convert(::Type{Histogram}, h::AutomaticHistogram) = Histogram(h.breaks, h.d
 
 Compute the log-likelihood (up to proportionality) of an `AutomaticHistogram`.
 
-...
 The value of the log-likelihood is
     ∑ⱼ Nⱼ log (dⱼ),
 where Nⱼ, dⱼ are the bin counts and estimated densities for bin j.
@@ -121,7 +120,6 @@ end
 
 Compute the log-marginal likelihood (up to proportionality) of an `AutomaticHistogram` when the value of the Dirichlet concentration parameter equals a. This can be automatically inferred if the histogram was fitted with `rule=:bayes`, and does not have to be explicitly passed as an argument in this case.
 
-...
 Assumes that the Dirichlet prior is centered on the uniform distribution, so that aⱼ = a/k for a scalar a>0 and all j.
 The value of the log-marginal likelihood is
     ∑ⱼ {log Γ(Nⱼ+aⱼ) - log Γ(aⱼ) - Nⱼlog(dⱼ)} - log Γ(a+n) + log Γ(a),
@@ -167,15 +165,47 @@ Return the minimum and the maximum of the support of `h` as a 2-tuple.
 """
 Base.extrema(h::AutomaticHistogram) = (h.breaks[1], h.breaks[end])
 
-#= """
+"""
     modes(h::AutomaticHistogram)
 
 Return the location of the modes of `h` as a Vector, sorted in increasing order.
 
-...
 Formally, the modes of the histogram `h` are defined as the midpoints of an interval I, where the density of `h` is constant on I, and the density of `h` is strictly smaller than this value in the histogram bins adjacent to I. Note that according this definition, I is in general a nonempty union of intervals in the histogram partition.
 """
-function StatsBase.modes(h::AutomaticHistogram)
+function modes(h::AutomaticHistogram)
     # implementation here (see peak_id_loss from loss_functions.jl)
-    return nothing
-end =#
+    breaks = h.breaks
+    dens = h.density
+    k = length(dens)
+
+    # Make new breaks and density vectors where equal-density bins are 'concatenated'
+    dens1 = [dens[1]]
+    breaks1 = [breaks[1]]
+    for j in 1:(k-1)
+        if !(isapprox(dens[j], dens[j+1]; atol=1e-10))
+            push!(dens1, dens[j+1])
+            push!(breaks1, breaks[j+1])
+        end
+    end
+    push!(breaks1, breaks[end])
+
+    k1 = length(dens1)
+    # Now identify modes of the histogram density
+    hist_modes = Float64[]
+    if k1 == 1
+        push!(hist_modes, 0.5*(breaks1[1]+breaks1[2]))
+    else
+        if dens1[1] > dens1[2]
+            push!(hist_modes, 0.5*(breaks1[1]+breaks1[2]))
+        end
+        for j in 2:(k1-1)
+            if dens1[j] > dens1[j-1] && dens1[j] > dens1[j+1]
+                push!(hist_modes, 0.5*(breaks1[j]+breaks1[j+1]))
+            end
+        end
+        if dens1[end] > dens1[end-1]
+            push!(hist_modes, 0.5*(breaks1[end-1]+breaks1[end]))
+        end
+    end
+    return hist_modes
+end
