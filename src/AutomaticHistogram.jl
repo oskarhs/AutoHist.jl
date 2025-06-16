@@ -172,7 +172,7 @@ Base.extrema(h::AutomaticHistogram) = (h.breaks[1], h.breaks[end])
 Return the location of the modes of `h` as a Vector, sorted in increasing order.
 
 ...
-Formally, the modes of the histogram `h` are defined as the midpoints of an interval I, where the density of `h` is constant on I, and the density of `h` is strictly smaller than this value in the adjacent bins.
+Formally, the modes of the histogram `h` are defined as the midpoints of an interval I, where the density of `h` is constant on I, and the density of `h` is strictly smaller than this value in the histogram bins adjacent to I. Note that according this definition, I is in general a nonempty union of intervals in the histogram partition.
 """
 function modes(h::AutomaticHistogram)
     # implementation here (see peak_id_loss from loss_functions.jl)
