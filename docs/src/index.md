@@ -12,7 +12,7 @@ h_irr = histogram_irregular(x)              # compute an automatic irregular his
 h_reg = histogram_regular(x)                # compute an automatic regular histogram
 ```
 
-Both `histogram_irregular` and `histogram_regular` return a [StatsBase.Histogram](https://juliastats.org/StatsBase.jl/stable/empirical/#StatsBase.Histogram), with weights normalized so that the resulting histograms are probability densities. This allows us to easily plot the two histograms resulting from the above code snippet:
+Both `histogram_irregular` and `histogram_regular` return a [AutoHist.AutomaticHistogram](api.md), with weights normalized so that the resulting histograms are probability densities. This allows us to easily plot the two histograms resulting from the above code snippet:
 
 ```@example index
 using Plots; gr()

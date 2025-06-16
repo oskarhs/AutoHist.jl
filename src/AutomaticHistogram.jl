@@ -47,9 +47,9 @@ Fit a histogram to a one-dimensional vector x with an automatic and data-based s
 - `x`: 1D vector of data for which a histogram is to be constructed.
 
 # Keyword arguments
-- `rule`: The criterion used to determine the optimal number of bins. Defaults to the method Bayesian method of Simensen et al. (2025)
-- `type`: Symbol indicating whether the fitted method is a regular and irregular one. The keywords `:bayes`, `:l2cv`, `:klcv` and `:nml` are implemented for both regular and irregular histograms, and this keyword specifies whether the regular or irregular version should be used. For other rules, this function infers the type automatically from the `rule` keyword, and misspecifying the rule in this case has not effect. Possible values are `:irregular` (default) and `regular`.
-- `kwargs`: Additional keyword arguments passed to `histogram_regular` or `histogram_irregular`.
+- `rule`: The criterion used to determine the optimal number of bins. Defaults to the method Bayesian method of Simensen et al. (2025).
+- `type`: Symbol indicating whether the fitted method is a regular and irregular one. The rules `:bayes`, `:l2cv`, `:klcv` and `:nml` are implemented for both regular and irregular histograms, and this keyword specifies whether the regular or irregular version should be used. For other rules, this function infers the type automatically from the `rule` keyword, and misspecifying the rule in this case has not effect. Possible values are `:irregular` (default) and `regular`.
+- `kwargs`: Additional keyword arguments passed to `histogram_regular` or `histogram_irregular` depending on the specified or inferred type.
 
 # Returns
 - `h`: An object of type `AutomaticHistogram`, corresponding to the fitted histogram.
@@ -60,7 +60,7 @@ function fit(::Type{AutomaticHistogram}, x::AbstractVector{<:Real}; rule=:bayes,
     elseif rule in [:pena, :penb, :penr]
         type = :irregular
     elseif rule in [:bayes, :l2cv, :klcv, :nml]
-        if !(type in [:regular, :irregular])
+        if !(type in [:regular, :irregular]) # if type is not specified correctly for any of these methods, throw an ArgumentError as type is ambiguous in this case.
             throw(ArgumentError("Unable to infer type automatically from the supplied rule and the supplied type is not supported. Valid types are :irregular and :regular."))
         end
     else
@@ -68,7 +68,12 @@ function fit(::Type{AutomaticHistogram}, x::AbstractVector{<:Real}; rule=:bayes,
     end
 
     # Fit the histogram here
-    # NB! Need to modify histogram_regular and histogram_irregular first to return an AutomaticHistogram
+    if type == :irregular
+        h = histogram_irregular(x; rule=rule, kwargs...)
+    elseif type == :regular
+        h = histogram_regular(x; rule=rule, kwargs...)
+    end
+    return h
 end
 
 """
