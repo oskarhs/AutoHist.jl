@@ -178,17 +178,20 @@ end
     @test AutomaticHistogram(breaks, density, counts, :irregular, :right, 1.0) == AutomaticHistogram(breaks, density, counts, :irregular, :right, 1.0)
 end
 
-@testset "AutomaticHistogram fit output" begin
+@testset "AutomaticHistogram fit" begin
     x = randn(10^3)
 
-    @test fit(AutomaticHistogram, x) == histogram_irregular(x)                 # check defaults
-    @test fit(AutomaticHistogram, x; type=:regular) == histogram_regular(x)
+    @test fit(AutomaticHistogram, x) == histogram_irregular(x)                  # check defaults, irregular
+    @test fit(AutomaticHistogram, x; type=:regular) == histogram_regular(x)     # check defaults, regular
 
     kwargs1 = Dict(:rule => :penb, :grid => :quantile)
     kwargs2 = Dict(:rule => :wand, :scalest => :iqr, :level => 4)
 
     @test fit(AutomaticHistogram, x; kwargs1) == histogram_regular(x; kwargs1)
     @test fit(AutomaticHistogram, x; kwargs2) == histogram_regular(x; kwargs2)
+
+    @test_throws ArgumentError fit(AutomaticHistogram, x; rule=:nonsense)               # test error handling
+    @test_throws ArgumentError fit(AutomaticHistogram, x; rule=:l2cv, type=:nonsense)
 end
 
 @testset "AutomaticHistogram loglik, logmarglik" begin
@@ -199,13 +202,6 @@ end
     @test_throws ArgumentError logmarginallikelihood(AutomaticHistogram(breaks, density, counts, :irregular, :right))
     @test logmarginallikelihood(AutomaticHistogram(breaks, density, counts, :irregular, :right, 1.0)) == logmarginallikelihood(AutomaticHistogram(breaks, density, counts, :irregular, :right), 1.0)
     @test !isnan(loglikelihood(AutomaticHistogram(breaks, density, counts, :irregular, :right)))
-end
-
-@testset "AutomaticHistogram throws error" begin
-    x = randn(10^3)
-
-    @test_throws ArgumentError fit(AutomaticHistogram, x; rule=:nonsense)
-    @test_throws ArgumentError fit(AutomaticHistogram, x; rule=:l2cv, type=:nonsense)
 end
 
 @testset "AutomaticHistogram extrema" begin
