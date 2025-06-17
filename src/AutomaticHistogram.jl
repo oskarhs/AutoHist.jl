@@ -173,6 +173,38 @@ Return `true` if `x` is in the support of `h`, and `false` otherwise.
 insupport(h::AutomaticHistogram, x::Real) = (h.breaks[1] <= x <= h.breaks[end])
 
 """
+    pdf(h::AutomaticHistogram, x::Real)
+
+Evaluate the probability density function of `h` at `x`.
+"""
+function pdf(h::AutomaticHistogram, x::Real)
+    val = 0.0
+    if insupport(h, x)
+        k = length(h.density)
+        if h.type == :irregular
+            if h.closed == :right
+                idx = max(1, searchsortedfirst(h.breaks, x) - 1)
+                @inbounds val = h.density[idx]
+            else 
+                idx = min(k, searchsortedlast(h.breaks, x))
+                @inbounds val = h.density[idx]
+            end
+        else
+            xmin, xmax = extrema(h)
+            edges_inc = k/(xmax-xmin)
+            if h.closed == :right
+                idx = min(k-1, floor(Int, (x-xmin)*edges_inc+100.0*eps())) + 1
+                @inbounds val = h.density[idx]
+            else 
+                idx = max(0, floor(Int, (x-xmin)*edges_inc-100.0*eps())) + 1
+                @inbounds val = h.density[idx]
+            end
+        end
+    end
+    return val
+end
+
+"""
     modes(h::AutomaticHistogram)
 
 Return the location of the modes of `h` as a Vector, sorted in increasing order.

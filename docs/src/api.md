@@ -25,6 +25,7 @@ minimum(::AutomaticHistogram)
 maximum(::AutomaticHistogram)
 extrema(::AutomaticHistogram)
 insupport(::AutomaticHistogram, ::Real)
+pdf(::AutomaticHistogram, ::Real)
 loglikelihood(::AutomaticHistogram)
 logmarginallikelihood
 convert(::Type{Histogram}, h::AutomaticHistogram)

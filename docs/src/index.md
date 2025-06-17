@@ -8,7 +8,7 @@ Despite being the oldest nonparametric density estimator, the histogram remains 
 The AutoHist.jl package makes it easy to construct both regular and irregular histograms automatically based on a given one-dimensional sample. It currently supports 7 different methods for irregular histograms and 12 criteria for regular histograms from the statistical literature. In addition, the package provides a number of convenience functions for automatic histograms, such as methods for evaluating the histogram probability density function or identifying the location of modes.
 
 ## Quick Start
-The two main functions exported by this package are `histogram_irregular` and `histogram_regular`, which constructs an irregular or regular histogram with automatic selection of the number of bins based on the sample. The following example shows how to compute and display a regular and an irregular histogram, with an automatic selection of the number of bins.
+The two main functions exported by this package are `fit`, `histogram_irregular` and `histogram_regular`, which constructs an irregular or regular histogram with automatic selection of the number of bins based on the sample. The following example shows how to compute and display a regular and an irregular histogram, with an automatic selection of the number of bins.
 
 ```@example index; continued=true
 using AutoHist, Random, Distributions
@@ -16,12 +16,17 @@ x = rand(Xoshiro(1812), Normal(), 10^6)     # simulate some data
 h_irr = histogram_irregular(x)              # compute an automatic irregular histogram
 h_reg = histogram_regular(x)                # compute an automatic regular histogram
 ```
-
-Both `histogram_irregular` and `histogram_regular` return a [AutoHist.AutomaticHistogram](api.md), with weights normalized so that the resulting histograms are probability densities. Alternatively, irregular and regular automatic histograms can be fitted to data using the `fit` method by controlling the `type` keyword argument.
+Alternatively, irregular and regular automatic histograms can be fitted to data using the `fit` method by controlling the `type` keyword argument.
 ```@example index; continued=true
-h_irr = fit(AutomaticHistogram, x; type=:irregular)     # equivalent to h_irr = histogram_irregular(x)
-h_reg = fit(AutomaticHistogram, x; type=:regular)       # equivalent to h_reg = histogram_regular(x)
+h_irr = fit(AutomaticHistogram, x; type=:irregular)  # equivalent to h_irr = histogram_irregular(x)
+h_reg = fit(AutomaticHistogram, x; type=:regular)    # equivalent to h_reg = histogram_regular(x)
 ```
+
+All of the above functions return an object of type [`AutomaticHistogram`](@ref), with weights normalized so that the resulting histograms are probability densities. This type represents the histogram in a similar fashion to [StatsBase.Histogram](https://juliastats.org/StatsBase.jl/stable/empirical/#Histograms), but has more fields to enable the use of several convenience functions.
+```@example index
+h_irr
+```
+
 
 AutomaticHistogram objects are compatible with Plots.jl, which allows us to easily plot the two histograms resulting from the above code snippet:
 
@@ -35,7 +40,7 @@ plot(p_irr, p_reg, layout=(1, 2), size=(600, 300))
 
 
 ## Supported methods
-Both the regular and the irregular procedure support a large number of criteria to select the histogram partition. The keyword argument `rule` controls the criterion used to choose the best partition, and includes the following criteria:
+Both the regular and the irregular procedure support a large number of criteria to select the histogram partition. The keyword argument `rule` controls the criterion used to choose the best partition, and includes the following options:
 
 - Regular Histograms:
     - Random regular histogram, :bayes (default)

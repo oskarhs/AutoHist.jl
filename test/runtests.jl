@@ -123,7 +123,7 @@ end
     h1 = histogram_irregular(x; rule=:klcv, use_min_length=true)
     h2 = histogram_irregular(x; rule=:l2cv, use_min_length=true)
     min_length = (maximum(x) - minimum(x))*log(n)^(1.5)/n
-    
+
     @test minimum(h1.breaks[2:end] - h1.breaks[1:end-1]) ≥ min_length
     @test minimum(h2.breaks[2:end] - h2.breaks[1:end-1]) ≥ min_length
 end
@@ -210,8 +210,31 @@ end
     counts4 = [1]
     true_modes4 = [0.5]
 
-    @test modes(AutomaticHistogram(breaks1, density1, counts1, :irregular, :right)) == true_modes1
-    @test modes(AutomaticHistogram(breaks2, density2, counts2, :irregular, :right)) == true_modes2
-    @test modes(AutomaticHistogram(breaks3, density3, counts3, :irregular, :right)) == true_modes3
-    @test modes(AutomaticHistogram(breaks4, density4, counts4, :irregular, :right)) == true_modes4
+    @test modes(AutomaticHistogram(breaks1, density1, counts1, :regular, :right)) == true_modes1
+    @test modes(AutomaticHistogram(breaks2, density2, counts2, :regular, :right)) == true_modes2
+    @test modes(AutomaticHistogram(breaks3, density3, counts3, :regular, :right)) == true_modes3
+    @test modes(AutomaticHistogram(breaks4, density4, counts4, :regular, :right)) == true_modes4
+end
+
+@testset "AutomaticHistogram pdf" begin
+    breaks1 = LinRange(0, 1, 11)
+    density1 = [1.08, 1.05, 1.05, 1.14, 0.91, 0.88, 0.80, 1.05, 1.01, 1.03]
+    counts1 = [108, 105, 105, 114, 91, 88, 80, 105, 101, 103]
+
+    breaks2 = [0.0, 0.2, 0.8, 0.9, 1.0]
+    density2 = [0.945, 1.045, 0.880, 0.960]
+    counts2 = [189, 627, 88, 96]
+
+    @test pdf(AutomaticHistogram(breaks1, density1, counts1, :regular, :right), -0.1) == 0.0    # test values outside of support
+    @test pdf(AutomaticHistogram(breaks2, density2, counts2, :irregular, :right), 1.2) == 0.0
+
+    for j in 1:9    # test at each boundary that closed=:right and closed=:left behave as expected
+        @test pdf(AutomaticHistogram(breaks1, density1, counts1, :regular, :right), breaks1[j+1]) == density1[j]
+        @test pdf(AutomaticHistogram(breaks1, density1, counts1, :regular, :left), breaks1[j+1]) == density1[j+1]
+    end
+
+    for j in 1:3    # test at each boundary that closed=:right and closed=:left behave as expected
+        @test pdf(AutomaticHistogram(breaks2, density2, counts2, :irregular, :right), breaks2[j+1]) == density2[j]
+        @test pdf(AutomaticHistogram(breaks2, density2, counts2, :irregular, :left), breaks2[j+1]) == density2[j+1]
+    end
 end
