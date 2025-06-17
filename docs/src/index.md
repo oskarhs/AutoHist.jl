@@ -2,6 +2,11 @@
 
 Fast automatic histogram construction. Supports a plethora of regular and irregular histogram procedures.
 
+## Introduction
+Despite being the oldest nonparametric density estimator, the histogram remains widespread in use even to this day. Regrettably, the quality of a histogram density estimate is rather sensitive to the choice of partition used to draw the histogram, which has lead to the development of automatic histogram methods that select the partition based on the sample itself. Unfortunately, most default histogram plotting software only support a few regular automatic histogram procedures, where all the bins are of equal length, and use very simple plug-in rules by default to compute the the number of bins, frequently leading to poor density estimates for non-normal data. Moreover, fast and fully automatic irregular histogram methods are rarely supported by default plotting software, which has prevented their adaptation by practitioners.
+
+The AutoHist.jl package makes it easy to construct both regular and irregular histograms automatically based on a given one-dimensional sample. It currently supports 7 different methods for irregular histograms and 12 criteria for regular histograms from the statistical literature. In addition, the package provides a number of convenience functions for automatic histograms, such as methods for evaluating the histogram probability density function or identifying the location of modes.
+
 ## Quick Start
 The two main functions exported by this package are `histogram_irregular` and `histogram_regular`, which constructs an irregular or regular histogram with automatic selection of the number of bins based on the sample. The following example shows how to compute and display a regular and an irregular histogram, with an automatic selection of the number of bins.
 
@@ -33,7 +38,7 @@ plot(p_irr, p_reg, layout=(1, 2), size=(600, 300))
 Both the regular and the irregular procedure support a large number of criteria to select the histogram partition. The keyword argument `rule` controls the criterion used to choose the best partition, and includes the following criteria:
 
 - Regular Histograms:
-    - Regular random histogram, :bayes (default)
+    - Random regular histogram, :bayes (default)
     - L2 cross-validation, :l2cv
     - Kullback-Leibler cross-validation: :klcv
     - AIC, :aic
@@ -46,11 +51,12 @@ Both the regular and the irregular procedure support a large number of criteria 
     - Scott's rule, :scott
     - Wand's rule, :wand
 - Irregular Histograms:
-    - Irregular random histogram, :bayes (default)
+    - Random irregular histogram, :bayes (default)
     - L2 cross-validation, :l2cv
     - Kullback-Leibler cross-validation: :klcv
-    - Rozenholc et al. penalty R: :penR
-    - Rozenholc et al. penalty B: :penB
+    - Rozenholc et al. penalty R: :penr
+    - Rozenholc et al. penalty B: :penb
+    - Rozenholc et al. penalty A: :pena
     - Normalized Maximum Likelihood: :nml
 
 A more detailed description along with references for each method can be found on the [methods page](methods.md).
@@ -60,6 +66,3 @@ Example usage with different rules:
 histogram_irregular(x; rule=:penr)
 histogram_regular(x; rule=:aic)
 ```
-
-## Features 
-In addition to providing automatic histogram construction, this library will at a later point in time include several convenience functions for histograms. These include functions to determine the number and the location of the modes of a histogram, and functions to compute numerical estimation error made with piecewise continuous densities in mind.

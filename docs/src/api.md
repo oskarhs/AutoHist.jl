@@ -24,7 +24,13 @@ modes(::AutomaticHistogram)
 minimum(::AutomaticHistogram)
 maximum(::AutomaticHistogram)
 extrema(::AutomaticHistogram)
+insupport(::AutomaticHistogram, ::Real)
 loglikelihood(::AutomaticHistogram)
 logmarginallikelihood
 convert(::Type{Histogram}, h::AutomaticHistogram)
+```
+
+
+```@index
+Pages = ["api.md"]
 ```

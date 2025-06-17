@@ -54,7 +54,7 @@ Fit a histogram to a one-dimensional vector x with an automatic and data-based s
 
 # Keyword arguments
 - `rule`: The criterion used to determine the optimal number of bins. Defaults to the method Bayesian method of Simensen et al. (2025).
-- `type`: Symbol indicating whether the fitted method is a regular and irregular one. The rules `:bayes`, `:l2cv`, `:klcv` and `:nml` are implemented for both regular and irregular histograms, and this keyword specifies whether the regular or irregular version should be used. For other rules, this function infers the type automatically from the `rule` keyword, and misspecifying the rule in this case has not effect. Possible values are `:irregular` (default) and `regular`.
+- `type`: Symbol indicating whether the fitted method is a regular and irregular one. The rules `:bayes`, `:l2cv`, `:klcv` and `:nml` are implemented for both regular and irregular histograms, and this keyword specifies whether the regular or irregular version should be used. For other rules, this function infers the type automatically from the `rule` keyword, and misspecifying the rule in this case has not effect. Possible values are `:irregular` (default) and `:regular`.
 - `kwargs`: Additional keyword arguments passed to `histogram_regular` or `histogram_irregular` depending on the specified or inferred type.
 
 # Returns
@@ -164,6 +164,13 @@ Base.maximum(h::AutomaticHistogram) = h.breaks[end]
 Return the minimum and the maximum of the support of `h` as a 2-tuple.
 """
 Base.extrema(h::AutomaticHistogram) = (h.breaks[1], h.breaks[end])
+
+"""
+    insupport(h::AutomaticHistogram, x::Real)
+
+Return `true` if `x` is in the support of `h`, and `false` otherwise.
+"""
+insupport(h::AutomaticHistogram, x::Real) = (h.breaks[1] <= x <= h.breaks[end])
 
 """
     modes(h::AutomaticHistogram)

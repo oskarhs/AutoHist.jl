@@ -6,9 +6,7 @@
 A pure Julia implementation of automatic regular and irregular histogram methods based on maximizing a goodness-of-fit criterion.
 
 ## Introduction
-Most default histogram plotting software only support regular automatic histogram procedures and use very simple plug-in rules to compute the the number of bins, frequently leading to poor density estimates for non-normal data \[cf. [Birgé and Rozenholc (2006)](#birge2006bins), [Simensen et al. (2025)](#simensen2025random)\]. The purpose of this software package is to offer the user a fast implementation of more sophisticated regular and irregular histogram procedures. Our package supports a variety of methods including those based on asymptotic risk minimization, leave-one-out cross-validiation, penalized maximum likelihood and fully Bayesian approaches.
-
-This module exports three functions that can be used to fit an automatic histogram to a one-dimensional sample, namely `fit`, `histogram_irregular` and `histogram_regular`. A detailed exposition of these functions can be found by typing `?fit`, `?histogram_irregular` and `?histogram_regular` in the repl or in the [API documentation](https://oskarhs.github.io/AutoHist.jl/stable/api/).
+Most default histogram plotting software only support a few regular automatic histogram procedures and use very simple plug-in rules by default to compute the the number of bins, frequently leading to poor density estimates for non-normal data \[cf. [Birgé and Rozenholc (2006)](#birge2006bins), [Simensen et al. (2025)](#simensen2025random)\]. The purpose of this software package is to offer the user a fast and simple-to-use implementation of more sophisticated regular and irregular histogram procedures. Our package supports a variety of methods including those based on asymptotic risk minimization, leave-one-out cross-validiation, penalized maximum likelihood and fully Bayesian approaches.
 
 ## Installation
 Installing the package is most easily done via Julia's builtin package manager `Pkg`. This package is part of the Julia general registry, so the installation can be done via the two following lines of code:
@@ -17,22 +15,28 @@ using Pkg
 Pkg.add("AutoHist")
 ```
 
-## Example usage
+## Quick start
 
-The following code snippet shows an example where an automatic regular histogram and an automatic irregular histogram are fitted to a normal random sample, and the resulting histograms are plotted.
+To get started, we illustrate the basic use of the package by fitting histograms to a normal random sample with an automatic selection of the histogram partition.
 
 ```julia
 julia> using AutoHist, Plots
 julia> x = randn(10^6);
-julia> h1 = histogram_regular(x);
+julia> h1 = histogram_regular(x);   # fits an automatic regular histogram
 julia> plot(h1)
 
-julia> h2 = histogram_irregular(x);
+julia> h2 = histogram_irregular(x); # fits an automatic irregular histogram
 julia> plot(h2)
+```
 
+Alternatively, we can construct an automatic histogram calling the `fit` method:
+
+```julia
 julia> h3 = fit(AutomaticHistogram, x; rule=:wand, scalest=:stdev);
 julia> plot(h3)
 ```
+
+A detailed exposition of the keyword arguments passed to each of these functions can be found by typing `?fit`, `?histogram_irregular` and `?histogram_regular` in the repl or in the [API documentation](https://oskarhs.github.io/AutoHist.jl/stable/api/).
 
 ## Supported criteria
 
@@ -40,14 +44,6 @@ The keyword argument `rule` determines the method used to construct the histogra
 
 The default method is the Bayesian approach of [Simensen et al. (2025)](#simensen2025random), corresponding to keyword `rule=:bayes`.
 A detailed description of the supported methods can be found in the [methods documentation](https://oskarhs.github.io/AutoHist.jl/stable/methods/).
-
-## Implementation
-
-### Irregular histograms
-Our implementation uses the dynamical programming algorithm of [Kanazawa (1988)](#kanazawa1988optimal) together with the greedy search heuristic of [Rozenholc et al. (2010)](#rozenholc2010combining) to build a histogram quickly, making this package an excellent option for histogram construction for large data sets.
-
-### Regular histograms
-For regular histograms, we provide a multithreaded implementation, which will be automatically used when Julia is launched with more than one thread.
 
 ## To do
 - Add an extension that allows for the numeric evaluation of statistical distances (lp, Hellinger, Kullback--Leibler) between an AutomaticHistogram and a given object which implements a pdf method.

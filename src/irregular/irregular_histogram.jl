@@ -158,7 +158,7 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::Symbol=:bayes, gri
     elseif rule == :pena
         @simd for k = 1:k_max
             @inbounds psi[k] = -logabsbinomial(maxbins-1, k-1)[1] - k - 2.0*log(k) -
-                    2.0 * sqrt(1.0*0.5*(k-1)*(logabsbinomial(maxbins-1, k-1)[1] + 1.0*log(k)))
+                    2.0 * sqrt(1.0*0.5*(k-1)*(logabsbinomial(maxbins-1, k-1)[1] + 2.0*log(k)))
         end
     elseif rule == :nml
         @simd for k = 1:k_max
@@ -174,7 +174,8 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::Symbol=:bayes, gri
     bin_edges_norm = compute_bounds(ancestor, mesh, k_opt)
     bin_edges = @. xmin + (xmax - xmin) * bin_edges_norm
 
-    N = convert.(Int64, bin_irregular(x, bin_edges, closed == :right))
+    #N = convert.(Int64, bin_irregular(x, bin_edges, closed == :right))
+    N = bin_irregular_int(x, bin_edges, closed == :right)
     a_opt = 0.0
     if rule == :bayes
         a_opt = a
@@ -183,17 +184,4 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::Symbol=:bayes, gri
     dens = (N .+ a_opt*p0) ./ ((n + a_opt)*(bin_edges[2:end] - bin_edges[1:end-1]))
     h = AutomaticHistogram(bin_edges, dens, N, :irregular, closed, ifelse(a_opt > 0.0, a_opt, NaN))
     return h
-    
-    #H = Histogram(bin_edges, dens, closed, true)
-    
-#=     N = bin_irregular(x, bin_edges, closed == :right)
-    H = Histogram(bin_edges, dens, closed, true)
-    p0 = bin_edges_norm[2:end] - bin_edges_norm[1:end-1]
-    if rule == :bayes
-        H.weights = (H.weights .+ a*p0) ./ ((n + a)*(bin_edges[2:end] - bin_edges[1:end-1]))
-    else
-        H.weights = H.weights ./ (n * (bin_edges[2:end] - bin_edges[1:end-1]) )
-    end
-    H.isdensity = true =#
-    #return H
 end
