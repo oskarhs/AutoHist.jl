@@ -8,7 +8,7 @@ Despite being the oldest nonparametric density estimator, the histogram remains 
 The AutoHist.jl package makes it easy to construct both regular and irregular histograms automatically based on a given one-dimensional sample. It currently supports 7 different methods for irregular histograms and 12 criteria for regular histograms from the statistical literature. In addition, the package provides a number of convenience functions for automatic histograms, such as methods for evaluating the histogram probability density function or identifying the location of modes.
 
 ## Quick Start
-The two main functions exported by this package are `fit`, `histogram_irregular` and `histogram_regular`, which constructs an irregular or regular histogram with automatic selection of the number of bins based on the sample. The following example shows how to compute and display a regular and an irregular histogram, with an automatic selection of the number of bins.
+The three main functions exported by this package are [`fit`](@ref), [`histogram_irregular`](@ref) and [`histogram_regular`](@ref), which constructs an irregular or regular histogram with automatic selection of the number of bins based on the sample. The following example shows how to compute and display an irregular and a regular histogram, with an automatic selection of the number of bins.
 
 ```@example index; continued=true
 using AutoHist, Random, Distributions
@@ -26,7 +26,6 @@ All of the above functions return an object of type [`AutomaticHistogram`](@ref)
 ```@example index
 h_irr
 ```
-
 
 AutomaticHistogram objects are compatible with Plots.jl, which allows us to easily plot the two histograms resulting from the above code snippet:
 
