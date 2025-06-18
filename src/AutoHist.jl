@@ -5,12 +5,13 @@ export fit
 export convert, loglikelihood, logmarginallikelihood, minimum, maximum, extrema, modes
 export histogram_regular, histogram_irregular
 
+using StatsBase, Base.Threads, Distributions
 import StatsBase: modes
-using StatsBase, Base.Threads
 import Statistics: quantile
 import SpecialFunctions: loggamma, logabsbinomial, gamma
 import FFTW: fft, ifft
 import StatsAPI: fit, loglikelihood
+import Distributions: pdf, insupport
 if !isdefined(Base, :get_extension)
     using Requires
 end

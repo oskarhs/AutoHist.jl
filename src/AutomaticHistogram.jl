@@ -185,11 +185,9 @@ function pdf(h::AutomaticHistogram, x::Real)
             if h.closed == :right
                 idx = max(1, searchsortedfirst(h.breaks, x) - 1)
                 @inbounds val = h.density[idx]
-                #val = h.density[idx]
             else 
                 idx = min(k, searchsortedlast(h.breaks, x))
                 @inbounds val = h.density[idx]
-                #val = h.density[idx]
             end
         else
             xmin, xmax = extrema(h)
@@ -197,11 +195,9 @@ function pdf(h::AutomaticHistogram, x::Real)
             if h.closed == :right
                 idx = max(0, floor(Int, (x-xmin)*edges_inc-10.0*edges_inc*eps())) + 1
                 @inbounds val = h.density[idx]
-                #val = h.density[idx]
             else 
                 idx = min(k-1, floor(Int, (x-xmin)*edges_inc+10.0*edges_inc*eps())) + 1
                 @inbounds val = h.density[idx]
-                #val = h.density[idx]
             end
         end
     end
