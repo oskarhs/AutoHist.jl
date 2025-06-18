@@ -184,9 +184,9 @@ end
     @test isapprox(minimum(h), support[1]; atol=1e-10)
     @test isapprox(maximum(h), support[2]; atol=1e-10)
     @test isapprox(extrema(h)[1], support[1]; atol=1e-10) && isapprox(extrema(h)[2], support[2]; atol=1e-10)
-    @test insupport(h, 0.5)
-    @test !insupport(h, -0.5)
-    @test !insupport(h, 1.5)
+    @test AutoHist.insupport(h, 0.5)
+    @test !AutoHist.insupport(h, -0.5)
+    @test !AutoHist.insupport(h, 1.5)
 end
 
 @testset "AutomaticHistogram modes" begin
@@ -225,16 +225,16 @@ end
     density2 = [0.945, 1.045, 0.880, 0.960]
     counts2 = [189, 627, 88, 96]
 
-    @test pdf(AutomaticHistogram(breaks1, density1, counts1, :regular, :right), -0.1) == 0.0    # test values outside of support
-    @test pdf(AutomaticHistogram(breaks2, density2, counts2, :irregular, :right), 1.2) == 0.0
+    @test AutoHist.pdf(AutomaticHistogram(breaks1, density1, counts1, :regular, :right), -0.1) == 0.0    # test values outside of support
+    @test AutoHist.pdf(AutomaticHistogram(breaks2, density2, counts2, :irregular, :right), 1.2) == 0.0
 
     for j in 1:9    # test at each boundary that closed=:right and closed=:left behave as expected
-        @test pdf(AutomaticHistogram(breaks1, density1, counts1, :regular, :right), breaks1[j+1]) == density1[j]
-        @test pdf(AutomaticHistogram(breaks1, density1, counts1, :regular, :left), breaks1[j+1]) == density1[j+1]
+        @test AutoHist.pdf(AutomaticHistogram(breaks1, density1, counts1, :regular, :right), breaks1[j+1]) == density1[j]
+        @test AutoHist.pdf(AutomaticHistogram(breaks1, density1, counts1, :regular, :left), breaks1[j+1]) == density1[j+1]
     end
 
     for j in 1:3    # test at each boundary that closed=:right and closed=:left behave as expected
-        @test pdf(AutomaticHistogram(breaks2, density2, counts2, :irregular, :right), breaks2[j+1]) == density2[j]
-        @test pdf(AutomaticHistogram(breaks2, density2, counts2, :irregular, :left), breaks2[j+1]) == density2[j+1]
+        @test AutoHist.pdf(AutomaticHistogram(breaks2, density2, counts2, :irregular, :right), breaks2[j+1]) == density2[j]
+        @test AutoHist.pdf(AutomaticHistogram(breaks2, density2, counts2, :irregular, :left), breaks2[j+1]) == density2[j+1]
     end
 end
