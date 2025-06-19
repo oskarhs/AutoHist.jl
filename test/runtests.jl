@@ -151,6 +151,20 @@ end
     @test typeof(output) == String
 end
 
+@testset "AutomaticHistogram approx" begin
+    breaks1 = LinRange(0, 1, 11)
+    density1 = [95, 84, 101, 101, 102, 106, 100, 104, 104, 103] / 100.0
+    counts1 = [95, 84, 101, 101, 102, 106, 100, 104, 104, 103]
+    true_modes1 = [0.05, 0.55, 0.8]
+
+    breaks2 = LinRange(0, 1, 11)
+    density2 = fill(100, 10) / 100.0
+    counts2 = fill(100, 10)
+    true_modes2 = [0.5]
+
+    AutomaticHistogram(breaks1, density1, counts1, :irregular, :right) ≈ AutomaticHistogram(breaks2, density2, counts2, :irregular, :right)
+end
+
 @testset "AutomaticHistogram fit" begin
     x = randn(10^3)
 

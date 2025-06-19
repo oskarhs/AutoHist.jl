@@ -2,7 +2,7 @@
 
 The following document illustrates the use of AutoHist.jl through examples. In particular, we showcase some of the relative advantages and disadvantages of regular and irregular histogram procedures.
 
-## Estimating the Chi-square probability density
+## Estimating the LogNormal probability density
 
 We start by considering an example with some simulated data from the [LogNormal-distribution](https://en.wikipedia.org/wiki/Log-normal_distribution). To start, we fit a regular histogram to the data, using the approach of [Birgé and Rozenholc (2006)](https://doi.org/10.1016/j.csda.2010.04.021), which corresponds to `rule=:br`.
 ```@example LogNormal; continued=true
@@ -14,7 +14,7 @@ Alternatively, since the standard LogNormal pdf has known support ``[0,\infty)``
 ```@example LogNormal; continued = true
 h2 = fit(AutomaticHistogram, x; rule=:br, support=(0.0, Inf))
 ```
-In this case, specifying the support makes little difference since the sample size is quite large, and the standard lognormal distribution assigns sufficient mass near ``0``.
+In this case, specifying the support makes little difference since the sample size is quite large, and the standard lognormal distribution assigns sufficient mass near ``0``, as evidenced by the near-identical bin edges and bin probabilities.
 
 The standard LogNormal is quite challenging to estimate well using a regular histogram procedure due to its heavy tails. These two factors make irregular methods an appealing alternative in this case. Here, we use the penalized log-likelihood approach from [Rozenholc et al. (2010)](https://doi.org/10.1016/j.csda.2010.04.021) with penalty `:penr` and a data-based grid to construct the histogram.
 ```@example LogNormal; continued = true
@@ -25,12 +25,14 @@ To compare the two approaches, we can plot the resulting histograms along with t
 ```@example LogNormal
 using Distributions, Plots; gr() # hide
 t = LinRange(0.0, 8.5, 1000) # hide
-p = plot(t, pdf(LogNormal(), t), xlabel="x", label="True density", color="black", lwd=1.5) # hide
+p = plot(t, pdf(LogNormal(), t), xlabel="x", label="True density", color="black", lw=2.0, linestyle=:dash) # hide
 p1 = plot(p, h2, ylabel="Density", label="Regular", alpha=0.4, color="red") # hide
 xlims!(p1, -0.5, 8.5) # hide
 p2 = plot(p, h3, label="Irregular", alpha=0.4, color="blue") # hide
 xlims!(p2, -0.5, 8.5) # hide
 plot(p1, p2, layout=(1, 2), size=(600, 300)) # hide
 ```
+The irregular procedure selects smaller bin widths near the origin, reflecting the fact that the LogNormal density is rapidly changing in this area. Both histogram procedures provide quite reasonable estimates of the density, owing to the fairly large sample size.
 
 ## Mode hunting
+In an exploratory data analysis setting, identifying key features in a dataset such as modes can be of great interest. Unfortunately, most popular regular histogram have been designed with good performance in term of statistical risk with respect to classical, integral-based loss functions, which typically results in a large amount of spurious histogram modes in regions where the true density is flat and in the tails of the density [(Denby and Mallows, 2009) ](https://doi.org/10.1198/jcgs.2009.0002). However, in cases where the true density has a smallish amount of well-separated modes, some irregular histogram procedures have been shown empirically to perform quite well with regard to automatic mode detection, see e.g. [Davies et al. (2009)](https://doi.org/10.1051/ps:2008005); [Li et al. (2020)](https://doi.org/10.1093/biomet/asz081); [Simensen et al. (2025)](https://doi.org/10.48550/ARXIV.2505.22034).

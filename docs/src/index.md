@@ -37,7 +37,6 @@ p_reg = plot(h_reg, xlabel="x", label="Regular", alpha=0.4, color="blue")
 plot(p_irr, p_reg, layout=(1, 2), size=(600, 300))
 ```
 
-
 ## Supported methods
 Both the regular and the irregular procedure support a large number of criteria to select the histogram partition. The keyword argument `rule` controls the criterion used to choose the best partition, and includes the following options:
 

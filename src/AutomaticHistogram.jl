@@ -1,7 +1,7 @@
 """
     AutomaticHistogram
 
-A type for representing a histogram where the histogram partition has been chosen automatically based on the sample. Can be fitted to data using the `fit`, `histogram_irregular` or `histogram_regular` methods.
+A type for representing a histogram where the histogram partition has been chosen automatically based on the sample. Can be fitted to data using the [`fit`](@ref), []`histogram_irregular`](@ref) or [`histogram_regular`](@ref) methods.
 
 ...
 # Fields
@@ -16,7 +16,7 @@ A type for representing a histogram where the histogram partition has been chose
 ```jldoctest 
 julia> using AutoHist
 
-julia> x = LinRange(eps(), 1-eps(), 5000) .^(1.0/4.0);
+julia> x = LinRange(eps(), 1.0-eps(), 5000) .^(1.0/4.0);
 
 julia> h = fit(AutomaticHistogram, x)
 AutomaticHistogram
@@ -39,22 +39,24 @@ end
 
 AutomaticHistogram(breaks::AbstractVector{Float64}, density::AbstractVector{Float64}, counts::AbstractVector{Int}, type::Symbol, closed::Symbol) = AutomaticHistogram(breaks, density, counts, type, closed, NaN)
 
-"""
+#= """
     ==(h1::AutomaticHistogram, h2::AutomaticHistogram)
 
 Return `true` if all fields of `h1` and `h2` are equal. Otherwise, return `false`.
-"""
+""" =#
 Base.:(==)(h1::AutomaticHistogram, h2::AutomaticHistogram) = all(isequal(getfield(h1, f), getfield(h2, f)) for f in fieldnames(AutomaticHistogram))
 
-"""
+#= """
     ≈(h1::AutomaticHistogram, h2::AutomaticHistogram)
 
 Return `true` if all numeric fields of `h1` and `h2` are approximately equal, and all symbol fields are exactly equal. Otherwise, return `false`.
-"""
+""" =#
 function Base.:(≈)(h1::AutomaticHistogram, h2::AutomaticHistogram)
     if ( !isnan(getfield(h1, :a)) ) && isnan(getfield(h2, :a))
         return false
     elseif ( !isnan(getfield(h2, :a)) ) && isnan(getfield(h1, :a))
+        return false
+    elseif length(h1.breaks) != length(h2.breaks)
         return false
     else 
         return all(isapprox(getfield(h1, f), getfield(h2, f)) for f in (:breaks, :density, :counts)) && all(isequal(getfield(h1, f), getfield(h2, f)) for f in (:type, :closed))
@@ -83,13 +85,13 @@ Fit a histogram to a one-dimensional vector x with an automatic and data-based s
 # Keyword arguments
 - `rule`: The criterion used to determine the optimal number of bins. Defaults to the method Bayesian method of Simensen et al. (2025).
 - `type`: Symbol indicating whether the fitted method is a regular and irregular one. The rules `:bayes`, `:l2cv`, `:klcv` and `:nml` are implemented for both regular and irregular histograms, and this keyword specifies whether the regular or irregular version should be used. For other rules, this function infers the type automatically from the `rule` keyword, and misspecifying the rule in this case has not effect. Possible values are `:irregular` (default) and `:regular`.
-- `kwargs`: Additional keyword arguments passed to `histogram_regular` or `histogram_irregular` depending on the specified or inferred type.
+- `kwargs`: Additional keyword arguments passed to [`histogram_regular`](@ref) or [`histogram_irregular`](@ref) depending on the specified or inferred type.
 
 # Returns
 - `h`: An object of type `AutomaticHistogram`, corresponding to the fitted histogram.
 
 # Examples
-```
+```julia
 julia> x = randn(10^3)
 julia> h1 = fit(AutomaticHistogram, x)                                      # fits an irregular histogram
 julia> h2 = fit(AutomaticHistogram, x; rule=:wand, scalest=:stdev, level=4) # fits a regular histogram

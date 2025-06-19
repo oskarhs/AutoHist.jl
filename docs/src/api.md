@@ -31,6 +31,7 @@ logmarginallikelihood
 convert(::Type{Histogram}, h::AutomaticHistogram)
 ```
 
+## Index
 
 ```@index
 Pages = ["api.md"]
