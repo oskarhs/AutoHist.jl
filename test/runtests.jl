@@ -115,6 +115,7 @@ end
     x = randn(10^3)
 
     @test histogram_regular(x; a = k->8.0) == histogram_regular(x; a=8.0)
+    @test histogram_regular(x; a = k->8.0) ≈ histogram_regular(x; a=8.0)
 end
 
 @testset "min length" begin
@@ -210,10 +211,10 @@ end
     counts4 = [1]
     true_modes4 = [0.5]
 
-    @test modes(AutomaticHistogram(breaks1, density1, counts1, :regular, :right)) == true_modes1
-    @test modes(AutomaticHistogram(breaks2, density2, counts2, :regular, :right)) == true_modes2
-    @test modes(AutomaticHistogram(breaks3, density3, counts3, :regular, :right)) == true_modes3
-    @test modes(AutomaticHistogram(breaks4, density4, counts4, :regular, :right)) == true_modes4
+    @test peaks(AutomaticHistogram(breaks1, density1, counts1, :regular, :right)) == true_modes1
+    @test peaks(AutomaticHistogram(breaks2, density2, counts2, :regular, :right)) == true_modes2
+    @test peaks(AutomaticHistogram(breaks3, density3, counts3, :regular, :right)) == true_modes3
+    @test peaks(AutomaticHistogram(breaks4, density4, counts4, :regular, :right)) == true_modes4
 end
 
 @testset "AutomaticHistogram pdf" begin

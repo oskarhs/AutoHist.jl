@@ -22,7 +22,7 @@ Returns an AutomaticHistogram object with the optimal partition corresponding to
 - `h`: AutomaticHistogram object with weights corresponding to densities, e.g. `:isdensity` is set to true.
 
 # Examples
-```
+```julia
 julia> x = [0.037, 0.208, 0.189, 0.656, 0.45, 0.846, 0.986, 0.751, 0.249, 0.447]
 julia> h1 = histogram_irregular(x)
 julia> h2 = histogram_irregular(x; grid=:quantile, support=(0.0, 1.0), logprior=k->-log(k), a=sqrt(10))

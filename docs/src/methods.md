@@ -1,5 +1,5 @@
 # Supported Methods
-This page provides background on each histogram method supported through the `rule` argument. Our presentation is intended to be rather brief, and we do as such not cover the theoretical underpinnings of each method in great detail. For some further background on automatic histogram procedures and the theory behind them, we recommend the excellent reviews contained in the articles of [Birgé and Rozenholc (2006)]((https://doi.org/10.1016/j.csda.2010.04.021)) and [Davies et al. (2009)](https://doi.org/10.1051/ps:2008005).
+This page provides background on each histogram method supported through the `rule` argument. Our presentation is intended to be rather brief, and we do as such not cover the theoretical underpinnings of each method in great detail. For some further background on automatic histogram procedures and the theory behind them, we recommend the excellent reviews contained in the articles of [Birgé and Rozenholc (2006)](https://doi.org/10.1016/j.csda.2010.04.021) and [Davies et al. (2009)](https://doi.org/10.1051/ps:2008005).
 
 For ease of exposition, we present all methods covered here in the context of estimating the density of a sample ``\boldsymbol{x} = (x_1, x_2, \ldots, x_n)`` on the unit interval, but note that extending the procedures presented here to other compact intervals is possible through a suitable affine transformation. In particular, if a density estimate with support ``[a,b]`` is desired, we can scale the data to the unit interval through ``z_i = (x_i - a)/(b-a)``, and apply the methods on this transformed sample and rescale the resulting density estimate to ``[a,b]``. In cases where the support of the density is unknown, a natural choice is ``a = x_{(1)}`` and ``b = x_{(n)}``. Cases where only the lower or upper bound is known can be handled similarly. The transformation used to construct the histogram can be controlled through the `support` keyword, where the default argument `support=(-Inf, Inf)` uses the order statistics-based approach described above.
 
@@ -113,7 +113,7 @@ Consists of maximizing a Kullback-Leibler leave-one-out cross-validation criteri
     n\log(k) + \sum_{j=1}^k N_j\log (N_j-1),
 ```
 where the maximmization is over all regular partitions with ``N_j \geq 2`` for all ``j``.
-This approach was first studied by [Hall (1990)]((https://doi.org/10.1007/BF01203164)).
+This approach was first studied by [Hall (1990)](https://doi.org/10.1007/BF01203164).
 #### mdl:
 Consists of finding the model providing the shortest encoding of the data, which is equivalent to maximization of
 ```math

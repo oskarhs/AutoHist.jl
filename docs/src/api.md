@@ -20,12 +20,12 @@ histogram_regular
 ### Additional methods for AutomaticHist
 
 ```@docs
-modes(::AutomaticHistogram)
+peaks(::AutomaticHistogram)
 minimum(::AutomaticHistogram)
 maximum(::AutomaticHistogram)
 extrema(::AutomaticHistogram)
-AutoHist.insupport(::AutomaticHistogram, ::Real)
-AutoHist.pdf(::AutomaticHistogram, ::Real)
+insupport(::AutomaticHistogram, ::Real)
+pdf(::AutomaticHistogram, ::Real)
 loglikelihood(::AutomaticHistogram)
 logmarginallikelihood
 convert(::Type{Histogram}, h::AutomaticHistogram)

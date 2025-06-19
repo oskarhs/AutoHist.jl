@@ -13,11 +13,19 @@ A type for representing a histogram where the histogram partition has been chose
 - `a`: Value of the Dirichlet concentration parameter corresponding to the chosen partition. Only of relevance if a Bayesian method was used to fit the histogram, and is otherwise set to `NaN`.
 
 # Examples
-```
-julia> x = [0.037, 0.208, 0.189, 0.656, 0.45, 0.846, 0.986, 0.751, 0.249, 0.447]
-julia> h1 = fit(AutomaticHistogram, x)      # fits an irregular histogram
-julia> h2 = fit(AutomaticHistogram, x; rule=:wand, scalest=:stdev, level=4)
-julia> h3 = histogram_irregular(x; grid=:quantile, support=(0.0, 1.0), logprior=k->-log(k), a=sqrt(10))
+```jldoctest 
+julia> using AutoHist
+
+julia> x = LinRange(eps(), 1-eps(), 5000) .^(1.0/4.0);
+
+julia> h = fit(AutomaticHistogram, x)
+AutomaticHistogram
+breaks: [0.00012207031249977798, 0.17763663029325183, 0.29718725232110504, 0.4022468898607337, 0.4928155429121377, 0.5797614498414855, 0.6667073567708333, 0.7572760098222373, 0.8405991706295289, 0.9239223314368207, 1.0000000000000002]
+density: [0.00662683597412854, 0.057821970706400425, 0.17596277991076312, 0.36279353706969375, 0.6214544825215076, 0.9730458529384184, 1.4481767793920146, 2.0440057561776532, 2.7513848134529346, 3.564842182949155]
+counts: [5, 34, 92, 164, 270, 423, 656, 852, 1147, 1357]
+type: irregular
+closed: right
+a: 5.0
 ```
 """
 struct AutomaticHistogram 
@@ -31,7 +39,27 @@ end
 
 AutomaticHistogram(breaks::AbstractVector{Float64}, density::AbstractVector{Float64}, counts::AbstractVector{Int}, type::Symbol, closed::Symbol) = AutomaticHistogram(breaks, density, counts, type, closed, NaN)
 
+"""
+    ==(h1::AutomaticHistogram, h2::AutomaticHistogram)
+
+Return `true` if all fields of `h1` and `h2` are equal. Otherwise, return `false`.
+"""
 Base.:(==)(h1::AutomaticHistogram, h2::AutomaticHistogram) = all(isequal(getfield(h1, f), getfield(h2, f)) for f in fieldnames(AutomaticHistogram))
+
+"""
+    ≈(h1::AutomaticHistogram, h2::AutomaticHistogram)
+
+Return `true` if all numeric fields of `h1` and `h2` are approximately equal, and all symbol fields are exactly equal. Otherwise, return `false`.
+"""
+function Base.:(≈)(h1::AutomaticHistogram, h2::AutomaticHistogram)
+    if ( !isnan(getfield(h1, :a)) ) && isnan(getfield(h2, :a))
+        return false
+    elseif ( !isnan(getfield(h2, :a)) ) && isnan(getfield(h1, :a))
+        return false
+    else 
+        return all(isapprox(getfield(h1, f), getfield(h2, f)) for f in (:breaks, :density, :counts)) && all(isequal(getfield(h1, f), getfield(h2, f)) for f in (:type, :closed))
+    end
+end
 
 function Base.show(io::IO, h::AutomaticHistogram)
     println(io, typeof(h))
@@ -60,6 +88,7 @@ Fit a histogram to a one-dimensional vector x with an automatic and data-based s
 # Returns
 - `h`: An object of type `AutomaticHistogram`, corresponding to the fitted histogram.
 
+# Examples
 ```
 julia> x = randn(10^3)
 julia> h1 = fit(AutomaticHistogram, x)                                      # fits an irregular histogram
@@ -91,7 +120,7 @@ end
 """
     convert(Histogram, h::AutomaticHistogram)
 
-Convert an `AutomaticHistogram` to a StatsBase.Histogram, normalized to be a density.
+Convert an `AutomaticHistogram` to a StatsBase.Histogram, normalized to be a probability density.
 """
 Base.convert(::Type{Histogram}, h::AutomaticHistogram) = Histogram(h.breaks, h.density, h.closed, true)
 
@@ -205,13 +234,13 @@ function pdf(h::AutomaticHistogram, x::Real)
 end
 
 """
-    modes(h::AutomaticHistogram)
+    peaks(h::AutomaticHistogram)
 
-Return the location of the modes of `h` as a Vector, sorted in increasing order.
+Return the location of the modes/peaks of `h` as a Vector, sorted in increasing order.
 
-Formally, the modes of the histogram `h` are defined as the midpoints of an interval ``J``, where the density of `h` is constant on ``J``, and the density of `h` is strictly smaller than this value in the histogram bins adjacent to ``J``. Note that according this definition, ``J`` is in general a nonempty union of intervals in the histogram partition.
+Formally, the modes/peaks of the histogram `h` are defined as the midpoints of an interval ``J``, where the density of `h` is constant on ``J``, and the density of `h` is strictly smaller than this value in the histogram bins adjacent to ``J``. Note that according this definition, ``J`` is in general a nonempty union of intervals in the histogram partition.
 """
-function modes(h::AutomaticHistogram)
+function peaks(h::AutomaticHistogram)
     # implementation here (see peak_id_loss from loss_functions.jl)
     breaks = h.breaks
     dens = h.density
