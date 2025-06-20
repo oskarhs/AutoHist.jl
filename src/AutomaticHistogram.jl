@@ -1,9 +1,8 @@
 """
     AutomaticHistogram
 
-A type for representing a histogram where the histogram partition has been chosen automatically based on the sample. Can be fitted to data using the [`fit`](@ref), []`histogram_irregular`](@ref) or [`histogram_regular`](@ref) methods.
+A type for representing a histogram where the histogram partition has been chosen automatically based on the sample. Can be fitted to data using the [`fit`](@ref), [`histogram_irregular`](@ref) or [`histogram_regular`](@ref) methods.
 
-...
 # Fields
 - `breaks`: AbstractVector consisting of the cut points in the chosen partition.
 - `density`: Estimated density in each bin.
@@ -39,6 +38,13 @@ end
 
 AutomaticHistogram(breaks::AbstractVector{Float64}, density::AbstractVector{Float64}, counts::AbstractVector{Int}, type::Symbol, closed::Symbol) = AutomaticHistogram(breaks, density, counts, type, closed, NaN)
 
+"""
+    length(h::AutomaticHistogram)
+
+Returns the number of bins of `h`.
+"""
+Base.length(h::AutomaticHistogram) = length(h.density)
+
 #= """
     ==(h1::AutomaticHistogram, h2::AutomaticHistogram)
 
@@ -56,7 +62,7 @@ function Base.:(≈)(h1::AutomaticHistogram, h2::AutomaticHistogram)
         return false
     elseif ( !isnan(getfield(h2, :a)) ) && isnan(getfield(h1, :a))
         return false
-    elseif length(h1.breaks) != length(h2.breaks)
+    elseif length(h1) != length(h2)
         return false
     else 
         return all(isapprox(getfield(h1, f), getfield(h2, f)) for f in (:breaks, :density, :counts)) && all(isequal(getfield(h1, f), getfield(h2, f)) for f in (:type, :closed))
@@ -74,21 +80,21 @@ function Base.show(io::IO, h::AutomaticHistogram)
 end
 
 """
-    fit(AutomaticHistogram, x::AbstractVector{x<:Real}; rule=:bayes, type=:irregular, kwargs...)
+    fit(AutomaticHistogram, x::AbstractVector{x<:Real}; rule=:default, type=:irregular, kwargs...)
 
-Fit a histogram to a one-dimensional vector x with an automatic and data-based selection of the histogram partition.
+Fit a histogram to a one-dimensional vector `x` with an automatic and data-based selection of the histogram partition.
 
 ...
 # Arguments
 - `x`: 1D vector of data for which a histogram is to be constructed.
 
 # Keyword arguments
-- `rule`: The criterion used to determine the optimal number of bins. Defaults to the method Bayesian method of Simensen et al. (2025).
+- `rule`: The criterion used to determine the optimal number of bins. Default value is `rule=:default` which uses the default rule for the regular or irregular histogram procedure depending on the value of `type`.
 - `type`: Symbol indicating whether the fitted method is a regular and irregular one. The rules `:bayes`, `:l2cv`, `:klcv` and `:nml` are implemented for both regular and irregular histograms, and this keyword specifies whether the regular or irregular version should be used. For other rules, this function infers the type automatically from the `rule` keyword, and misspecifying the rule in this case has not effect. Possible values are `:irregular` (default) and `:regular`.
 - `kwargs`: Additional keyword arguments passed to [`histogram_regular`](@ref) or [`histogram_irregular`](@ref) depending on the specified or inferred type.
 
 # Returns
-- `h`: An object of type `AutomaticHistogram`, corresponding to the fitted histogram.
+- `h`: An object of type [`AutomaticHistogram`](@ref), corresponding to the fitted histogram.
 
 # Examples
 ```julia
@@ -97,8 +103,16 @@ julia> h1 = fit(AutomaticHistogram, x)                                      # fi
 julia> h2 = fit(AutomaticHistogram, x; rule=:wand, scalest=:stdev, level=4) # fits a regular histogram
 ```
 """
-function fit(::Type{AutomaticHistogram}, x::AbstractVector{<:Real}; rule::Symbol=:bayes, type::Symbol=:irregular, kwargs...)
-    if rule in [:aic, :bic, :br, :mdl, :sturges, :fd, :scott, :wand]
+function fit(::Type{AutomaticHistogram}, x::AbstractVector{<:Real}; rule::Symbol=:default, type::Symbol=:irregular, kwargs...)
+    if rule == :default
+        if type == :irregular
+            rule = :bayes
+        elseif type == :regular
+            rule = :knuth
+        else 
+            throw(ArgumentError("The supplied type, :$type, is not supported and the supplied rule=:default could as such not be inferred. Valid types are :irregular and :regular."))
+        end
+    elseif rule in [:aic, :bic, :br, :mdl, :sturges, :fd, :scott, :wand]
         type = :regular
     elseif rule in [:pena, :penb, :penr]
         type = :irregular
@@ -122,14 +136,14 @@ end
 """
     convert(Histogram, h::AutomaticHistogram)
 
-Convert an `AutomaticHistogram` to a StatsBase.Histogram, normalized to be a probability density.
+Convert an `h` to a StatsBase.Histogram, normalized to be a probability density.
 """
 Base.convert(::Type{Histogram}, h::AutomaticHistogram) = Histogram(h.breaks, h.density, h.closed, true)
 
 """
     loglikelihood(h::AutomaticHistogram)
 
-Compute the log-likelihood (up to proportionality) of an `AutomaticHistogram`.
+Compute the log-likelihood (up to proportionality) of an `h`.
 
 The value of the log-likelihood is
     ∑ⱼ Nⱼ log (dⱼ),
@@ -149,7 +163,7 @@ end
     logmarginallikelihood(h::AutomaticHistogram, a::Real)
     logmarginallikelihood(h::AutomaticHistogram)
 
-Compute the log-marginal likelihood (up to proportionality) of an `AutomaticHistogram` when the value of the Dirichlet concentration parameter equals a. This can be automatically inferred if the histogram was fitted with `rule=:bayes`, and does not have to be explicitly passed as an argument in this case.
+Compute the log-marginal likelihood (up to proportionality) of `h` when the value of the Dirichlet concentration parameter equals `a`. This can be automatically inferred if the histogram was fitted with `rule=:bayes`, and does not have to be explicitly passed as an argument in this case.
 
 Assumes that the Dirichlet prior is centered on the uniform distribution, so that aⱼ = a/k for a scalar a>0 and all j.
 The value of the log-marginal likelihood is
@@ -211,7 +225,7 @@ Evaluate the probability density function of `h` at `x`.
 function pdf(h::AutomaticHistogram, x::Real)
     val = 0.0
     if insupport(h, x)
-        k = length(h.density)
+        k = length(h)
         if h.type == :irregular
             if h.closed == :right
                 idx = max(1, searchsortedfirst(h.breaks, x) - 1)
@@ -235,12 +249,21 @@ function pdf(h::AutomaticHistogram, x::Real)
     return val
 end
 
+# Allows for pdf.(h, x) where x is a vector.
+function Base.Broadcast.broadcasted(::typeof(pdf), h::AutomaticHistogram, x::AbstractVector)
+    vals = Array{Float64}(undef, length(x))
+    @inbounds for i in eachindex(x)
+        vals[i] = pdf(h, x[i])
+    end
+    return vals
+end
+
 """
     peaks(h::AutomaticHistogram)
 
 Return the location of the modes/peaks of `h` as a Vector, sorted in increasing order.
 
-Formally, the modes/peaks of the histogram `h` are defined as the midpoints of an interval ``J``, where the density of `h` is constant on ``J``, and the density of `h` is strictly smaller than this value in the histogram bins adjacent to ``J``. Note that according this definition, ``J`` is in general a nonempty union of intervals in the histogram partition.
+Formally, the modes/peaks of the histogram `h` are defined as the midpoints of an interval ``\\mathcal{J}``, where the density of `h` is constant on ``\\mathcal{J}``, and the density of `h` is strictly smaller than this value in the histogram bins adjacent to ``\\mathcal{J}``. Note that according this definition, ``\\mathcal{J}`` is in general a nonempty union of intervals in the histogram partition.
 """
 function peaks(h::AutomaticHistogram)
     # implementation here (see peak_id_loss from loss_functions.jl)

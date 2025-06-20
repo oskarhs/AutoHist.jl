@@ -19,7 +19,7 @@ Returns an AutomaticHistogram object with the optimal partition corresponding to
 - `a`: Dirichlet concentration parameter in the Bayesian irregular histogram model. Set to the default value (5.0) if the supplied value is not a positive real number. Only used when `rule` is set to `:bayes`.
 
 # Returns
-- `h`: AutomaticHistogram object with weights corresponding to densities, e.g. `:isdensity` is set to true.
+- `h`: The fitted histogram as an [`AutomaticHistogram`](@ref) object.
 
 # Examples
 ```julia

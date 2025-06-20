@@ -32,35 +32,36 @@ AutomaticHistogram objects are compatible with Plots.jl, which allows us to easi
 ```@example index
 using Plots; gr()
 # Plot the resulting histograms
-p_irr = plot(h_irr, xlabel="x", ylabel="Density", label="Irregular", alpha=0.4, color="red")
-p_reg = plot(h_reg, xlabel="x", label="Regular", alpha=0.4, color="blue")
-plot(p_irr, p_reg, layout=(1, 2), size=(600, 300))
+p_irr = plot(h_irr, xlabel="x", ylabel="Density", label="Irregular", alpha=0.4, color="black")
+p_reg = plot(h_reg, xlabel="x", label="Regular", alpha=0.4, color="red")
+plot(p_irr, p_reg, layout=(1, 2), size=(670, 320))
 ```
 
 ## Supported methods
 Both the regular and the irregular procedure support a large number of criteria to select the histogram partition. The keyword argument `rule` controls the criterion used to choose the best partition, and includes the following options:
 
 - Regular Histograms:
-    - Random regular histogram, :bayes (default)
-    - L2 cross-validation, :l2cv
-    - Kullback-Leibler cross-validation: :klcv
-    - AIC, :aic
-    - BIC, :bic
-    - Birgé and Rozenholc's criterion, :br
-    - Normalized Maximum Likelihood, :nml
-    - Minimum Description Length, :mdl
-    - Sturges' rule, :sturges
-    - Freedman and Diaconis' rule, :fd
-    - Scott's rule, :scott
-    - Wand's rule, :wand
+    - Knuth's rule, [:knuth](methods.md#bayes,-knuth) (default)
+    - Random regular histogram, [:bayes](methods.md#bayes,-knuth)
+    - L2 cross-validation, [:l2cv](methods.md#l2cv-(regular))
+    - Kullback-Leibler cross-validation: [:klcv](methods.md#klcv-(regular))
+    - AIC, [:aic](methods.md#aic)
+    - BIC, [:bic](methods.md#bic)
+    - Birgé and Rozenholc's criterion, [:br](methods.md#br)
+    - Normalized Maximum Likelihood, [:nml](methods.md#nml-(regular))
+    - Minimum Description Length, [:mdl](methods.md#mdl)
+    - Sturges' rule, [:sturges](methods.md##Sturges'-rule)
+    - Freedman and Diaconis' rule, [:fd](methods.md#Freedman-and-Diaconis'-rule)
+    - Scott's rule, [:scott](methods.md#Scott's-rule)
+    - Wand's rule, [:wand](methods.md#Wand's-rule)
 - Irregular Histograms:
-    - Random irregular histogram, :bayes (default)
-    - L2 cross-validation, :l2cv
-    - Kullback-Leibler cross-validation: :klcv
-    - Rozenholc et al. penalty R: :penr
-    - Rozenholc et al. penalty B: :penb
-    - Rozenholc et al. penalty A: :pena
-    - Normalized Maximum Likelihood: :nml
+    - Random irregular histogram, [:bayes](methods.md#bayes) (default)
+    - L2 cross-validation, [:l2cv](methods.md#l2cv-(irregular))
+    - Kullback-Leibler cross-validation: [:klcv](methods.md#klcv-(irregular))
+    - Rozenholc et al. penalty R: [:penr](methods.md#penr)
+    - Rozenholc et al. penalty B: [:penb](methods.md#penb)
+    - Rozenholc et al. penalty A: [:pena](methods.md#pena)
+    - Normalized Maximum Likelihood: [:nml](methods.md#nml-(irregular))
 
 A more detailed description along with references for each method can be found on the [methods page](methods.md).
 

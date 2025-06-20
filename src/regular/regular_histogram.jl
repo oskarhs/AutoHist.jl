@@ -4,7 +4,6 @@
 Create a regular histogram based on an asymptotic risk estimate, or optimization criteria from Bayesian probability, penalized likelihood or LOOCV.
 Returns a AutomaticHistogram object with regular bins, with the optimal bin number corresponding to the supplied criterion.
 
-...
 # Arguments
 - `x`: 1D vector of data for which a histogram is to be constructed.
 
@@ -19,7 +18,7 @@ Returns a AutomaticHistogram object with regular bins, with the optimal bin numb
 - `level`: Specifies the level used for the Kernel functional estimate in Wands' rule. Only used if `rule==:wand`. Possible values are 0,1,2,3,4 and 5. Default value is `level=2`.
 
 # Returns
-- `h`: AutomaticHistogram object with weights corresponding to densities, e.g. `isdensity` is set to true.
+- `h`: The fitted histogram as an [`AutomaticHistogram`](@ref) object.
 
 # Examples
 ```
@@ -29,10 +28,10 @@ julia> h2 = histogram_regular(x; logprior=k->-log(k), a=k->0.5*k)
 ```
 ...
 """
-function histogram_regular( x::AbstractVector{<:Real}; rule::Symbol=:bayes, closed::Symbol=:right, maxbins::Int=1000,
-                            support::Tuple{Real,Real}=(-Inf,Inf), logprior::Function=k->0.0, a::Union{Real,Function}=1.0,
+function histogram_regular( x::AbstractVector{<:Real}; rule::Symbol=:knuth, closed::Symbol=:right, maxbins::Int=1000,
+                            support::Tuple{Real,Real}=(-Inf,Inf), logprior::Function=k->0.0, a::Union{Real,Function}=5.0,
                             scalest::Symbol=:minim, level::Int=2)
-    if !(rule in [:aic, :bic, :br, :bayes, :mdl, :klcv, :nml, :l2cv, :sturges, :fd, :scott, :wand])
+    if !(rule in [:aic, :bic, :br, :bayes, :knuth, :mdl, :klcv, :nml, :l2cv, :sturges, :fd, :scott, :wand])
         throw(ArgumentError("The supplied rule, :$rule, is not supported. The rule kwarg must be one of :aic, :bic, :br, :bayes, :mdl, :klcv, :nml, :l2cv, :sturges, :fd, :scott or :wand"))
     end
     if !(closed in [:right, :left]) # if supplied symbol is nonsense, just use default
@@ -102,6 +101,10 @@ function histogram_regular( x::AbstractVector{<:Real}; rule::Symbol=:bayes, clos
                     end
                 end
             end
+        elseif rule == :knuth
+            aₖ = LinRange(0.5, 0.5*k_max, k_max)  # a = 0.5k
+            logprior = k->0.0 # pₙ(k) ∝ 1
+            rule = :bayes
         end
 
         criterion = Array{Float64}(undef, k_max) # Criterion to be maximized depending on the specified rule

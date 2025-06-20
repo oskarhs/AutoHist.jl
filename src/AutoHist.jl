@@ -1,7 +1,7 @@
 module AutoHist
 
 export AutomaticHistogram
-export fit, convert, loglikelihood, logmarginallikelihood, minimum, maximum, extrema, peaks, pdf, insupport
+export fit, convert, loglikelihood, logmarginallikelihood, minimum, maximum, extrema, peaks, pdf, insupport, length
 export histogram_regular, histogram_irregular
 
 using StatsBase, Base.Threads, Distributions

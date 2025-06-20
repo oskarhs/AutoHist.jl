@@ -7,7 +7,7 @@ import StatsBase: Histogram, fit
 @testset "return type" begin
     x = collect(LinRange(0,1,11))
 
-    for rule in [:bayes, :aic, :bic, :br, :mdl, :nml, :l2cv, :klcv,
+    for rule in [:bayes, :knuth, :aic, :bic, :br, :mdl, :nml, :l2cv, :klcv,
                  :sturges, :fd, :scott]
         for closed in [:left, :right]
             h = histogram_regular(x; rule=rule, closed=closed)
@@ -151,18 +151,16 @@ end
     @test typeof(output) == String
 end
 
-@testset "AutomaticHistogram approx" begin
+@testset "AutomaticHistogram approx different dims" begin
     breaks1 = LinRange(0, 1, 11)
     density1 = [95, 84, 101, 101, 102, 106, 100, 104, 104, 103] / 100.0
     counts1 = [95, 84, 101, 101, 102, 106, 100, 104, 104, 103]
-    true_modes1 = [0.05, 0.55, 0.8]
 
-    breaks2 = LinRange(0, 1, 11)
-    density2 = fill(100, 10) / 100.0
-    counts2 = fill(100, 10)
-    true_modes2 = [0.5]
+    breaks2 = LinRange(0, 1, 6)
+    density2 = fill(100, 5) / 100.0
+    counts2 = fill(100, 5)
 
-    AutomaticHistogram(breaks1, density1, counts1, :irregular, :right) ≈ AutomaticHistogram(breaks2, density2, counts2, :irregular, :right)
+    @test !(AutomaticHistogram(breaks1, density1, counts1, :irregular, :right) ≈ AutomaticHistogram(breaks2, density2, counts2, :irregular, :right))
 end
 
 @testset "AutomaticHistogram fit" begin
@@ -179,6 +177,7 @@ end
 
     @test_throws ArgumentError fit(AutomaticHistogram, x; rule=:nonsense)               # test error handling
     @test_throws ArgumentError fit(AutomaticHistogram, x; rule=:l2cv, type=:nonsense)
+    @test_throws ArgumentError fit(AutomaticHistogram, x; type=:nonsense)
 end
 
 @testset "AutomaticHistogram loglik, logmarglik" begin
@@ -252,4 +251,8 @@ end
         @test AutoHist.pdf(AutomaticHistogram(breaks2, density2, counts2, :irregular, :right), breaks2[j+1]) == density2[j]
         @test AutoHist.pdf(AutomaticHistogram(breaks2, density2, counts2, :irregular, :left), breaks2[j+1]) == density2[j+1]
     end
+
+    # Test the broadcasted versions as well
+    @test AutoHist.pdf.(AutomaticHistogram(breaks1, density1, counts1, :regular, :right), [0.1]) == [1.08]
+    @test AutoHist.pdf.(AutomaticHistogram(breaks2, density2, counts2, :irregular, :right), [0.2]) == [0.945]
 end
