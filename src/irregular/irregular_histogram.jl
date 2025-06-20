@@ -141,37 +141,46 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::Symbol=:bayes, gri
         end
     end
 
-    optimal, ancestor = dynamic_algorithm(phi, k_max)
-    psi = Array{Float64}(undef, k_max)
-    if rule == :penb   
-        @simd for k = 1:k_max
-            @inbounds psi[k] = -logabsbinomial(maxbins-1, k-1)[1] - k - log(k)^(2.5)
-        end
-    elseif rule == :bayes
-        @simd for k = 1:k_max
-            @inbounds psi[k] = logprior(k) - logabsbinomial(maxbins-1, k-1)[1] + loggamma(a) - loggamma(a + n)
-        end
-    elseif rule == :penr
-        @simd for k = 1:k_max
-            @inbounds psi[k] = -logabsbinomial(maxbins-1, k-1)[1] - k - log(k)^(2.5)
-        end
-    elseif rule == :pena
-        @simd for k = 1:k_max
-            @inbounds psi[k] = -logabsbinomial(maxbins-1, k-1)[1] - k - 2.0*log(k) -
-                    2.0 * sqrt(1.0*0.5*(k-1)*(logabsbinomial(maxbins-1, k-1)[1] + 2.0*log(k)))
-        end
-    elseif rule == :nml
-        @simd for k = 1:k_max
-            @inbounds psi[k] =  -( 0.5*k*log(0.5*n) - loggamma(0.5*k) +
-            1.0/sqrt(n) * sqrt(2.0)*k/3.0 * exp(loggamma(0.5*k) - loggamma(0.5*k-0.5)) +
-            1.0/n * ((3.0 + k*(k-2.0)*(2.0*k+1.0))/36.0 - k^2/9.0*exp(2.0*loggamma(0.5*k) - 2.0*loggamma(0.5*k-0.5)))
-            )
-            psi[k] = psi[k] - logabsbinomial(maxbins-1, k-1)[1]
-        end
-    end # NB! no penalties for klcv and l2cv
-    k_opt = argmax(optimal + psi)
+    #optimal, ancestor = dynamic_algorithm(phi, k_max)
+    if rule in [:klcv, :l2cv] # use quadratic complexity dynamic programming algorithm, tailored to criteria of this form
+        optimal, ancestor = dynprog_quadratic(phi, k_max)
+        #k_opt = argmax(optimal)
+        bin_edges_norm = compute_bounds_quadratic(ancestor, mesh, k_max)
 
-    bin_edges_norm = compute_bounds(ancestor, mesh, k_opt)
+    else # use the cubic complexity algorithm
+        optimal, ancestor = dynprog_cubic(phi, k_max)
+        psi = Array{Float64}(undef, k_max)
+        if rule == :penb   
+            @simd for k = 1:k_max
+                @inbounds psi[k] = -logabsbinomial(maxbins-1, k-1)[1] - k - log(k)^(2.5)
+            end
+        elseif rule == :bayes
+            @simd for k = 1:k_max
+                @inbounds psi[k] = logprior(k) - logabsbinomial(maxbins-1, k-1)[1] + loggamma(a) - loggamma(a + n)
+            end
+        elseif rule == :penr
+            @simd for k = 1:k_max
+                @inbounds psi[k] = -logabsbinomial(maxbins-1, k-1)[1] - k - log(k)^(2.5)
+            end
+        elseif rule == :pena
+            @simd for k = 1:k_max
+                @inbounds psi[k] = -logabsbinomial(maxbins-1, k-1)[1] - k - 2.0*log(k) -
+                        2.0 * sqrt(1.0*0.5*(k-1)*(logabsbinomial(maxbins-1, k-1)[1] + 2.0*log(k)))
+            end
+        elseif rule == :nml
+            @simd for k = 1:k_max
+                @inbounds psi[k] =  -( 0.5*k*log(0.5*n) - loggamma(0.5*k) +
+                1.0/sqrt(n) * sqrt(2.0)*k/3.0 * exp(loggamma(0.5*k) - loggamma(0.5*k-0.5)) +
+                1.0/n * ((3.0 + k*(k-2.0)*(2.0*k+1.0))/36.0 - k^2/9.0*exp(2.0*loggamma(0.5*k) - 2.0*loggamma(0.5*k-0.5)))
+                )
+                psi[k] = psi[k] - logabsbinomial(maxbins-1, k-1)[1]
+            end
+        end
+        k_opt = argmax(optimal + psi)
+        bin_edges_norm = compute_bounds_cubic(ancestor, mesh, k_opt)
+    end
+
+    #bin_edges_norm = compute_bounds(ancestor, mesh, k_opt)
     bin_edges = @. xmin + (xmax - xmin) * bin_edges_norm
 
     #N = convert.(Int64, bin_irregular(x, bin_edges, closed == :right))
