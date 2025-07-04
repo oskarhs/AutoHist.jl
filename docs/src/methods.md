@@ -60,7 +60,7 @@ Consists of maximization of a Kullback-Leibler cross-validation criterion,
     \sum_{j=1}^k N_j\log(N_j-1) - \sum_{j=1}^k N_j\log |I_j|,
 ```
 where the maximmization is over all partitions with ``N_j \geq 2`` for all ``j``.
-This approach was, to our knowledge, first pursued by Simensen et al. (2025).
+This approach was, to our knowledge, first pursued by [Simensen et al. (2025)](https://doi.org/10.48550/ARXIV.2505.22034).
 #### nml: (irregular)
 Consists of maximization of a penalized likelihood,
 ```math

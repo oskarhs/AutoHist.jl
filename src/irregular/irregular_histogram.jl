@@ -101,7 +101,7 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::Symbol=:bayes, gri
         mesh = finestgrid[grid_ind]
         k_max = length(mesh) - 1
         # convert grid_ind to array of integers equal to true
-        chosen_ind = findall(grid_ind)
+        #chosen_ind = findall(grid_ind)
 
         # Update bin counts to the newly constructed grid
         N_cum = N_cum[grid_ind]

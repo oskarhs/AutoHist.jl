@@ -90,7 +90,7 @@ Fit a histogram to a one-dimensional vector `x` with an automatic and data-based
 
 # Keyword arguments
 - `rule`: The criterion used to determine the optimal number of bins. Default value is `rule=:default` which uses the default rule for the regular or irregular histogram procedure depending on the value of `type`.
-- `type`: Symbol indicating whether the fitted method is a regular and irregular one. The rules `:bayes`, `:l2cv`, `:klcv` and `:nml` are implemented for both regular and irregular histograms, and this keyword specifies whether the regular or irregular version should be used. For other rules, this function infers the type automatically from the `rule` keyword, and misspecifying the rule in this case has not effect. Possible values are `:irregular` (default) and `:regular`.
+- `type`: Symbol indicating whether the fitted method is a regular and irregular one. The rules `:bayes`, `:l2cv`, `:klcv` and `:nml` are implemented for both regular and irregular histograms, and this keyword specifies whether the regular or irregular version should be used. For other rules, this function automatically infers the type from the `rule` keyword, and misspecifying the rule in this case has no effect. Possible values are `:irregular` (default) and `:regular`.
 - `kwargs`: Additional keyword arguments passed to [`histogram_regular`](@ref) or [`histogram_irregular`](@ref) depending on the specified or inferred type.
 
 # Returns
@@ -266,7 +266,6 @@ Return the location of the modes/peaks of `h` as a Vector, sorted in increasing 
 Formally, the modes/peaks of the histogram `h` are defined as the midpoints of an interval ``\\mathcal{J}``, where the density of `h` is constant on ``\\mathcal{J}``, and the density of `h` is strictly smaller than this value in the histogram bins adjacent to ``\\mathcal{J}``. Note that according this definition, ``\\mathcal{J}`` is in general a nonempty union of intervals in the histogram partition.
 """
 function peaks(h::AutomaticHistogram)
-    # implementation here (see peak_id_loss from loss_functions.jl)
     breaks = h.breaks
     dens = h.density
     k = length(dens)
