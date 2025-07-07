@@ -2,11 +2,7 @@
 function phi_penB(i::Int, j::Int, N_cum::AbstractArray{<:Real}, grid::AbstractArray{<:Real})
     @inbounds N_bin = N_cum[j] - N_cum[i]
     @inbounds len_bin = grid[j] - grid[i]
-    if N_bin > 0.0
-        contrib = N_bin * log(N_bin / len_bin) # Contribution of the given bin to log-likelihood
-    else
-        contrib = 0.0 # Contribution of the given bin to log-likelihood
-    end
+    contrib = ifelse(N_bin > 0.0, N_bin * log(N_bin / len_bin), 0.0)
     return contrib
 end
 
@@ -22,11 +18,7 @@ end
 function phi_penR(i::Int, j::Int, N_cum::AbstractArray{<:Real}, grid::AbstractArray{<:Real}, n::Real)
     @inbounds N_bin = N_cum[j] - N_cum[i]
     @inbounds len_bin = grid[j] - grid[i]
-    if N_bin > 0.0
-        contrib = N_bin * log(N_bin / len_bin) - 0.5 * N_bin / (n*len_bin) # Contribution of the given bin to log-likelihood
-    else
-        contrib = 0.0 # Contribution of the given bin to log-likelihood
-    end
+    contrib = ifelse(N_bin > 0, N_bin * log(N_bin / len_bin) - 0.5 * N_bin / (n*len_bin), 0.0)
     return contrib
 end
 
@@ -34,16 +26,8 @@ end
 function phi_KLCV(i::Int, j::Int, N_cum::AbstractArray{<:Real}, grid::AbstractArray{<:Real}, n::Real; minlength::Real=0.0)
     @inbounds N_bin = N_cum[j] - N_cum[i]
     @inbounds len_bin = grid[j] - grid[i]
-    contrib = 0.0
-    if len_bin > minlength
-        if N_bin >= 2
-            contrib = N_bin * log((N_bin-1.0) / len_bin)
-        else
-            contrib = -Inf64
-        end
-    else
-        contrib = -Inf64
-    end
+    # NB! log throws error for negative args
+    contrib = ifelse(N_bin ≥ 2 && len_bin ≥ minlength, N_bin * log(max((N_bin-1.0) / len_bin, 0.0)), -Inf64)
     return contrib
 end
 
@@ -51,10 +35,6 @@ end
 function phi_L2CV(i::Int, j::Int, N_cum::AbstractArray{<:Real}, grid::AbstractArray{<:Real}, n::Real; minlength::Real=0.0)
     @inbounds N_bin = N_cum[j] - N_cum[i]
     @inbounds len_bin = grid[j] - grid[i]
-    if len_bin > minlength
-        contrib = ((n+1)/n * N_bin^2 - 2.0*N_bin) / len_bin
-    else
-        contrib = -Inf64
-    end
+    contrib = ifelse(len_bin ≥ minlength, ((n+1)/n * N_bin^2 - 2.0*N_bin) / len_bin, -Inf64)
     return contrib
 end

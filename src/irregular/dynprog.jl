@@ -7,14 +7,13 @@ function dynprog_quadratic(phi::Function, k_max::Int)
     weight = Matrix{Float64}(undef, k_max+1, k_max+1)
 
     function optimal_path!(ancestor, cum_weight, k)
-        #ancestor0 = Array{Int64}(undef, k_max-k+1) # these don't have to be reallocated
         obj = Vector{Float64}(undef, k)
-        for i = 1:k
+        @inbounds for i in 1:k
             obj[i] = cum_weight[i] + weight[i, k+1]
         end
-        temp = argmax(obj)
-        ancestor[k] = temp - 1
-        cum_weight[k+1] = obj[temp]
+        amax = argmax(obj)
+        ancestor[k] = amax - 1
+        cum_weight[k+1] = obj[amax]
     end
 
     # Compute weights for each possible interval
@@ -33,6 +32,7 @@ function dynprog_quadratic(phi::Function, k_max::Int)
 end
 
 function compute_bounds_quadratic(ancestor::Vector{Int}, grid::AbstractVector{<:Real}, k_max::Int)
+    # Start recursion at k_max (last cutpoint), then reverse the result to get the correct order
     L = Int64[k_max]
     j = k_max
     @inbounds while j > 0
@@ -56,7 +56,7 @@ function dynprog_cubic(phi::Function, k_max::Int)
         ancestor0 = Vector{Int64}(undef, k_max-k+1) # these don't have to be reallocated
         cum_weight0 = Vector{Float64}(undef, k_max-k+1)
 
-        @inbounds for i = k:k_max
+        @inbounds for i in k:k_max
             obj = @views cum_weight[(k-1):(i-1), k-1] .+ weight[k:i, i+1]
             ancestor0[i-k+1] = argmax(obj)
             cum_weight0[i-k+1] = obj[ancestor0[i-k+1]]
@@ -86,7 +86,7 @@ end
 function compute_bounds_cubic(ancestor::Matrix{Int}, grid::AbstractVector{<:Real}, k::Int)
     L = Vector{Int64}(undef, k+1)
     L[k+1] = size(ancestor, 1)
-    @inbounds for i = k:-1:1
+    @inbounds for i in k:-1:1
         L[i] = ancestor[L[i+1], i]
     end
     bounds = grid[L .+ 1]
