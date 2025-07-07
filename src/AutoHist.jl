@@ -1,7 +1,7 @@
 module AutoHist
 
 export AutomaticHistogram
-export fit, convert, loglikelihood, logmarginallikelihood, minimum, maximum, extrema, peaks, pdf, insupport, length
+export fit, convert, loglikelihood, logmarginallikelihood, minimum, maximum, extrema, peaks, pdf, insupport, length, distance
 export histogram_regular, histogram_irregular
 
 using StatsBase, Base.Threads, Distributions
@@ -15,6 +15,7 @@ if !isdefined(Base, :get_extension)
     using Requires
 end
 
+include("AutomaticHistogram.jl")
 include("utils.jl")
 
 include(joinpath("regular", "objective_functions.jl"))
@@ -27,8 +28,6 @@ include(joinpath("irregular", "dynprog.jl"))
 
 include(joinpath("regular", "regular_histogram.jl"))
 include(joinpath("irregular", "irregular_histogram.jl"))
-
-include("AutomaticHistogram.jl")
 
 function __init__()
     @static if !isdefined(Base, :get_extension)

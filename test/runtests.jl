@@ -256,3 +256,19 @@ end
     @test AutoHist.pdf.(AutomaticHistogram(breaks1, density1, counts1, :regular, :right), [0.1]) == [1.08]
     @test AutoHist.pdf.(AutomaticHistogram(breaks2, density2, counts2, :irregular, :right), [0.2]) == [0.945]
 end
+
+@testset "AutomaticHistogram distance" begin
+    breaks = LinRange(0, 1, 11)
+    density = [1.08, 1.05, 1.05, 1.14, 0.91, 0.88, 0.80, 1.05, 1.01, 1.03]
+    counts = [108, 105, 105, 114, 91, 88, 80, 105, 101, 103]
+
+    h1 = AutomaticHistogram(breaks, density, counts, :regular, :right)
+    h2 = h1
+
+    for dist in [:iae, :ise, :hell]
+        @test distance(h1, h2, dist) == 0.0
+    end
+    @test distance(h1, h2, :lp; p=3.0) == 0.0
+
+    @test_throws ArgumentError distance(h1, h2, :nonsense) # error handling
+end

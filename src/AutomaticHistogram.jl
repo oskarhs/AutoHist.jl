@@ -84,7 +84,6 @@ end
 
 Fit a histogram to a one-dimensional vector `x` with an automatic and data-based selection of the histogram partition.
 
-...
 # Arguments
 - `x`: 1D vector of data for which a histogram is to be constructed.
 
@@ -300,4 +299,32 @@ function peaks(h::AutomaticHistogram)
         end
     end
     return hist_modes
+end
+
+
+"""
+    distance(h1::AutomaticHistogram, h2::AutomaticHistogram, dist::Symbol=:iae; p::Real=1.0)
+
+Compute a statistical distance between two histogram probability densities.
+
+# Arguments
+- `h1`, `h2`: The two histograms for which the distance should be computed
+- `dist`: The name of the distance to compute. Valid options are `:iae` (default), `:ise`, `:hellinger`, `:max`, `:lp`. For the ``l_p``-metric, a given power `p` can be specified as a keyword argument. 
+
+# Keyword arguments
+- `p`: Power of the ``l_p``-metric, which should be a number in the interval ``[1, \\infty]``. Ignored if `dist != :lp`. Defaults to `p=1.0`.
+"""
+function distance(h1::AutomaticHistogram, h2::AutomaticHistogram, dist::Symbol=:iae; p::Real=1.0)
+    if !(dist in [:iae, :ise, :lp, :hell])
+        throw(ArgumentError("The supplied distance, :$dist, is not supported."))
+    end
+    if dist == :iae
+        return lp_distance(h1, h2, 1.0)
+    elseif dist == :ise
+        return lp_distance(h1, h2, 2.0)^2
+    elseif dist == :lp
+        return lp_distance(h1, h2, p)
+    else
+        return hellinger_distance(h1, h2)
+    end
 end

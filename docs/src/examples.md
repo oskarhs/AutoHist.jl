@@ -14,11 +14,15 @@ Alternatively, since the standard LogNormal pdf has known support ``[0,\infty)``
 ```@example LogNormal; continued = true
 h2 = fit(AutomaticHistogram, x; rule=:br, support=(0.0, Inf))
 ```
-In this case, specifying the support makes little difference in practice since the sample size is quite large, and the standard lognormal distribution assigns sufficient mass near ``0``, as evidenced by the near-identical bin edges and bin probabilities.
+To quantify the difference of using the correct, known support in this case, we compute the integrated absolute error between the two densities in the following code snippet, which is given by ``\int |f(x) - g(x)|\text{d}x``.
+```@example LogNormal
+distance(h1, h2, :iae)
+```
+The resulting ``l_1`` distance of ``0.042`` indicates that the new bin origin at ``0`` has a moderate effect on the resulting density estimate.
 
 The standard LogNormal is quite challenging to estimate well using a regular histogram procedure due to its heavy tails. These two factors make irregular methods an appealing alternative in this case. Here, we use the penalized log-likelihood approach from [Rozenholc et al. (2010)](https://doi.org/10.1016/j.csda.2010.04.021) with penalty `:penr` and a data-based grid to construct the histogram.
 ```@example LogNormal; continued = true
-h3 = fit(AutomaticHistogram, x; rule=:penr, grid=:data, support=(0.0, Inf))
+h3 = fit(AutomaticHistogram, x; rule=:penr, grid=:data)
 ```
 
 To compare the two approaches, we can plot the resulting histograms along with the true density:
@@ -32,7 +36,7 @@ p2 = plot(p, h3, label="Irregular", alpha=0.4, color="black") # hide
 xlims!(p2, -0.5, 8.5) # hide
 plot(p1, p2, layout=(1, 2), size=(670, 320)) # hide
 ```
-The irregular procedure selects smaller bin widths near the origin, reflecting the fact that the LogNormal density is rapidly changing in this area. On the other hand, the larger  Both histogram procedures provide quite reasonable estimates of the density, owing to the fairly large sample size.
+The irregular procedure selects smaller bin widths near the origin, reflecting the fact that the LogNormal density is rapidly changing in this area. On the other hand, the bin widths are larger in the flatter region in the right tail of the density. Both histogram procedures provide quite reasonable estimates of the density, owing to the fairly large sample size.
 
 ## Mode hunting
 In an exploratory data analysis setting, identifying key features in a dataset such as modes is frequently of great interest to statisticians and practicioners alike. Unfortunately, most popular regular histogram have been designed with good performance in terms of statistical risk with respect to classical, integral-based loss functions, which typically results in a large amount of spurious histogram modes in regions where the true density is flat and in the tails of the density [(Scott, 1992)](https://doi.org/10.1002/9780470316849). In practice, this means that a data-analyst must use subjective judgement to infer whether a regular histogram estimate is indicative of a mode being present or not. If the presence of a mode is deemed likely, subjective visual smoothing is typically required to get a rough idea of its location. In constrast, some irregular histogram procedures have been shown empirically to perform quite well with regard to automatic mode detection in cases where the true density has a smallish amount of well-separated modes, see e.g. [Davies et al. (2009)](https://doi.org/10.1051/ps:2008005); [Li et al. (2020)](https://doi.org/10.1093/biomet/asz081); [Simensen et al. (2025)](https://doi.org/10.48550/ARXIV.2505.22034).

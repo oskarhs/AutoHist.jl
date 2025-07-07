@@ -30,6 +30,7 @@ length(::AutomaticHistogram)
 loglikelihood(::AutomaticHistogram)
 logmarginallikelihood
 convert(::Type{Histogram}, h::AutomaticHistogram)
+distance
 ```
 
 ## Index
