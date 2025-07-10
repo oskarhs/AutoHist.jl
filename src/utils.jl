@@ -78,7 +78,7 @@ function merge_sorted_vec(x1::AbstractVector{T}, x2::AbstractVector{T}) where T
     j1 = 1
     j2 = 1
     i = 1
-    while j1 ≤ k1 && j2 ≤ k2
+    @inbounds while j1 ≤ k1 && j2 ≤ k2
         new[i], j1, j2 = ifelse(
             x1[j1] < x2[j2],
             (x1[j1], j1+1, j2),
@@ -86,12 +86,12 @@ function merge_sorted_vec(x1::AbstractVector{T}, x2::AbstractVector{T}) where T
         )
         i = i+1
     end
-    while j1 ≤ k1
+    @inbounds while j1 ≤ k1
         new[i] = x1[j1]
         j1 = j1+1
         i = i+1
     end
-    while j2 ≤ k2
+    @inbounds while j2 ≤ k2
         new[i] = x2[j2]
         j2 = j2+1
         i = i+1
@@ -112,16 +112,16 @@ function hellinger_distance(h1::AutomaticHistogram, h2::AutomaticHistogram)
         bin_ind1 = searchsortedfirst(breaks1, disc[j]+10*eps()) - 1
         bin_ind2 = searchsortedfirst(breaks2, disc[j]+10*eps()) - 1
         if bin_ind1 == 0 || bin_ind1 == (length(dens1)+1)
-            h1 = 0.0
+            d1 = 0.0
         else
-            h1 = dens1[bin_ind1]
+            d1 = dens1[bin_ind1]
         end
         if bin_ind2 == 0 || bin_ind2 == (length(dens2)+1)
-            h2 = 0.0
+            d2 = 0.0
         else
-            h2 = dens2[bin_ind2]
+            d2 = dens2[bin_ind2]
         end
-        hell += (disc[j+1]-disc[j])*(sqrt(h1)-sqrt(h2))^2
+        hell += (disc[j+1]-disc[j])*(sqrt(d1)-sqrt(d2))^2
     end
     return sqrt(hell)
 end
@@ -139,16 +139,42 @@ function lp_distance(h1::AutomaticHistogram, h2::AutomaticHistogram, p::Real)
         bin_ind1 = searchsortedfirst(breaks1, disc[j]+10*eps()) - 1
         bin_ind2 = searchsortedfirst(breaks2, disc[j]+10*eps()) - 1
         if bin_ind1 == 0 || bin_ind1 == (length(dens1)+1)
-            h1 = 0.0
+            d1 = 0.0
         else
-            h1 = dens1[bin_ind1]
+            d1 = dens1[bin_ind1]
         end
         if bin_ind2 == 0 || bin_ind2 == (length(dens2)+1)
-            h2 = 0.0
+            d2 = 0.0
         else
-            h2 = dens2[bin_ind2]
+            d2 = dens2[bin_ind2]
         end
-        lp += (disc[j+1]-disc[j])*abs(h1-h2)^p
+        lp += (disc[j+1]-disc[j])*abs(d1-d2)^p
     end
     return lp^(1.0/p)
+end
+
+function supremum_distance(h1::AutomaticHistogram, h2::AutomaticHistogram)
+    breaks1 = h1.breaks
+    dens1 = h1.density
+    breaks2 = h2.breaks
+    dens2 = h2.density
+    disc = merge_sorted_vec(breaks1, breaks2) # union of points of discontinuity for the two histograms
+    m = length(disc)-1
+    sup = 0.0
+    for j = 1:m
+        bin_ind1 = searchsortedfirst(breaks1, disc[j]+10*eps()) - 1
+        bin_ind2 = searchsortedfirst(breaks2, disc[j]+10*eps()) - 1
+        if bin_ind1 == 0 || bin_ind1 == (length(dens1)+1)
+            d1 = 0.0
+        else
+            d1 = dens1[bin_ind1]
+        end
+        if bin_ind2 == 0 || bin_ind2 == (length(dens2)+1)
+            d2 = 0.0
+        else
+            d2 = dens2[bin_ind2]
+        end
+        sup = max(abs(d1-d2), sup)
+    end
+    return sup
 end

@@ -4,7 +4,7 @@ using Test
 
 import StatsBase: Histogram, fit
 
-@testset "return type" begin
+@testset "return type regular" begin
     x = collect(LinRange(0,1,11))
 
     for rule in [:bayes, :knuth, :aic, :bic, :br, :mdl, :nml, :l2cv, :klcv,
@@ -24,6 +24,10 @@ import StatsBase: Histogram, fit
     end
     h = histogram_regular(x; rule=:wand)
     @test typeof(h) <: AutomaticHistogram
+end
+
+@testset "return type irregular" begin
+    x = collect(LinRange(0,1,11))
 
     for rule in [:pena, :penb, :penr, :bayes, :klcv, :l2cv, :nml]
         h = histogram_irregular(x; rule=rule)
@@ -35,7 +39,7 @@ import StatsBase: Histogram, fit
             @test typeof(h) <: AutomaticHistogram
         end
     end
-    h = histogram_irregular(x; greedy=false) # check that greedy != false works
+    h = histogram_irregular(x; alg=DP(greedy=false)) # check that greedy == false works
     @test typeof(h) <: AutomaticHistogram
 end
 
@@ -50,6 +54,25 @@ end
     @test h2.closed == :left
     @test h3.closed == :right
     @test h4.closed == :left
+end
+
+@testset "algorithms" begin
+    x = collect(LinRange(0,1,11))
+
+    for alg in [DP(), GPDP()]
+        for rule in [:klcv, :l2cv, :penr, :bayes]
+            h = histogram_irregular(x; rule=rule, alg=alg)
+            @test typeof(h) <: AutomaticHistogram
+        end
+    end
+
+    # Error handling
+    @test_throws ArgumentError DP(gr_maxbins = :nonsense)
+    @test_throws ArgumentError GPDP(gr_maxbins = :nonsense)
+    @test_throws DomainError DP(gr_maxbins = -1)
+    @test_throws DomainError GPDP(gr_maxbins = -1)
+    @test_throws ArgumentError GPDP(max_cand = :nonsense)
+    @test_throws DomainError GPDP(max_cand = -1)
 end
 
 @testset "estimated support" begin
@@ -262,13 +285,14 @@ end
     density = [1.08, 1.05, 1.05, 1.14, 0.91, 0.88, 0.80, 1.05, 1.01, 1.03]
     counts = [108, 105, 105, 114, 91, 88, 80, 105, 101, 103]
 
-    h1 = AutomaticHistogram(breaks, density, counts, :regular, :right)
-    h2 = h1
+    h = AutomaticHistogram(breaks, density, counts, :regular, :right)
 
-    for dist in [:iae, :ise, :hell]
-        @test distance(h1, h2, dist) == 0.0
+    for dist in [:iae, :ise, :hell, :sup]
+        @test distance(h, h, dist) == 0.0
     end
-    @test distance(h1, h2, :lp; p=3.0) == 0.0
+    @test distance(h, h, :lp; p=3.0) == 0.0
+    @test distance(h, h, :lp; p=Inf) == 0.0
 
-    @test_throws ArgumentError distance(h1, h2, :nonsense) # error handling
+    @test_throws ArgumentError distance(h, h, :nonsense) # error handling
+    @test_throws DomainError distance(h, h, :lp; p=-1.0)
 end

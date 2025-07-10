@@ -84,7 +84,7 @@ function histogram_regular( x::AbstractVector{<:Real}; rule::Symbol=:knuth, clos
         k_max = min(ceil(Int, 4.0*n / log(n)^2), maxbins)
 
         if rule == :bayes
-            aₖ = Array{Float64}(undef, k_max)
+            aₖ = Vector{Float64}(undef, k_max)
             if !isa(a, Function) # create constant function if typeof(a) <: Real
                 if a ≤ 0.0
                     throw(DomainError("Supplied value of a must be positive."))
@@ -107,7 +107,7 @@ function histogram_regular( x::AbstractVector{<:Real}; rule::Symbol=:knuth, clos
             rule = :bayes
         end
 
-        criterion = Array{Float64}(undef, k_max) # Criterion to be maximized depending on the specified rule
+        criterion = Vector{Float64}(undef, k_max) # Criterion to be maximized depending on the specified rule
     
         # Scale data to the interval [0,1]:
         z = @. (x - xmin) / (xmax - xmin)

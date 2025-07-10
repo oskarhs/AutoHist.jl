@@ -32,7 +32,7 @@ This approach to irregular histograms was pioneered by [Simensen et al. (2025)](
 #### pena
 Consists of maximizing a penalized log-likelihood,
 ```math
-    \sum_{j=1}^k N_j \log (N_j/|\mathcal{I}_j|) - \log \binom{k_n-1}{k-1} - k - 2\log(k) - \sqrt{2(k-1)\Big[\log \binom{k_n-1}{k-1}+ 2\log(k)\Big]}*.
+    \sum_{j=1}^k N_j \log (N_j/|\mathcal{I}_j|) - \log \binom{k_n-1}{k-1} - k - 2\log(k) - \sqrt{2(k-1)\Big[\log \binom{k_n-1}{k-1}+ 2\log(k)\Big]}.
 ```
 This approach was suggested by [Rozenholc et al. (2010)](https://doi.org/10.1016/j.csda.2010.04.021).
 
@@ -158,44 +158,6 @@ A more sophisticated version of Scott's rule, Wand's rule proceeds by determinin
 ```math
     h = \Big(\frac{6}{\hat{C}(f_0) n}\Big)^{1/3},
 ```
-where ``\hat{C}(f_0)`` is an estimate of the functional ``C(f_0) = \int \{f_0'(x)\}^2\, \text{d}x``. The corresponding number of bins ``k = \lceil h^{-1}\rceil``. The full details on this method are given in [Wand (1997)](https://doi.org/10.2307/2684697).
+where ``\hat{C}(f_0)`` is an estimate of the functional ``C(f_0) = \int \{f_0'(x)\}^2\, \text{d}x``. The corresponding number of bins is ``k = \lceil h^{-1}\rceil``. The full details on this method are given in [Wand (1997)](https://doi.org/10.2307/2684697).
 The density estimate is computed based on a scale estimate, which can be controlled through the `scale` keyword argument. Possible choices are `:stdev`, `:iqr` which uses an estimate based on the sample standard deviation or the sample interquartile range as a scale estimate. The default choice `:minim` uses the minimum of the above estimates.
 The `level` keyword controls the number of stages of functional estimation used to compute ``\hat{C}``, and can take values `0, 1, 2, 3, 4, 5`, with the default value being `level=2`. The choice `level=0` corresponds to Scott's rule under the chosen scale estimate.
-
-
-## References
-Simensen, O. H., Christensen, D. & Hjort, N. L. (2025). Random Irregular Histograms. _arXiv preprint_. doi: [10.48550/ARXIV.2505.22034](https://doi.org/10.48550/ARXIV.2505.22034)
-
-Taylor, C. C. (1987). Akaike’s information criterion and the histogram. _Biometrika_, **74**, 636–639.
-doi: [10.1093/biomet/74.3.636](https://doi.org/10.1093/biomet/74.3.636)
-
-Rozenholc, Y., Mildenberger, T., & Gather, U. (2010). Combining regular and irregular histograms by penalized likelihood. _Computational Statistics & Data Analysis_, **54**, 3313–3323. doi: [10.1016/j.csda.2010.04.021](https://doi.org/10.1016/j.csda.2010.04.021)
-
-Birgé, L., & Rozenholc, Y. (2006). How many bins should be put in a regular histogram. _ESAIM: Probability and Statistics_, **10**, 24–45. doi: [10.1051/ps:2006001](https://doi.org/10.1051/ps:2006001)
-
-Rudemo, M. (1982). Empirical choice of histograms and kernel density estimators. _Scandinavian Journal of Statistics_, **9**, 65-78
-
-Hall, P. (1990). Akaike’s information criterion and Kullback–Leibler loss for histogram density estimation.
-_Probability Theory and Related Fields_, **85**, 449–467. doi: [10.1007/BF01203164](https://doi.org/10.1007/BF01203164)
-
-Hall, P. and Hannan, E. J. (1988). On stochastic complexity and nonparametric density estimation.
-_Biometrika_, **75**, 705–714. doi: [10.1093/biomet/75.4.705](https://doi.org/10.1093/biomet/75.4.705)
-
-Knuth, K. H. (2019). Optimal data-based binning for histograms and histogram-based probability density models.
-_Digital Signal Processing_, **95**, doi: [10.1016/j.dsp.2019.102581](https://doi.org/10.1016/j.dsp.2019.102581)
-
-Kontkanen, P. and Myllymäki, P. (2007). Mdl histogram density estimation. _Proceedings of the Eleventh International Conference on Artificial Intelligence and Statistics_, **2**, 219–226
-
-Sturges, H. A. (1926). The choice of a class interval. _Journal of the American Statistical Association_, **21**, 65–66. doi: [10.1080/01621459.1926.10502161](https://doi.org/10.1080/01621459.1926.10502161).
-
-Freedman, D. and Diaconis, P. (1981) On the histogram as a density estimator: L2 theory.
-_Zeitschrift für Wahrscheinlichkeitstheorie und verwandte Gebiete_, **57**, 453–476.
-doi: [10.1007/BF01025868](https://doi.org/10.1007/BF01025868).
-
-Scott, D. W. (1979). On optimal and data-based histograms. _Biometrika_, **66**, 605–610,
-doi: [10.1093/biomet/66.3.605](https://doi.org/10.1093/biomet/66.3.605).
-
-Wand, M. P. (1997). Data-based choice of histogram bin width. _The American Statistician_, **51**, 59–64.
-doi: [10.2307/2684697](https://doi.org/10.2307/2684697)
-
-Davies, P. L., Gather, U., Nordman, D., and Weinert, H. (2009). A comparison of automatic histogram constructions. _ESAIM: Probability and Statistics_, **13**, 181–196. doi: [10.1051/ps:2008005](https://doi.org/10.1051/ps:2008005).

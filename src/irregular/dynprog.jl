@@ -1,5 +1,5 @@
-# The dynamic programming algorithm of Jackson et al. (2005).
-function dynprog_quadratic(phi::Function, k_max::Int)
+# The optimal partitioning (dynamic programming) algorithm of Jackson et al. (2005).
+function optimal_partitioning(phi::Function, k_max::Int)
     cum_weight = Vector{Float64}(undef, k_max+1)
     cum_weight[1] = 0.0
     ancestor = Vector{Int64}(undef, k_max)
@@ -31,21 +31,8 @@ function dynprog_quadratic(phi::Function, k_max::Int)
     return optimal, ancestor
 end
 
-function compute_bounds_quadratic(ancestor::Vector{Int}, grid::AbstractVector{<:Real}, k_max::Int)
-    # Start recursion at k_max (last cutpoint), then reverse the result to get the correct order
-    L = Int64[k_max]
-    j = k_max
-    @inbounds while j > 0
-        j = ancestor[j]
-        L = push!(L, j)
-    end
-    bounds = grid[reverse(L) .+ 1]
-    return bounds
-end
-
-
-# The dynamical programming algorithm of Kanazawa (1988).
-function dynprog_cubic(phi::Function, k_max::Int)
+# The segment neighborhood (dynamical programming) algorithm of Kanazawa (1988).
+function segment_neighborhood(phi::Function, k_max::Int)
     cum_weight = Matrix{Float64}(undef, k_max, k_max)
     ancestor = Matrix{Int64}(undef, k_max, k_max)
     ancestor[:, 1] .= 0
@@ -80,15 +67,4 @@ function dynprog_cubic(phi::Function, k_max::Int)
     optimal = @views cum_weight[k_max,:] # Get weight function for each partition
 
     return optimal, ancestor
-end
-
-# Compute optimal partition based on the output of the cubic DP algorithm
-function compute_bounds_cubic(ancestor::Matrix{Int}, grid::AbstractVector{<:Real}, k::Int)
-    L = Vector{Int64}(undef, k+1)
-    L[k+1] = size(ancestor, 1)
-    @inbounds for i in k:-1:1
-        L[i] = ancestor[L[i+1], i]
-    end
-    bounds = grid[L .+ 1]
-    return bounds
 end

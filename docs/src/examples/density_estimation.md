@@ -1,6 +1,6 @@
-# Examples
+# Density estimation
 
-The following document illustrates the use of AutoHist.jl through examples. In particular, we showcase some of the relative advantages and disadvantages of regular and irregular histogram procedures.
+The following document illustrates the use of AutoHist.jl through examples from the world of density estimation. In particular, we showcase some of the relative advantages and disadvantages of regular and irregular histogram procedures.
 
 ## Estimating the LogNormal probability density
 
