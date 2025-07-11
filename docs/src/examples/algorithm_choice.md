@@ -90,5 +90,3 @@ fit(
 nothing # hide
 ```
 This code snippet clocks in at about ``150\ \text{ms}`` on average.
-
-<!-- Could do a final example here that compares statistical efficiency vs. runtime for the two approaches -->
