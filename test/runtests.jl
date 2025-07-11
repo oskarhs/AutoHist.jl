@@ -60,10 +60,14 @@ end
     x = collect(LinRange(0,1,11))
 
     for alg in [DP(), GPDP()]
-        for rule in [:klcv, :l2cv, :penr, :bayes]
+        for rule in [:penr, :bayes]
             h = histogram_irregular(x; rule=rule, alg=alg)
             @test typeof(h) <: AutomaticHistogram
         end
+    end
+    for rule in [:klcv, :l2cv]
+        h = histogram_irregular(x; rule=rule, alg=DP())
+        @test typeof(h) <: AutomaticHistogram
     end
 
     # Error handling
@@ -73,6 +77,8 @@ end
     @test_throws DomainError GPDP(gr_maxbins = -1)
     @test_throws ArgumentError GPDP(max_cand = :nonsense)
     @test_throws DomainError GPDP(max_cand = -1)
+
+    @test_throws ArgumentError histogram_irregular(x; rule=:l2cv, alg=GPDP())
 end
 
 @testset "estimated support" begin

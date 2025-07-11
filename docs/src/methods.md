@@ -3,6 +3,7 @@ This page provides background on each histogram method supported through the `ru
 
 For ease of exposition, we present all methods covered here in the context of estimating the density of a sample ``\boldsymbol{x} = (x_1, x_2, \ldots, x_n)`` on the unit interval, but note that extending the procedures presented here to other compact intervals is possible through a suitable affine transformation. In particular, if a density estimate with support ``[a,b]`` is desired, we can scale the data to the unit interval through ``z_i = (x_i - a)/(b-a)``, and apply the methods on this transformed sample and rescale the resulting density estimate to ``[a,b]``. In cases where the support of the density is unknown, a natural choice is ``a = x_{(1)}`` and ``b = x_{(n)}``. Cases where only the lower or upper bound is known can be handled similarly. The transformation used to construct the histogram can be controlled through the `support` keyword, where the default argument `support=(-Inf, Inf)` uses the order statistics-based approach described above.
 
+#### Notation
 Before we describe the methods included here in more detail, we introduce some notation. We let ``\mathcal{I} = (\mathcal{I}_1, \mathcal{I}_2, \ldots, \mathcal{I}_k)`` denote a partition of ``[0,1]`` into ``k`` intervals and write ``|\mathcal{I}_j|`` for the length of interval ``\mathcal{I}_j``. The intervals in the partition ``\mathcal{I}`` can be either right- or left-closed. Whether a left- or right-closed partition is used to draw the histogram is controlled by the keyword argument `closed`, with options `:left` and `:right` (default). This choice is somewhat arbitrary, but is unlikely to matter much in practical applications.
 
 Based on a partition ``\mathcal{I}``, we can write down the corresponding histogram density estimate by
@@ -61,7 +62,7 @@ Consists of maximization of a Kullback-Leibler cross-validation criterion,
 ```
 where the maximmization is over all partitions with ``N_j \geq 2`` for all ``j``.
 This approach was, to our knowledge, first pursued by [Simensen et al. (2025)](https://doi.org/10.48550/ARXIV.2505.22034).
-#### nml: (irregular)
+#### nml (irregular)
 Consists of maximization of a penalized likelihood,
 ```math
 \begin{aligned}

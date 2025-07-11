@@ -7,9 +7,12 @@ makedocs(
     pages = [
         "Introdution" => "index.md",
         "Supported Methods" => "methods.md",
-        "Algorithms" => "algorithms.md",
-        "Examples" => "examples.md",
-        "API" => "api.md"
+        "Examples" => [
+            "examples/density_estimation.md",
+            "examples/algorithm_choice.md"
+        ],
+        "API" => "api.md",
+        "Algorithms" => "algorithms.md"
     ]
 )
 

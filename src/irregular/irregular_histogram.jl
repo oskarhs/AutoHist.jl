@@ -43,6 +43,9 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::Symbol=:bayes, gri
         throw(ArgumentError("The supplied value of the closed keyword, :$closed, is invalid. Valid values are :left or :right."))
     end
 
+    if rule in [:klcv, :l2cv] && typeof(alg) != DP
+        throw(ArgumentError("Supplied algorithm, $alg is not supported for rule=:$rule. The supported algorithm for this rule is DP()."))
+    end
     if !(grid in [:data, :regular, :quantile])
         throw(ArgumentError("The supplied grid, :$grid, is not supported. The grid kwarg must be one of :data, :regular or :quantile"))
     end
@@ -81,7 +84,7 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::Symbol=:bayes, gri
     N_cum[1] = 0.0
     if grid == :data
         finestgrid[1] = -eps()
-        finestgrid[2:end-1] = z[2:n-1]
+        finestgrid[2:end-1] = z[2:end-1]
         finestgrid[end] = 1.0 + eps()
         N_cum[2:end] = cumsum(bin_irregular(y, finestgrid, closed == :right))
     elseif grid == :regular
@@ -99,24 +102,33 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::Symbol=:bayes, gri
 
     if alg.greedy
         if typeof(alg) == DP && alg.gr_maxbins == :default
-            gr_maxbins = min(maxbins, max(floor(Int, n^(1.0/3.0)), 500))
+            gr_maxbins = ifelse(
+                rule in [:klcv, :l2cv],
+                min(maxbins, max(ceil(Int, n^(1.0/2.0)), 3000)),
+                min(maxbins, max(ceil(Int, n^(1.0/3.0)), 500))
+            )
         elseif typeof(alg) == DP
             gr_maxbins = min(maxbins, alg.gr_maxbins)
         elseif alg.gr_maxbins == :default
-            gr_maxbins = min(maxbins, max(floor(Int, n^(1.0/2.0)), 1000))
+            gr_maxbins = min(maxbins, max(ceil(Int, n^(1.0/2.0)), 1000))
         else
             gr_maxbins = min(maxbins, alg.gr_maxbins)
         end
-        grid_ind = greedy_grid(
-            get_objective(ifelse(rule != :klcv, rule, :penb), N_cum, finestgrid, n, a, false), 
-            maxbins,
-            gr_maxbins
-        )
-        mesh = finestgrid[grid_ind]
-        k_max = length(mesh) - 1
+        if gr_maxbins == maxbins # no reason to use the greedy algorithm in this case
+            k_max = maxbins
+            mesh = finestgrid
+        else
+            grid_ind = greedy_grid(
+                get_objective(ifelse(rule != :klcv, rule, :penb), N_cum, finestgrid, n, a, false), 
+                maxbins,
+                gr_maxbins
+            )
+            mesh = finestgrid[grid_ind]
+            k_max = length(mesh) - 1
 
-        # Update bin counts to the newly constructed grid
-        N_cum = N_cum[grid_ind]
+            # Update bin counts to the newly constructed grid
+            N_cum = N_cum[grid_ind]
+        end
     else
         k_max = maxbins
         mesh = finestgrid
@@ -124,16 +136,7 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::Symbol=:bayes, gri
     phi = get_objective(rule, N_cum, mesh, n, a, use_min_length)
 
     if rule in [:klcv, :l2cv] # use a variant of the optimal partitioning algorithm, tailored to criteria of this form
-        if typeof(alg) == DP
-            optimal, ancestor = optimal_partitioning(phi, k_max)
-        else
-            if alg.max_cand == :default
-                max_cand = 45
-            else
-                max_cand = alg.max_cand
-            end
-            optimal, ancestor = optimal_partitioning_greedy(phi, k_max, max_cand)
-        end
+        optimal, ancestor = optimal_partitioning(phi, k_max)
         bin_edges_norm = compute_bounds_op(ancestor, mesh, k_max)
     else # use a variant of the segment neighbourhood algorithm
         if typeof(alg) == DP
@@ -180,10 +183,7 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::Symbol=:bayes, gri
     bin_edges = @. xmin + (xmax - xmin) * bin_edges_norm
 
     N = bin_irregular_int(x, bin_edges, closed == :right)
-    a_opt = 0.0
-    if rule == :bayes
-        a_opt = a
-    end
+    a_opt = ifelse(rule == :bayes, a, 0.0)
     p0 = bin_edges_norm[2:end] - bin_edges_norm[1:end-1]
     dens = (N .+ a_opt*p0) ./ ((n + a_opt)*(bin_edges[2:end] - bin_edges[1:end-1]))
     h = AutomaticHistogram(bin_edges, dens, N, :irregular, closed, ifelse(a_opt > 0.0, a_opt, NaN))

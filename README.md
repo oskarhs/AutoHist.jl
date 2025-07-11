@@ -45,9 +45,6 @@ The keyword argument `rule` determines the method used to construct the histogra
 The default method is the Bayesian approach of [Simensen et al. (2025)](#simensen2025random), corresponding to keyword `rule=:bayes`.
 A detailed description of the supported methods can be found in the [methods documentation](https://oskarhs.github.io/AutoHist.jl/stable/methods/).
 
-## To do
-- Add an extension that allows for the numeric evaluation of statistical distances (lp, Hellinger, Kullback--Leibler) between an AutomaticHistogram and a given object which implements a pdf method.
-
 ## References
 <a name="simensen2025random"></a> Simensen, O. H., Christensen, D. & Hjort, N. L. (2025). Random Irregular Histograms. _arXiv preprint_. doi: [10.48550/ARXIV.2505.22034](https://doi.org/10.48550/ARXIV.2505.22034)
 

@@ -1,5 +1,5 @@
 # Greedy, linear-time pruned dynamic programming algorithm
-function optimal_partitioning_greedy(phi::Function, k_max::Int, max_cand::Int=15)
+#= function optimal_partitioning_greedy(phi::Function, k_max::Int, max_cand::Int=15)
     cum_weight = Vector{Float64}(undef, k_max+1)
     cum_weight[1] = 0.0
     ancestor = Vector{Int64}(undef, k_max)
@@ -31,7 +31,7 @@ function optimal_partitioning_greedy(phi::Function, k_max::Int, max_cand::Int=15
     optimal = cum_weight[k_max+1] # Get optimum
 
     return optimal, ancestor
-end
+end =#
 
 # Greedy, quadratic-time pruned dynamic programming algorithm
 function segment_neighborhood_greedy(phi::Function, k_max::Int, max_cand::Int=15)
@@ -46,6 +46,7 @@ function segment_neighborhood_greedy(phi::Function, k_max::Int, max_cand::Int=15
         cum_weight0 = Vector{Float64}(undef, k_max-k+1)
 
         cpts_cand = Int64[k]
+        sizehint!(cpts_cand, max_cand)
         @inbounds for i in k:k_max
             # Compute optimum among the non-pruned candidates
             obj = Vector{Float64}(undef, length(cpts_cand))
@@ -58,10 +59,11 @@ function segment_neighborhood_greedy(phi::Function, k_max::Int, max_cand::Int=15
 
             # Greedy pruning step
             num_cand = min(length(obj), max_cand-1)
-            #top_idx = Vector{Int}(undef, num_cand)
-            #topk_indices!(top_idx, obj, num_cand)
-            noprune = partialsortperm(obj, 1:min(max_cand-1, length(obj)), rev=true)
-            cpts_cand = Int64[cpts_cand[noprune]; i]
+            if num_cand < max_cand - 1
+                push!(cpts_cand, i)        # add candidates until max_cand is reached
+            else
+                cpts_cand[argmin(obj)] = i # replace worst candidate
+            end
         end
         @inbounds ancestor[k:k_max, k] = ancestor0
         @inbounds cum_weight[k:k_max, k] = cum_weight0
