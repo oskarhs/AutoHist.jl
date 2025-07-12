@@ -43,16 +43,72 @@ In an exploratory data analysis setting, identifying key features in a dataset s
 
 To illustrate the advantage of irregular histograms when it comes to mode identification, we will consider an example where we attempt to locate the modes of the Harp density of [Li et al. (2020)](https://doi.org/10.1093/biomet/asz081), plotted below.
 
-```@example
-using TestDistributions, Plots; gr() # hide
-p = plot_test_distribution(Harp()) # hide
+```@example Harp; continued=true
+module TestDistributions # hide
+
+using Distributions # hide
+using Random # hide
+using Plots # hide
+
+import Distributions: pdf, cdf # hide
+import Random: rand # hide
+
+export pdf, cdf, rand, peaks, plot_test_distribution, Harp # hide
+
+struct Harp <: ContinuousUnivariateDistribution end # hide
+function pdf(d::Harp, x::Real) # hide
+    means = [0.0, 5.0, 15.0, 30.0, 60.0] # hide
+    sds = [0.5, 1.0, 2.0, 4.0, 8.0] # hide
+    dens = 0.0 # hide
+    for j = 1:5 # hide
+        dens = dens + 0.2 * pdf(Normal(means[j], sds[j]), x) # hide
+    end # hide
+    return dens # hide
+end # hide
+function cdf(d::Harp, x::Real) # hide
+    means = [0.0, 5.0, 15.0, 30.0, 60.0] # hide
+    sds = [0.5, 1.0, 2.0, 4.0, 8.0] # hide
+    cum = 0.0 # hide
+    for j = 1:5 # hide
+        cum += 0.2 * cdf(Normal(means[j], sds[j]), x) # hide
+    end # hide
+    return cum # hide
+end # hide
+function rand(rng::AbstractRNG, d::Harp) # hide
+    means = [0.0, 5.0, 15.0, 30.0, 60.0] # hide
+    sds = [0.5, 1.0, 2.0, 4.0, 8.0] # hide
+    j = rand(rng, DiscreteUniform(1, 5)) # hide
+    return rand(rng, Normal(means[j], sds[j])) # hide
+end # hide
+function peaks(d::Harp) # hide
+    return Float64[0.0, 5.0, 15.001837158203125, 30.003319148997427, 60.000555419921874] # hide
+end # hide
+function plot_test_distribution(d::Harp) # hide
+    if d != Harp() # hide
+        throw(ArgumentError("Supplied distribution $d is not supported.")) # hide
+    end # hide
+    dom = LinRange(-5.0, 80.0, 5000) # hide
+    x_lims = [-5.0, 80.0] # hide
+    p = plot() # hide
+    t = dom # hide
+    plot!(p, t, pdf.(d, t), label="", ylims=(0.0, Inf), titlefontsize=10, color="blue", linestyle=:dash) # hide
+    xlims!(p, x_lims...) # hide
+    return p # hide
+end # hide
+end # hide
+```
+
+```@example Harp
+using Plots; gr() # hide
+import .TestDistributions as TD # hide
+p = TD.plot_test_distribution(TD.Harp()) # hide
 plot!(p, title="", xlab="x", ylab="Density") # hide
-plot(p, size=(670, 310)) # hide
+plot(p, size=(650, 310)) # hide
 ```
 The Harp density has 5 peaks with varying degrees of sharpness, with the location of each mode becoming gradually more difficult to locate in absolute terms as we move rightward on the ``x``-axis. In the numerical experiment to follow, we generate a random sample of size ``n = 5000`` from the Harp density, and fit both an irregular and a regular histogram to the data. Motivated by the results of the simulation studies in [Davies et al. (2009)](https://doi.org/10.1051/ps:2008005) and [Simensen et al. (2025)](https://doi.org/10.48550/ARXIV.2505.22034), we have used the BIC criterion to draw the regular histogram, and the random irregular histogram method (`rule=:bayes`), as both of these have been shown to perform relatively well compared to their respective regular/irregular counterparts in automatic mode identification. To access the Harp distribution, we use the TestDistributions package, which can be found in [the following github repository](https://github.com/oskarhs/Random-Histograms---Paper/tree/main/TestDistributions).
 
 ```@example Harp; continued = true
-import TestDistributions as TD
+import .TestDistributions as TD
 using AutoHist, Distributions, Random
 x = rand(Xoshiro(1812), TD.Harp(), 5000)
 

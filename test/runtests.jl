@@ -39,6 +39,7 @@ end
             @test typeof(h) <: AutomaticHistogram
         end
     end
+    x = collect(LinRange(0,1,11))
     h = histogram_irregular(x; alg=DP(greedy=false)) # check that greedy == false works
     @test typeof(h) <: AutomaticHistogram
 end
@@ -67,6 +68,11 @@ end
     end
     for rule in [:klcv, :l2cv]
         h = histogram_irregular(x; rule=rule, alg=DP())
+        @test typeof(h) <: AutomaticHistogram
+    end
+
+    for alg in [DP(gr_maxbins=5), GPDP(gr_maxbins=5, max_cand=10)]
+        h = histogram_irregular(x; alg=alg)
         @test typeof(h) <: AutomaticHistogram
     end
 

@@ -2,7 +2,7 @@
 
 julia_version = "1.11.5"
 manifest_format = "2.0"
-project_hash = "6a69bd7d5329a8f349ba09bd77ebdf1776320408"
+project_hash = "b79bd5a73d3a94015caade0888d178441a441744"
 
 [[deps.ANSIColoredPrinters]]
 git-tree-sha1 = "574baf8110975760d391c710b6341da1afa48d8c"
@@ -979,15 +979,6 @@ version = "0.1.1"
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
 uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 version = "1.11.0"
-
-[[deps.TestDistributions]]
-deps = ["Distributions", "Plots", "Random", "StatsBase"]
-git-tree-sha1 = "a4677e798485687074a1294b6670c4ece9948056"
-repo-rev = "main"
-repo-subdir = "TestDistributions"
-repo-url = "https://github.com/oskarhs/Random-Histograms---Paper.git"
-uuid = "bc4c241b-8ce4-4657-98b5-16604d2e6194"
-version = "0.1.0"
 
 [[deps.TranscodingStreams]]
 git-tree-sha1 = "0c45878dcfdcfa8480052b6ab162cdd138781742"
