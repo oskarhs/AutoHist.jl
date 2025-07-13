@@ -1,50 +1,66 @@
-# Uses the greedy algorithm of Rozenholc et al. to construct a coarser grid to make the algorithm better suited for large datasets.
+# Uses the greedy algorithm of Rozenholc et al. (2010) to construct a coarser grid to make the algorithm better suited for large datasets.
 # To be used prior to running the dynamic programming algorithm.
-function greedy_grid(N_cum::AbstractVector{<:Real}, finestgrid::AbstractVector{<:Real}, maxbins::Int, gr_maxbins::Int)
+function greedy_grid(phi::Function, maxbins::Int, gr_maxbins::Int)
     # Update increments between the values i and j
-    n = N_cum[end]
-    compute_loglik_increments! = let N_cum = N_cum, finestgrid=finestgrid, n = n
-        function (incr, i, j)
-            if finestgrid[i] < finestgrid[j]
-                # Log-likelihood contribution
-                @inbounds loglik_old = ifelse(isapprox(N_cum[i], N_cum[j], atol=1e-4), 0.0, (N_cum[j] - N_cum[i]) * log((N_cum[j]-N_cum[i])/(n*(finestgrid[j]-finestgrid[i]))))
-                @inbounds for l = (i+1):(j-1)
-                    loglik_new = ifelse(isapprox(N_cum[l], N_cum[i], atol=1e-4), 0.0, (N_cum[l] - N_cum[i]) * log((N_cum[l]-N_cum[i])/(n*(finestgrid[l]-finestgrid[i]))))
-                    loglik_new += ifelse(isapprox(N_cum[j], N_cum[l], atol=1e-4), 0.0, (N_cum[j] - N_cum[l]) * log((N_cum[j]-N_cum[l])/(n*(finestgrid[j]-finestgrid[l]))))        
-                    incr[l] = loglik_new - loglik_old
-                end
-            end
+    function compute_objective_increments!(incr, i, j)
+        # objective contribution
+        @inbounds obj_old = phi(i, j)
+        @inbounds for l = (i+1):(j-1)
+            obj_new = phi(i, l)
+            obj_new += phi(l, j)        
+            incr[l] = obj_new - obj_old
         end
     end
-    grid_ind = fill(false, maxbins+1) # Array of booleans storing which indices to use
-    grid_ind[1] = true
-    grid_ind[end] = true
-    incr = Array{Float64}(undef, maxbins+1) # Array of increments from splitting at index d at each step
+    grid_ind = Int64[1, maxbins+1] # Indices included in partiiton
+    sizehint!(grid_ind, gr_maxbins)
+    incr = Vector{Float64}(undef, maxbins+1) # Array of increments from splitting at index d at each step
     incr[1] = -Inf # Would create a bin of lebesgue measure 0
     incr[end] = -Inf
 
     # First iteration
     i = 1
     j = maxbins+1
-    compute_loglik_increments!(incr, i, j)
+    compute_objective_increments!(incr, i, j)
     num_bins = 1
+    dctn = Dict{Int64, Tuple{Int64, Int64, Float64}}() # store next, argmax, max over interval to next
+    max_new, amax_new = findmax(incr)
+    dctn[1] = (maxbins+1, amax_new, max_new)
 
-    # Terminate when num_bins has reached the limit or 
-    # when increases to the log-likelihood are no longer possible
-    while num_bins < gr_maxbins && maximum(incr) > 0
+    # Terminate when num_bins has reached the limit
+    while num_bins < gr_maxbins
         # Update increments for indices in (i, d) and (d, j)
-        d = argmax(incr)
-        @inbounds grid_ind[d] = true # Include finestgrid[d] in the grid
-        @inbounds incr[d] = -Inf # Included in grid
+        curr_val, next_val, argmax_val = findmax_dctn(dctn)
+        push!(grid_ind, argmax_val)
+        @inbounds incr[argmax_val] = -Inf # Included in grid
         num_bins = num_bins + 1
 
-        # Set i to maximal index < than d s.t. grid_ind[i] == true
-        i = findlast(@views grid_ind[1:d-1])
-        # Set j to minimal index > than d s.t. grid_ind[j] == true
-        j = findfirst(@views grid_ind[d+1:end]) + d
+        # Update increments for  curr_val < i < argmax val
+        compute_objective_increments!(incr, curr_val, argmax_val)
+        # Update increments for  argmax_val < i < next_val
+        compute_objective_increments!(incr, argmax_val, next_val)
 
-        compute_loglik_increments!(incr, i, d)
-        compute_loglik_increments!(incr, d, j)
+        # Update dictionary entries so that curr_val -> argmax_val
+        max_new, amax_new = if curr_val+1 < argmax_val findmax(@views incr[curr_val+1:argmax_val-1]) else (-Inf, 0) end
+        dctn[curr_val] = (argmax_val, amax_new+curr_val, max_new)
+        max_new, amax_new = if argmax_val+1 < next_val findmax(@views incr[argmax_val+1:next_val-1]) else (-Inf, 0) end
+        dctn[argmax_val] = (next_val, amax_new+argmax_val, max_new)
     end
-    return grid_ind
+    return sort!(grid_ind)
+end
+
+# Find dictionary entry yielding the maximal increment
+function findmax_dctn(dctn::Dict{Int64, Tuple{Int64, Int64, Float64}})
+    max_val = -Inf
+    argmax_val = 0
+    curr_val = 0
+    next_val = 0
+    @inbounds for (key, value) in dctn
+        if value[3] > max_val
+            max_val = value[3]
+            argmax_val = value[2]
+            next_val = value[1]
+            curr_val = key
+        end
+    end
+    return curr_val, next_val, argmax_val
 end

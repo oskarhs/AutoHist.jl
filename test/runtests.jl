@@ -4,69 +4,96 @@ using Test
 
 import StatsBase: Histogram, fit
 
-@testset "return type" begin
+@testset "return type regular" begin
     x = collect(LinRange(0,1,11))
 
-    for rule in [:bayes, :aic, :bic, :br, :mdl, :nml, :l2cv, :klcv,
+    for rule in [:bayes, :knuth, :aic, :bic, :br, :mdl, :nml, :l2cv, :klcv,
                  :sturges, :fd, :scott]
         for closed in [:left, :right]
-            H = histogram_regular(x; rule=rule, closed=closed)
-            @test typeof(H) <: AutomaticHistogram
+            h = histogram_regular(x; rule=rule, closed=closed)
+            @test typeof(h) <: AutomaticHistogram
         end
     end
     for scalest in [:minim, :iqr, :stdev]
         for level in [0,1,2,3,4,5]
             for closed in [:left, :right]
-                H = histogram_regular(x; rule=:wand, closed=closed, scalest=scalest, level=level)
-                @test typeof(H) <: AutomaticHistogram
+                h = histogram_regular(x; rule=:wand, closed=closed, scalest=scalest, level=level)
+                @test typeof(h) <: AutomaticHistogram
             end
         end
     end
-    H = histogram_regular(x; rule=:wand)
-    @test typeof(H) <: AutomaticHistogram
+    h = histogram_regular(x; rule=:wand)
+    @test typeof(h) <: AutomaticHistogram
+end
+
+@testset "return type irregular" begin
+    x = collect(LinRange(0,1,11))
 
     for rule in [:pena, :penb, :penr, :bayes, :klcv, :l2cv, :nml]
-        H = histogram_irregular(x; rule=rule)
-        @test typeof(H) <: AutomaticHistogram
+        h = histogram_irregular(x; rule=rule)
+        @test typeof(h) <: AutomaticHistogram
     end
     for grid in [:regular, :data, :quantile] # test grid, right-left open interval combinations
         for closed in [:left, :right]
-            H = histogram_irregular(x; grid=grid, closed=closed)
-            @test typeof(H) <: AutomaticHistogram
+            h = histogram_irregular(x; grid=grid, closed=closed)
+            @test typeof(h) <: AutomaticHistogram
         end
     end
-    H = histogram_irregular(x; greedy=false) # check that greedy != false works
-    @test typeof(H) <: AutomaticHistogram
+    x = collect(LinRange(0,1,11))
+    h = histogram_irregular(x; alg=DP(greedy=false)) # check that greedy == false works
+    @test typeof(h) <: AutomaticHistogram
 end
 
 @testset "left open and right open intervals" begin
     x = collect(LinRange(0,1,11))
-    H1 = histogram_regular(x; closed=:right)
-    H2 = histogram_regular(x; closed=:left)
-    H3 = histogram_irregular(x; closed=:right)
-    H4 = histogram_irregular(x; closed=:left)
+    h1 = histogram_regular(x; closed=:right)
+    h2 = histogram_regular(x; closed=:left)
+    h3 = histogram_irregular(x; closed=:right)
+    h4 = histogram_irregular(x; closed=:left)
 
-    @test H1.closed == :right
-    @test H2.closed == :left
-    @test H3.closed == :right
-    @test H4.closed == :left
+    @test h1.closed == :right
+    @test h2.closed == :left
+    @test h3.closed == :right
+    @test h4.closed == :left
+end
+
+@testset "algorithms" begin
+    x = collect(LinRange(0,1,11))
+
+    for alg in [DP(), GPDP()]
+        for rule in [:penr, :bayes]
+            h = histogram_irregular(x; rule=rule, alg=alg)
+            @test typeof(h) <: AutomaticHistogram
+        end
+    end
+    for rule in [:klcv, :l2cv]
+        h = histogram_irregular(x; rule=rule, alg=DP())
+        @test typeof(h) <: AutomaticHistogram
+    end
+
+    for alg in [DP(gr_maxbins=5), GPDP(gr_maxbins=5, max_cand=10)]
+        h = histogram_irregular(x; alg=alg)
+        @test typeof(h) <: AutomaticHistogram
+    end
+
+    # Error handling
+    @test_throws ArgumentError DP(gr_maxbins = :nonsense)
+    @test_throws ArgumentError GPDP(gr_maxbins = :nonsense)
+    @test_throws DomainError DP(gr_maxbins = -1)
+    @test_throws DomainError GPDP(gr_maxbins = -1)
+    @test_throws ArgumentError GPDP(max_cand = :nonsense)
+    @test_throws DomainError GPDP(max_cand = -1)
+
+    @test_throws ArgumentError histogram_irregular(x; rule=:l2cv, alg=GPDP())
 end
 
 @testset "estimated support" begin
     n = 100
     x = [-5.0, 4.5]
-    H1 = histogram_regular(x)
-    #= edges1 = H1.edges[1]
-    H2 = histogram_irregular(x)
-    edges2 = H2.edges[1]
-    @test isapprox(edges1[1], minimum(x); atol=1e-10)
-    @test isapprox(edges1[end], maximum(x); atol=1e-10)
-    @test isapprox(edges2[1], minimum(x); atol=1e-10)
-    @test isapprox(edges2[end], maximum(x); atol=1e-10) =#
-
-    breaks1 = H1.breaks
-    H2 = histogram_irregular(x)
-    breaks2 = H2.breaks
+    h1 = histogram_regular(x)
+    breaks1 = h1.breaks
+    h2 = histogram_irregular(x)
+    breaks2 = h2.breaks
     @test isapprox(breaks1[1], minimum(x); atol=1e-10)
     @test isapprox(breaks1[end], maximum(x); atol=1e-10)
     @test isapprox(breaks2[1], minimum(x); atol=1e-10)
@@ -76,14 +103,6 @@ end
 @testset "given support" begin
     n = 100
     x = rand(n)
-    #= H1 = histogram_regular(x; support=(0.0, 1.0))
-    edges1 = H1.edges[1]
-    H2 = histogram_irregular(x; support=(0.0, 1.0))
-    edges2 = H2.edges[1]
-    @test isapprox(edges1[1], 0.0; atol=1e-10)
-    @test isapprox(edges1[end], 1.0; atol=1e-10)
-    @test isapprox(edges2[1], 0.0; atol=1e-10)
-    @test isapprox(edges2[end], 1.0; atol=1e-10) =#
 
     h1 = histogram_regular(x; support=(0.0, 1.0))
     breaks1 = h1.breaks
@@ -98,14 +117,6 @@ end
 @testset "is density" begin
     n = 100
     x = randn(n)
-#=     H1 = histogram_regular(x)
-    edges1 = H1.edges[1]
-    dens1 = H1.weights
-    H2 = histogram_irregular(x)
-    edges2 = H2.edges[1]
-    dens2 = H2.weights
-    @test sum(dens1 .* (edges1[2:end] - edges1[1:end-1])) ≈ 1.0
-    @test sum(dens2 .* (edges2[2:end] - edges2[1:end-1])) ≈ 1.0 =#
 
     h1 = histogram_regular(x)
     breaks1 = h1.breaks
@@ -139,6 +150,7 @@ end
     x = randn(10^3)
 
     @test histogram_regular(x; a = k->8.0) == histogram_regular(x; a=8.0)
+    @test histogram_regular(x; a = k->8.0) ≈ histogram_regular(x; a=8.0)
 end
 
 @testset "min length" begin
@@ -146,11 +158,8 @@ end
     x = randn(n)
     h1 = histogram_irregular(x; rule=:klcv, use_min_length=true)
     h2 = histogram_irregular(x; rule=:l2cv, use_min_length=true)
-
     min_length = (maximum(x) - minimum(x))*log(n)^(1.5)/n
 
-    #= @test minimum(H1.edges[1][2:end] - H1.edges[1][1:end-1]) ≥ min_length
-    @test minimum(H2.edges[1][2:end] - H2.edges[1][1:end-1]) ≥ min_length =#
     @test minimum(h1.breaks[2:end] - h1.breaks[1:end-1]) ≥ min_length
     @test minimum(h2.breaks[2:end] - h2.breaks[1:end-1]) ≥ min_length
 end
@@ -177,6 +186,18 @@ end
     @test typeof(output) == String
 end
 
+@testset "AutomaticHistogram approx different dims" begin
+    breaks1 = LinRange(0, 1, 11)
+    density1 = [95, 84, 101, 101, 102, 106, 100, 104, 104, 103] / 100.0
+    counts1 = [95, 84, 101, 101, 102, 106, 100, 104, 104, 103]
+
+    breaks2 = LinRange(0, 1, 6)
+    density2 = fill(100, 5) / 100.0
+    counts2 = fill(100, 5)
+
+    @test !(AutomaticHistogram(breaks1, density1, counts1, :irregular, :right) ≈ AutomaticHistogram(breaks2, density2, counts2, :irregular, :right))
+end
+
 @testset "AutomaticHistogram fit" begin
     x = randn(10^3)
 
@@ -191,6 +212,7 @@ end
 
     @test_throws ArgumentError fit(AutomaticHistogram, x; rule=:nonsense)               # test error handling
     @test_throws ArgumentError fit(AutomaticHistogram, x; rule=:l2cv, type=:nonsense)
+    @test_throws ArgumentError fit(AutomaticHistogram, x; type=:nonsense)
 end
 
 @testset "AutomaticHistogram loglik, logmarglik" begin
@@ -211,6 +233,9 @@ end
     @test isapprox(minimum(h), support[1]; atol=1e-10)
     @test isapprox(maximum(h), support[2]; atol=1e-10)
     @test isapprox(extrema(h)[1], support[1]; atol=1e-10) && isapprox(extrema(h)[2], support[2]; atol=1e-10)
+    @test AutoHist.insupport(h, 0.5)
+    @test !AutoHist.insupport(h, -0.5)
+    @test !AutoHist.insupport(h, 1.5)
 end
 
 @testset "AutomaticHistogram modes" begin
@@ -234,8 +259,52 @@ end
     counts4 = [1]
     true_modes4 = [0.5]
 
-    @test modes(AutomaticHistogram(breaks1, density1, counts1, :irregular, :right)) == true_modes1
-    @test modes(AutomaticHistogram(breaks2, density2, counts2, :irregular, :right)) == true_modes2
-    @test modes(AutomaticHistogram(breaks3, density3, counts3, :irregular, :right)) == true_modes3
-    @test modes(AutomaticHistogram(breaks4, density4, counts4, :irregular, :right)) == true_modes4
+    @test peaks(AutomaticHistogram(breaks1, density1, counts1, :regular, :right)) == true_modes1
+    @test peaks(AutomaticHistogram(breaks2, density2, counts2, :regular, :right)) == true_modes2
+    @test peaks(AutomaticHistogram(breaks3, density3, counts3, :regular, :right)) == true_modes3
+    @test peaks(AutomaticHistogram(breaks4, density4, counts4, :regular, :right)) == true_modes4
+end
+
+@testset "AutomaticHistogram pdf" begin
+    breaks1 = LinRange(0, 1, 11)
+    density1 = [1.08, 1.05, 1.05, 1.14, 0.91, 0.88, 0.80, 1.05, 1.01, 1.03]
+    counts1 = [108, 105, 105, 114, 91, 88, 80, 105, 101, 103]
+
+    breaks2 = [0.0, 0.2, 0.8, 0.9, 1.0]
+    density2 = [0.945, 1.045, 0.880, 0.960]
+    counts2 = [189, 627, 88, 96]
+
+    @test AutoHist.pdf(AutomaticHistogram(breaks1, density1, counts1, :regular, :right), -0.1) == 0.0    # test values outside of support
+    @test AutoHist.pdf(AutomaticHistogram(breaks2, density2, counts2, :irregular, :right), 1.2) == 0.0
+
+    for j in 1:9    # test at each boundary that closed=:right and closed=:left behave as expected
+        @test AutoHist.pdf(AutomaticHistogram(breaks1, density1, counts1, :regular, :right), breaks1[j+1]) == density1[j]
+        @test AutoHist.pdf(AutomaticHistogram(breaks1, density1, counts1, :regular, :left), breaks1[j+1]) == density1[j+1]
+    end
+
+    for j in 1:3    # test at each boundary that closed=:right and closed=:left behave as expected
+        @test AutoHist.pdf(AutomaticHistogram(breaks2, density2, counts2, :irregular, :right), breaks2[j+1]) == density2[j]
+        @test AutoHist.pdf(AutomaticHistogram(breaks2, density2, counts2, :irregular, :left), breaks2[j+1]) == density2[j+1]
+    end
+
+    # Test the broadcasted versions as well
+    @test AutoHist.pdf.(AutomaticHistogram(breaks1, density1, counts1, :regular, :right), [0.1]) == [1.08]
+    @test AutoHist.pdf.(AutomaticHistogram(breaks2, density2, counts2, :irregular, :right), [0.2]) == [0.945]
+end
+
+@testset "AutomaticHistogram distance" begin
+    breaks = LinRange(0, 1, 11)
+    density = [1.08, 1.05, 1.05, 1.14, 0.91, 0.88, 0.80, 1.05, 1.01, 1.03]
+    counts = [108, 105, 105, 114, 91, 88, 80, 105, 101, 103]
+
+    h = AutomaticHistogram(breaks, density, counts, :regular, :right)
+
+    for dist in [:iae, :ise, :hell, :sup]
+        @test distance(h, h, dist) == 0.0
+    end
+    @test distance(h, h, :lp; p=3.0) == 0.0
+    @test distance(h, h, :lp; p=Inf) == 0.0
+
+    @test_throws ArgumentError distance(h, h, :nonsense) # error handling
+    @test_throws DomainError distance(h, h, :lp; p=-1.0)
 end

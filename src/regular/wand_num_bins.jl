@@ -90,16 +90,6 @@ function linbin(X, gpoints)
             gcnts[li] += 1 - rem
             gcnts[li + 1] += rem
         end
-
-#=         if !trun
-            if lt < 1
-                gcnts[1] += 1
-            end
-
-            if li >= M
-                gcnts[M] += 1
-            end
-        end =#
     end
     return gcnts
 end
@@ -126,7 +116,6 @@ function bkfe(gcounts, drv, bandwidth, range_x)
     lvec = 0:L
     arg = lvec .* delta / h
 
-    # kappam = pdf.(Normal(), arg) ./ h^(drv + 1)
     kappam = @. 1.0/sqrt(2.0*pi) * exp(-0.5*arg ^ 2) / h^(drv + 1)
     hmold0, hmnew = ones(length(arg)), ones(length(arg))
     hmold1 = arg
