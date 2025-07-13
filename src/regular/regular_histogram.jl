@@ -26,7 +26,6 @@ julia> x = [0.037, 0.208, 0.189, 0.656, 0.45, 0.846, 0.986, 0.751, 0.249, 0.447]
 julia> h1 = histogram_regular(x)
 julia> h2 = histogram_regular(x; logprior=k->-log(k), a=k->0.5*k)
 ```
-...
 """
 function histogram_regular( x::AbstractVector{<:Real}; rule::Symbol=:knuth, closed::Symbol=:right, maxbins::Int=1000,
                             support::Tuple{Real,Real}=(-Inf,Inf), logprior::Function=k->0.0, a::Union{Real,Function}=5.0,
@@ -39,22 +38,22 @@ function histogram_regular( x::AbstractVector{<:Real}; rule::Symbol=:knuth, clos
     end
     n = length(x)
 
-    if maxbins < 1          # maximal number of bins must be positive
+    if maxbins < 1             # maximal number of bins must be positive
         throw(DomainError("Maximal number of bins must be positive."))
     end
 
     xmin, xmax = extrema(x)
 
-    if support[1] > -Inf   # estimate lower bound of support if unknown,
+    if support[1] > -Inf       # estimate lower bound of support if unknown,
         if xmin > support[1]
-            xmin = support[1]   # use known lower bound
+            xmin = support[1]  # use known lower bound
         else 
             throw(DomainError("The supplied lower bound is greater than the smallest value of the sample."))
         end
     end
     if support[2] < Inf
         if xmax < support[2]
-            xmax = support[2]   # use known upper bound
+            xmax = support[2]  # use known upper bound
         else 
             throw(DomainError("The supplied upper bound is smaller than the smallest value of the sample."))
         end
@@ -158,7 +157,6 @@ function histogram_regular( x::AbstractVector{<:Real}; rule::Symbol=:knuth, clos
     end
 
     # Create a StatsBase.Histogram object with the chosen number of bins
-    #N = convert.(Int64, bin_regular(x, xmin, xmax, k_opt, closed == :right))
     N = bin_regular_int(x, xmin, xmax, k_opt, closed == :right)
     a_opt = 0.0
     if rule == :bayes
@@ -167,7 +165,4 @@ function histogram_regular( x::AbstractVector{<:Real}; rule::Symbol=:knuth, clos
     dens = k_opt/(xmax-xmin) * (N .+ a_opt/k_opt) / (a_opt + n) # Estimated density
     h = AutomaticHistogram(LinRange(xmin, xmax, k_opt+1), dens, N, :regular, closed, ifelse(a_opt > 0.0, a_opt, NaN))
     return h
-
-    #H_opt = Histogram(LinRange(xmin, xmax, k_opt+1), dens, closed, true)
-    #return H_opt
 end
