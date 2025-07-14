@@ -181,7 +181,7 @@ end
     h = AutomaticHistogram(breaks, density, counts, :irregular, :right, 1.0)
     @test typeof(Plots.plot(h)) == Plots.Plot{Plots.GRBackend}    # check that Plots extension works
     
-    if !isnothing(Base.find_package("Makie"))
+    @static if VERSION ≥ v"1.10"
         @test typeof(Makie.plot(h)) == Makie.FigureAxisPlot # check that Makie extension works
         @test typeof(Makie.plot!(h)) == Makie.PlotList{Tuple{Makie.PlotSpec}}
         @test typeof(Makie.barplot(h)) == Makie.FigureAxisPlot
