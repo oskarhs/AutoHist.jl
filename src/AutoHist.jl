@@ -12,9 +12,6 @@ import SpecialFunctions: loggamma, logabsbinomial, gamma
 import FFTW: fft, ifft
 import StatsAPI: fit, loglikelihood
 import Distributions: pdf, insupport
-if !isdefined(Base, :get_extension)
-    using Requires
-end
 
 include("AutomaticHistogram.jl")
 include("utils.jl")
@@ -33,9 +30,7 @@ include(joinpath("regular", "regular_histogram.jl"))
 include(joinpath("irregular", "irregular_histogram.jl"))
 
 function __init__()
-    @static if !isdefined(Base, :get_extension) # Latest makie version requires Julia >= v1.10
-        @require Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80" include(joinpath("..", "ext", "PlotsExt.jl"))
-    end
+    return nothing
 end
 
 end
