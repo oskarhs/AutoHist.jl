@@ -9,8 +9,7 @@ function Makie.convert_arguments(P::Type{<:BarPlot}, h::AutomaticHistogram)
     kwargs = (;width = widths, gap = 0, dodge_gap = 0)
     return Makie.to_plotspec(BarPlot, Makie.convert_arguments(P, centers, h.density); kwargs...)
 end
-Makie.plot(h::AutomaticHistogram; kwargs...) = barplot(h; kwargs...)
-Makie.plot!(h::AutomaticHistogram; kwargs...) = barplot!(h; kwargs...)
+Makie.plottype(::AutomaticHistogram) = BarPlot
 
 function Makie.plot!(plot::Hist{<:Tuple{<:AutomaticHistogram}}) # enables hist(h)
     attributes = Makie.Attributes(plot)

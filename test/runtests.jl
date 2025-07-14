@@ -182,10 +182,14 @@ end
     @test typeof(Plots.plot(h)) == Plots.Plot{Plots.GRBackend}    # check that Plots extension works
     
     @test typeof(Makie.plot(h)) == Makie.FigureAxisPlot # check that Makie extension works
-    @test typeof(Makie.plot!(h)) == Makie.PlotList{Tuple{Makie.PlotSpec}} # check that Makie extension works
-    @test typeof(Makie.barplot(h)) == Makie.FigureAxisPlot # check that Makie extension works
-    @test typeof(Makie.hist(h)) == Makie.FigureAxisPlot # check that Makie extension works
-    @test typeof(Makie.stephist(h)) == Makie.FigureAxisPlot # check that Makie extension works
+    @test typeof(Makie.plot!(h)) == Makie.PlotList{Tuple{Makie.PlotSpec}}
+    @test typeof(Makie.barplot(h)) == Makie.FigureAxisPlot
+    @test typeof(Makie.hist(h)) == Makie.FigureAxisPlot
+    @test typeof(Makie.stephist(h)) == Makie.FigureAxisPlot
+
+    F = Makie.Figure(); ax = Makie.Axis(F[1,1])
+    Makie.plot!(ax, h)
+    @test length(ax.scene.plots) == 1 && typeof(ax.scene.plots[1]) == Makie.PlotList{Tuple{Makie.PlotSpec}}
 
     io = IOBuffer() # just checks that we can call the show method
     show(io, h)

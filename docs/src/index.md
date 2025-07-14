@@ -27,14 +27,24 @@ All of the above functions return an object of type [`AutomaticHistogram`](@ref)
 h_irr
 ```
 
-AutomaticHistogram objects are compatible with Plots.jl, which allows us to easily plot the two histograms resulting from the above code snippet:
+AutomaticHistogram objects are compatible with [Plots.jl](https://github.com/JuliaPlots/Plots.jl), which allows us to easily plot the two histograms resulting from the above code snippet via e.g. `Plots.plot(h_irr)`. To show both histograms side by side, we can create a plot as follows:
 
 ```@example index
-using Plots; gr()
-# Plot the resulting histograms
-p_irr = plot(h_irr, xlabel="x", ylabel="Density", label="Irregular", alpha=0.4, color="black")
-p_reg = plot(h_reg, xlabel="x", label="Regular", alpha=0.4, color="red")
-plot(p_irr, p_reg, layout=(1, 2), size=(670, 320))
+import Plots; Plots.gr()
+p_irr = Plots.plot(h_irr, xlabel="x", ylabel="Density", title="Irregular", alpha=0.4, color="black", label="")
+p_reg = Plots.plot(h_reg, xlabel="x", title="Regular", alpha=0.4, color="red", label="")
+Plots.plot(p_irr, p_reg, layout=(1, 2), size=(670, 320))
+```
+
+Alternatively, [Makie.jl](https://github.com/MakieOrg/Makie.jl) can also be used to make graphical displays of the fitted histograms via e.g. `Makie.plot(h_irr)`. To produce a plot similar to the above display, we may for instance do the following:
+```@example index
+import CairoMakie, Makie # using the CairoMakie backend
+F = Makie.Figure(size=(670, 320))
+ax1 = Makie.Axis(F[1, 1], title="Irregular", xlabel="x", ylabel="Density")
+ax2 = Makie.Axis(F[1, 2], title="Regular", xlabel="x")
+p_irr = Makie.plot!(ax1, h_irr, alpha=0.4, color="black")
+p_reg = Makie.plot!(ax2, h_reg, alpha=0.4, color="red")
+F
 ```
 
 ## Supported methods
