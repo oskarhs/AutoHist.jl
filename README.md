@@ -41,7 +41,7 @@ A detailed exposition of the keyword arguments passed to each of these functions
 The fitted histograms can be displayed through the [Plots.jl](https://github.com/JuliaPlots/Plots.jl) or [Makie.jl](https://github.com/MakieOrg/Makie.jl) packages as follows:
 
 ```julia
-import Plots, CairoMakie
+import Plots, CairoMakie, Makie
 Plots.plot(h)
 Makie.plot(h)
 ```
