@@ -1,4 +1,5 @@
-using Plots; gr()
+import Plots; Plots.gr() # avoid namespace pollution
+import CairoMakie, Makie
 using AutoHist, Distributions
 using Test
 
@@ -178,7 +179,13 @@ end
     density = counts ./ ((breaks[2:end] - breaks[1:end-1])*sum(counts))
 
     h = AutomaticHistogram(breaks, density, counts, :irregular, :right, 1.0)
-    @test typeof(plot(h)) == Plots.Plot{Plots.GRBackend}                            # check that Plots extension works
+    @test typeof(Plots.plot(h)) == Plots.Plot{Plots.GRBackend}    # check that Plots extension works
+    
+    @test typeof(Makie.plot(h)) == Makie.FigureAxisPlot # check that Makie extension works
+    @test typeof(Makie.plot!(h)) == Makie.PlotList{Tuple{Makie.PlotSpec}} # check that Makie extension works
+    @test typeof(Makie.barplot(h)) == Makie.FigureAxisPlot # check that Makie extension works
+    @test typeof(Makie.hist(h)) == Makie.FigureAxisPlot # check that Makie extension works
+    @test typeof(Makie.stephist(h)) == Makie.FigureAxisPlot # check that Makie extension works
 
     io = IOBuffer() # just checks that we can call the show method
     show(io, h)
@@ -307,4 +314,14 @@ end
 
     @test_throws ArgumentError distance(h, h, :nonsense) # error handling
     @test_throws DomainError distance(h, h, :lp; p=-1.0)
+
+    @test distance(
+        AutomaticHistogram([-1.0, 0.0], [1.0], [1], :regular, :right),
+        AutomaticHistogram([0.0, 1.0], [1.0], [1], :regular, :right),
+        :iae
+    ) == distance(
+        AutomaticHistogram([0.0, 1.0], [1.0], [1], :regular, :right),
+        AutomaticHistogram([-1.0, 0.0], [1.0], [1], :regular, :right),
+        :iae
+    ) == 2.0
 end

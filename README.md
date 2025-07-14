@@ -20,23 +20,31 @@ Pkg.add("AutoHist")
 To get started, we illustrate the basic use of the package by fitting histograms to a normal random sample with an automatic selection of the histogram partition.
 
 ```julia
-julia> using AutoHist, Plots
-julia> x = randn(10^6);
-julia> h1 = histogram_regular(x);   # fits an automatic regular histogram
-julia> plot(h1)
-
-julia> h2 = histogram_irregular(x); # fits an automatic irregular histogram
-julia> plot(h2)
+using AutoHist
+x = randn(10^6)
+h1 = fit(AutomaticHistogram, x)
 ```
 
-Alternatively, we can construct an automatic histogram calling the `fit` method:
-
+Several rules are available to select the histogram partition, and can be controlled through the use of the `rule` keyword argument. For instance, a regular histogram based on maximizing the AIC can be fit as follows:
 ```julia
-julia> h3 = fit(AutomaticHistogram, x; rule=:wand, scalest=:stdev);
-julia> plot(h3)
+h2 = fit(AutomaticHistogram, x; rule=:aic)
+```
+
+Alternatively, we can fit regular and irregular histograms by calling the functions `histogram_regular` or `histogram_regular`.
+```julia
+h3 = histogram_regular(x; rule=:wand, scalest=:iqr)
+h4 = histogram_irregular(x; rule=:penr)
 ```
 
 A detailed exposition of the keyword arguments passed to each of these functions can be found by typing `?fit`, `?histogram_irregular` and `?histogram_regular` in the repl or in the [API documentation](https://oskarhs.github.io/AutoHist.jl/stable/api/).
+
+The fitted histograms can be displayed through the [Plots.jl](https://github.com/JuliaPlots/Plots.jl) or [Makie.jl](https://github.com/MakieOrg/Makie.jl) packages as follows:
+
+```julia
+import Plots, CairoMakie
+Plots.plot(h)
+Makie.plot(h)
+```
 
 ## Supported criteria
 

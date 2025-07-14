@@ -15,7 +15,7 @@ fit(
     alg = DP(greedy=false)
 )
 ```
-Benchmarking the above code snippet yields a mean runtime of around ``60\ \text{ms}`` on my machine. Since dynamic programming is quick for samples of this size, the greedy algorithm will only be used if the number of candidate cutpoints exceeds ``500``. Thus, changing `greedy` to `true` in the above code snippet would produce the same histogram, as there are ``499`` possible cutpoints.
+Benchmarking the above code snippet yields a mean runtime of around ``60\ \text{ms}`` on my machine. Since dynamic programming is quick for samples of this size, the greedy algorithm will only be used if the number of candidate cutpoints exceeds ``501``. Thus, changing `greedy` to `true` in the above code snippet would produce the same histogram, as there are ``501`` possible cutpoints.
 
 #### Speeding up computations via heuristics
 
