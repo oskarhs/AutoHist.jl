@@ -1,8 +1,6 @@
 import Plots; Plots.gr() # avoid namespace pollution
-import CairoMakie, Makie
 using AutoHist, Distributions
 using Test
-
 import StatsBase: Histogram, fit
 
 @testset "return type regular" begin
@@ -173,7 +171,7 @@ end
     @test_throws DomainError histogram_regular(x; support=(-Inf, 0.5))
 end
 
-@testset "AutomaticHistogram plot and string" begin
+@testset "AutomaticHistogram Plots and string" begin
     breaks = [0.0, 0.4, 0.6, 1.0]
     counts = [2, 5, 10]
     density = counts ./ ((breaks[2:end] - breaks[1:end-1])*sum(counts))
@@ -182,6 +180,8 @@ end
     @test typeof(Plots.plot(h)) == Plots.Plot{Plots.GRBackend}    # check that Plots extension works
     
     @static if VERSION ≥ v"1.10"
+        import Makie, CairoMakie
+
         @test typeof(Makie.plot(h)) == Makie.FigureAxisPlot # check that Makie extension works
         @test typeof(Makie.plot!(h)) == Makie.PlotList{Tuple{Makie.PlotSpec}}
         @test typeof(Makie.barplot(h)) == Makie.FigureAxisPlot
@@ -197,6 +197,27 @@ end
     show(io, h)
     output = String(take!(io))
     @test typeof(output) == String
+end
+
+@testset "Makie" begin
+    breaks = [0.0, 0.4, 0.6, 1.0]
+    counts = [2, 5, 10]
+    density = counts ./ ((breaks[2:end] - breaks[1:end-1])*sum(counts))
+    h = AutomaticHistogram(breaks, density, counts, :irregular, :right, 1.0)
+    
+    @static if VERSION ≥ v"1.10"
+        import Makie, CairoMakie
+
+        @test typeof(Makie.plot(h)) == Makie.FigureAxisPlot # check that Makie extension works
+        @test typeof(Makie.plot!(h)) == Makie.PlotList{Tuple{Makie.PlotSpec}}
+        @test typeof(Makie.barplot(h)) == Makie.FigureAxisPlot
+        @test typeof(Makie.hist(h)) == Makie.FigureAxisPlot
+        @test typeof(Makie.stephist(h)) == Makie.FigureAxisPlot
+
+        F = Makie.Figure(); ax = Makie.Axis(F[1,1])
+        Makie.plot!(ax, h)
+        @test length(ax.scene.plots) == 1 && typeof(ax.scene.plots[1]) == Makie.PlotList{Tuple{Makie.PlotSpec}}
+    end
 end
 
 @testset "AutomaticHistogram approx different dims" begin
