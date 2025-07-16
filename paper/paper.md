@@ -54,7 +54,7 @@ h_irr = fit(AutomaticHistogram, x; rule=:bayes) # fit an irregular histogram
 h_reg = fit(AutomaticHistogram, x; rule=:aic)   # fit a regular histogram
 ```
 
-The call to the `fit` method returns an object of type `AutomaticHistogram`, which stores the essential information to represent the fitted histogram including the chosen histogram partition, estimated density and bin counts.
+The call to the `fit` method returns an object of type `AutomaticHistogram`, which has fields recording the chosen histogram partition, estimated density and bin counts.
 
 ```julia
 using Makie, CairoMakie
