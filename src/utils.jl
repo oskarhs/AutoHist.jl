@@ -18,7 +18,7 @@ function bin_regular(x::AbstractVector{<:Real}, xmin::Real, xmax::Real, k::Int, 
     return bincounts
 end
 
-function bin_regular_int(x::AbstractVector{<:Real}, xmin::Real, xmax::Real, k::Int, right::Bool)
+#= function bin_regular_int(x::AbstractVector{<:Real}, xmin::Real, xmax::Real, k::Int, right::Bool)
     R = xmax - xmin
     bincounts = zeros(Int64, k)
     edges_inc = k/R
@@ -34,7 +34,7 @@ function bin_regular_int(x::AbstractVector{<:Real}, xmin::Real, xmax::Real, k::I
         end
     end
     return bincounts
-end
+end =#
 
 function bin_irregular(x::AbstractVector{<:Real}, edges::AbstractVector{<:Real}, right::Bool)
     bincounts = zeros(Float64, length(edges)-1)
