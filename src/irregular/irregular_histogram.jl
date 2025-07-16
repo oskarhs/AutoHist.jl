@@ -172,13 +172,12 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::Symbol=:bayes, gri
                 1.0/sqrt(n) * sqrt(2.0)*k/3.0 * exp(loggamma(0.5*k) - loggamma(0.5*k-0.5)) +
                 1.0/n * ((3.0 + k*(k-2.0)*(2.0*k+1.0))/36.0 - k^2/9.0*exp(2.0*loggamma(0.5*k) - 2.0*loggamma(0.5*k-0.5)))
                 )
-                psi[k] = psi[k] - logabsbinomial(maxbins-1, k-1)[1]
+                @inbounds psi[k] = psi[k] - logabsbinomial(maxbins-1, k-1)[1]
             end
         end
         k_opt = argmax(optimal + psi)
         bin_edges_norm = compute_bounds_sn(ancestor, mesh, k_opt)
     end
-
     bin_edges = @. xmin + (xmax - xmin) * bin_edges_norm
 
     N = bin_irregular_int(x, bin_edges, closed == :right)
