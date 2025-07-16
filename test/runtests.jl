@@ -230,6 +230,8 @@ end
     counts2 = fill(100, 5)
 
     @test !(AutomaticHistogram(breaks1, density1, counts1, :irregular, :right) ≈ AutomaticHistogram(breaks2, density2, counts2, :irregular, :right))
+    @test !(AutomaticHistogram(breaks1, density1, counts1, :irregular, :right, 1.0) ≈ AutomaticHistogram(breaks2, density2, counts2, :irregular, :right))
+    @test !(AutomaticHistogram(breaks1, density1, counts1, :irregular, :right) ≈ AutomaticHistogram(breaks2, density2, counts2, :irregular, :right, 1.0))
 end
 
 @testset "AutomaticHistogram fit" begin

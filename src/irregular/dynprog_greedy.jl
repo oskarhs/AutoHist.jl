@@ -51,7 +51,8 @@ function segment_neighborhood_greedy(phi::Function, k_max::Int, max_cand::Int=15
             # Compute optimum among the non-pruned candidates
             obj = Vector{Float64}(undef, length(cpts_cand))
             for (l,j) in enumerate(cpts_cand)
-                obj[l] = cum_weight[j, k-1] + weight[j+1, i+1]
+                #obj[l] = cum_weight[j, k-1] + weight[j+1, i+1]
+                obj[l] = cum_weight[j-1, k-1] + weight[j, i+1]
             end
             amax = argmax(obj)
             ancestor0[i-k+1] = cpts_cand[amax]
