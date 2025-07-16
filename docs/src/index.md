@@ -39,12 +39,12 @@ Plots.plot(p_irr, p_reg, layout=(1, 2), size=(670, 320))
 Alternatively, [Makie.jl](https://github.com/MakieOrg/Makie.jl) can also be used to make graphical displays of the fitted histograms via e.g. `Makie.plot(h_irr)`. To produce a plot similar to the above display, we may for instance do the following:
 ```@example index
 import CairoMakie, Makie # using the CairoMakie backend
-F = Makie.Figure(size=(670, 320))
-ax1 = Makie.Axis(F[1, 1], title="Irregular", xlabel="x", ylabel="Density")
-ax2 = Makie.Axis(F[1, 2], title="Regular", xlabel="x")
+fig = Makie.Figure(size=(670, 320))
+ax1 = Makie.Axis(fig[1, 1], title="Irregular", xlabel="x", ylabel="Density")
+ax2 = Makie.Axis(fig[1, 2], title="Regular", xlabel="x")
 p_irr = Makie.plot!(ax1, h_irr, alpha=0.4, color="black")
 p_reg = Makie.plot!(ax2, h_reg, alpha=0.4, color="red")
-F
+fig
 ```
 
 ## Supported methods

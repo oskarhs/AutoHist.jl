@@ -22,8 +22,8 @@ date: 16 July 2025
 # Summary
 
 `AutoHist.jl` is a `Julia` [@bezanson2017julia] package for fitting histograms to univariate data, with an automatic and data-based selection of the histogram partition.
-It currently supports 7 irregular and 12 regular automatic histogram procedures from the statistical literature. `AutoHist.jl` provides extensions for `Plots.jl` [@christ2023plots] and `Makie.jl` [@danisch2021makie],
-allowing for simple and intuitive visualization of the resulting histograms.
+It currently supports 7 irregular and 12 regular automatic histogram procedures from the statistical literature. Additionally, `AutoHist.jl` provides extensions for `Plots.jl` [@christ2023plots] and `Makie.jl` [@danisch2021makie],
+allowing for simple visualization of the resulting histograms.
 
 # Statement of need
 
@@ -33,14 +33,42 @@ Although contructing a histogram for a given interval partition is a simple task
 As a result, the task of designing automatic histogram procedures, where the number of bins and their location are chosen automatically based on the sample has recieved considerable interest in the statistics community.
 Despite advances in our understanding of different bin selection rules, many popular software libraries only include a limited number of simple rules for selecting a regular histogram partition,
 and typically do not provide any support for automatic irregular histogram construction.
-`AutoHist.jl` fills this gap by providing a fast implementation of state-of-the-art regular and irregular bin selection algorithms from the statistics literature.
+`AutoHist.jl` fills this gap by providing a fast implementation of state-of-the-art regular and irregular bin selection algorithms from the statistics literature. A complete overview of the bin selection procedures that have been implemented so far is given in **Table 1**.
+
+| Rule | Type (regular/irregular) | Reference |
+|-----------|:--------|:--------------------|
+| sturges | regular   | sturges |
+| scott   | regular   | scott   |
+| fd      | regular   | freedman diaconis |
+| aic     | regular   | hall    |
+| bic     | regular   | davies  |
+| br      | regular   | birge rozenholc |
+| mdl     | regular   | hall hannan |
+| wand    | regular   | wand |
+| pena    | irregular | rozenholc et al. |
+| penb    | irregular | rozenholc et al. |
+| penr    | irregular | rozenholc et al. |
+| nml     | both      | kontkanen myllamaki |
+| l2cv    | both      | rudemo |
+| klcv    | both      | hall, simensen et al. |
+| bayes   | both      | knuth, simensen et al. |
+ 
+
+Table: Implemented bin selection procedures so far.
+
 
 We note that some automatic histogram selection rules have been implemented in `Julia`, typically as part of plotting libraries.
-The `Plots.jl` package provides an implementation of some plug-in rules for regular histograms, while the `StatsPlots` package offers an implementation of equal-area histograms.
+The `Plots.jl` package provides an implementation of some plug-in rules for regular histograms, while the `StatsPlots` package [@christ2023plots] offers an implementation of equal-area histograms.
 The `R` package `histogram` [@mildenberger2019histogram] supports some regular and irregular histogram methods, but their implementation covers fewer criteria.
 Our implementation has the additional advantage of avoiding the awkward conversion of histogram objects from `R` to an appropriate type in `Julia`.
 
-# Examples
+# Installation
+
+The `AutoHist` package is part of the `Julia` general registry, and can as such be installed via the built in package manager,
+```julia
+using Pkg
+Pkg.add("AutoHist")
+```
 
 To illustrate the basic use of the software, we fit an irregular histogram based on the Bayesian criterion and a regular histogram bas on AIC to a standard normal random sample of size $n = 10^6$.
 
@@ -54,10 +82,16 @@ h_irr = fit(AutomaticHistogram, x; rule=:bayes) # fit an irregular histogram
 h_reg = fit(AutomaticHistogram, x; rule=:aic)   # fit a regular histogram
 ```
 
-The call to the `fit` method returns an object of type `AutomaticHistogram`, with fields recording the chosen histogram partition, estimated density and bin counts. 
+The call to the `fit` method returns an object of type `AutomaticHistogram`, with fields recording the chosen histogram partition, estimated density and bin counts. `AutoHist` provides recipes for `Plots.jl` and `Makie.jl`, which allows the user to easily plot the results of the above code snippet. Here, we show the to plot the irregular and the regular histogram using `Makie`.
 
 ```julia
-using Makie, CairoMakie
+import CairoMakie, Makie # using the CairoMakie backend
+fig = Makie.Figure(size=(670, 320))
+ax1 = Makie.Axis(fig[1, 1], title="Irregular", xlabel="x", ylabel="Density")
+ax2 = Makie.Axis(fig[1, 2], title="Regular", xlabel="x")
+p_irr = Makie.plot!(ax1, h_irr, alpha=0.4, color="black")
+p_reg = Makie.plot!(ax2, h_reg, alpha=0.4, color="red")
+fig
 ```
 
 
