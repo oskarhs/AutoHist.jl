@@ -157,7 +157,7 @@ function histogram_regular( x::AbstractVector{<:Real}; rule::Symbol=:knuth, clos
     end
 
     # Create a StatsBase.Histogram object with the chosen number of bins
-    N = convert.(Int, bin_regular(x, xmin, xmax, k_opt, closed == :right))
+    N = bin_irregular_int(x, LinRange(xmin, xmax, k_opt+1), closed == :right)
     a_opt = 0.0
     if rule == :bayes
         a_opt = aₖ[k_opt]
