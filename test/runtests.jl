@@ -77,7 +77,7 @@ end
 
     # Greedy
     @test typeof(histogram_irregular(LinRange(0.0, 1.0, 10^4); alg=DP(greedy=true))) <: AutomaticHistogram
-    @test typeof(histogram_irregular(LinRange(0.0, 1.0, 10^4); alg=DP(greedy=true, gr_maxbins=600))) <: AutomaticHistogram
+    @test typeof(histogram_irregular(LinRange(0.0, 1.0, 10^4); grid=:data, alg=DP(greedy=true, gr_maxbins=600))) <: AutomaticHistogram
 
 end
 

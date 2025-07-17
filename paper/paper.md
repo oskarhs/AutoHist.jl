@@ -94,7 +94,7 @@ p_irr = Makie.plot!(ax1, h_irr, alpha=0.4, color="black")
 p_reg = Makie.plot!(ax2, h_reg, alpha=0.4, color="red")
 fig
 ```
-![An irregular and a regular histogram fit to the standard sample](figures/makie_plotting.png)
+![Plot of the irregular and regular histogram fit to the standard normal sample.](figures/makie_plotting.png)
 
 
 # References
