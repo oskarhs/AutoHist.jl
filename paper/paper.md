@@ -23,14 +23,14 @@ date: 16 July 2025
 
 `AutoHist.jl` is a Julia [@bezanson2017julia] package for fitting histograms to univariate data, with an automatic and data-based selection of the histogram partition.
 It currently supports 7 irregular and 12 regular automatic histogram procedures from the statistical literature. Additionally, `AutoHist.jl` provides extensions for `Plots.jl` [@christ2023plots] and `Makie.jl` [@danisch2021makie],
-allowing for simple visualization of the resulting histograms.
+allowing for simple visualization of the resulting histogram fits.
 
 # Statement of need
 
 To this day, histograms remain one of the most widely used nonparametric density estimators. Their popularity is in no doubt due to their simplicity and interpretability,
-and they are routinely used by practitioners with limited mathematical backgrounds as a means of visualizing data. 
+and they are routinely used by practitioners with limited mathematical backgrounds as a means of visualizing the distribution of data sets. 
 Although the construction of a histogram for a given interval partition is a simple task, the quality of the resulting density estimate is very sensitive to the choice of bins.
-As a result, the task of designing automatic histogram procedures, where the number of bins and their location are chosen automatically based on the sample has recieved considerable interest in the statistics community.
+As a result, the task of designing automatic histogram procedures, where the number of bins and their location are chosen automatically based on the sample, has recieved considerable interest in the statistics community.
 Despite advances in our understanding of different bin selection rules, many popular software libraries only include a limited number of simple rules for selecting a regular histogram partition,
 and typically do not provide any support for automatic irregular histogram construction.
 `AutoHist.jl` fills this gap by providing a fast implementation of state-of-the-art regular and irregular bin selection algorithms from the statistics literature. A complete overview of the bin selection procedures that have been implemented so far is given in **Table 1**.
@@ -94,6 +94,7 @@ p_irr = Makie.plot!(ax1, h_irr, alpha=0.4, color="black")
 p_reg = Makie.plot!(ax2, h_reg, alpha=0.4, color="red")
 fig
 ```
-![](figures/makie_plotting.png)
+![An irregular and a regular histogram fit to the standard sample](figures/makie_plotting.png)
+
 
 # References

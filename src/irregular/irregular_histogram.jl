@@ -42,9 +42,6 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::Symbol=:bayes, gri
         throw(ArgumentError("The supplied value of the closed keyword, :$closed, is invalid. Valid values are :left or :right."))
     end
 
-    if rule in [:klcv, :l2cv] && typeof(alg) != DP
-        throw(ArgumentError("Supplied algorithm, $alg is not supported for rule=:$rule. The supported algorithm for this rule is DP()."))
-    end
     if !(grid in [:data, :regular, :quantile])
         throw(ArgumentError("The supplied grid, :$grid, is not supported. The grid kwarg must be one of :data, :regular or :quantile"))
     end
