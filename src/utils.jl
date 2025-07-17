@@ -178,3 +178,31 @@ function supremum_distance(h1::AutomaticHistogram, h2::AutomaticHistogram)
     end
     return sup
 end
+
+# Compute K(f₁, f₂) (asymmetric)
+function kl_divergence(h1::AutomaticHistogram, h2::AutomaticHistogram)
+    breaks1 = h1.breaks
+    dens1 = h1.density
+    breaks2 = h2.breaks
+    dens2 = h2.density
+    disc = merge_sorted_vec(breaks1, breaks2) # union of points of discontinuity for the two histograms
+    m = length(disc)-1
+    kl = 0.0
+    for j = 1:m
+        bin_ind1 = searchsortedfirst(breaks1, disc[j]+10*eps()) - 1
+        bin_ind2 = searchsortedfirst(breaks2, disc[j]+10*eps()) - 1
+        if bin_ind1 == 0 || bin_ind1 == (length(dens1)+1)
+            d1 = 0.0
+        else
+            d1 = dens1[bin_ind1]
+        end
+        if bin_ind2 == 0 || bin_ind2 == (length(dens2)+1)
+            d2 = 0.0
+        else
+            d2 = dens2[bin_ind2]
+        end
+        kl += (disc[j+1]-disc[j])*ifelse(d1 == 0.0, 0.0, d1*log(d1))
+        kl -= (disc[j+1]-disc[j])*d1*log(d2)
+    end
+    return kl
+end

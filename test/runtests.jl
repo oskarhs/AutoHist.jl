@@ -335,7 +335,7 @@ end
 
     h = AutomaticHistogram(breaks, density, counts, :regular, :right)
 
-    for dist in [:iae, :ise, :hell, :sup]
+    for dist in [:iae, :ise, :hell, :sup, :kl]
         @test distance(h, h, dist) == 0.0
     end
     @test distance(h, h, :lp; p=3.0) == 0.0
@@ -353,4 +353,9 @@ end
         AutomaticHistogram([-1.0, 0.0], [1.0], [1], :regular, :right),
         :iae
     ) == 2.0
+    @test Inf == distance(
+        AutomaticHistogram([-1.0, 0.0], [1.0], [1], :regular, :right),
+        AutomaticHistogram([0.0, 1.0], [1.0], [1], :regular, :right),
+        :kl
+    )
 end

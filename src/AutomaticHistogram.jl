@@ -315,7 +315,7 @@ Compute a statistical distance between two histogram probability densities.
 - `p`: Power of the ``l_p``-metric, which should be a number in the interval ``[1, \\infty]``. Ignored if `dist != :lp`. Defaults to `p=1.0`.
 """
 function distance(h1::AutomaticHistogram, h2::AutomaticHistogram, dist::Symbol=:iae; p::Real=1.0)
-    if !(dist in [:iae, :ise, :lp, :hell, :sup])
+    if !(dist in [:iae, :ise, :lp, :hell, :sup, :kl])
         throw(ArgumentError("The supplied distance, :$dist, is not supported."))
     end
     if dist == :iae
@@ -332,6 +332,8 @@ function distance(h1::AutomaticHistogram, h2::AutomaticHistogram, dist::Symbol=:
         else
             return supremum_distance(h1, h2)
         end
+    elseif dist == :kl
+        return kl_divergence(h1, h2)
     else
         return hellinger_distance(h1, h2)
     end
