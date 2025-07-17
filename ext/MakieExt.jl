@@ -1,5 +1,5 @@
 module MakieExt
-isdefined(Base, :get_extension) ? (using Makie) : (using ..Makie)
+using Makie
 
 import AutoHist: AutomaticHistogram
 
