@@ -1,7 +1,7 @@
 name = "AutoHist"
 uuid = "0bf0ee65-3559-4d1e-a282-1b0e88839781"
 authors = ["Oskar Høgberg Simensen"]
-version = "0.5.0"
+version = "0.6.0"
 
 [deps]
 CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
