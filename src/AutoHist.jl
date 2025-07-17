@@ -23,7 +23,6 @@ include(joinpath("irregular", "algorithms.jl"))
 include(joinpath("irregular" ,"greedy_grid.jl"))
 include(joinpath("irregular", "objective_functions_irregular.jl"))
 include(joinpath("irregular", "dynprog.jl"))
-include(joinpath("irregular", "dynprog_greedy.jl"))
 include(joinpath("irregular", "compute_bounds.jl"))
 
 include(joinpath("regular", "regular_histogram.jl"))
