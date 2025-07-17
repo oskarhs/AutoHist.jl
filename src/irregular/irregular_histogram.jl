@@ -11,7 +11,7 @@ Returns an AutomaticHistogram object with the optimal partition corresponding to
 - `rule`: The criterion used to determine the optimal number of bins. Defaults to the Bayesian method of Simensen et al. (2025).
 - `grid`: Symbol indicating how the finest possible mesh should be constructed. Options are `:data`, which uses each unique data point as a grid point, `:regular` (default) which constructs a fine regular grid, and `:quantile` which constructs the grid based on the sample quantiles.
 - `closed`: Symbol indicating whether the drawn intervals should be right-inclusive or not. Possible values are `:right` (default) and `:left`.
-- `alg`: Algorithm used to fit the model. Possible options are `DP()` and `GDPD()`. See [`DP`](@ref) and [`GPDP`](@ref) for further details.
+- `alg`: Algorithm used to fit the model. Currently, only `DP()` is supported. See [`DP`](@ref) for further details.
 - `maxbins`: The maximal number of bins to be considered by the optimization criterion. Only used if grid is set to `:regular` or `:quantile`. Defaults to `maxbins=min(4*n/log(n)^2, 1000)`. If the specified argument is not a positive integer, the default value is used.
 - `support`: Tuple specifying the the support of the histogram estimate. If the first element is -Inf, then `minimum(x)` is taken as the leftmost cutpoint. Likewise, if the second elemen is `Inf`, then the rightmost cutpoint is `maximum(x)`. Default value is `(-Inf, Inf)`, which estimates the support of the data.
 - `use_min_length`: Boolean indicating whether or not to impose a restriction on the minimum bin length of the histogram. If set to true, the smallest allowed bin length is set to `(maximum(x)-minimum(x))/n*log(n)^(1.5)`.

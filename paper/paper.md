@@ -35,26 +35,26 @@ Despite advances in our understanding of different bin selection rules, many pop
 and typically do not provide any support for automatic irregular histogram construction.
 `AutoHist.jl` fills this gap by providing a fast implementation of state-of-the-art regular and irregular bin selection algorithms from the statistics literature. A complete overview of the bin selection procedures that have been implemented so far is given in **Table 1**.
 
-| Rule | Type (regular/irregular) | Reference |
-|-----------|:--------|:--------------------|
-| sturges | regular   | sturges |
-| scott   | regular   | scott   |
-| fd      | regular   | freedman diaconis |
-| aic     | regular   | hall    |
-| bic     | regular   | davies  |
-| br      | regular   | birge rozenholc |
-| mdl     | regular   | hall hannan |
-| wand    | regular   | wand |
-| pena    | irregular | rozenholc et al. |
-| penb    | irregular | rozenholc et al. |
-| penr    | irregular | rozenholc et al. |
-| nml     | both      | kontkanen myllamaki |
-| l2cv    | both      | rudemo |
-| klcv    | both      | hall, simensen et al. |
-| bayes   | both      | knuth, simensen et al. |
+|Method | Rule | Type (regular/irregular) | Reference |
+|---------|:-----------|:--------|:--------------------|
+| :sturges | regular   | sturges |
+| :scott   | regular   | scott   |
+| :fd      | regular   | freedman diaconis |
+| :aic     | regular   | hall    |
+| :bic     | regular   | davies  |
+| :br      | regular   | birge rozenholc |
+| :mdl     | regular   | hall hannan |
+| :wand    | regular   | wand |
+| :pena    | irregular | rozenholc et al. |
+| :penb    | irregular | rozenholc et al. |
+| :penr    | irregular | rozenholc et al. |
+| :nml     | both      | kontkanen myllamaki |
+| :l2cv    | both      | rudemo |
+| :klcv    | both      | hall, simensen et al. |
+| :bayes   | both      | knuth, simensen et al. |
  
 
-Table: Implemented bin selection procedures so far.
+Table: Implemented bin selection procedures so far. For methods with type=both, a regular and an irregular variant of the criterion is supported.
 
 
 We note that some automatic histogram selection rules have been implemented in `Julia`, typically as part of plotting libraries.
