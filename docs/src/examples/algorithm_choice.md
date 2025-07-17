@@ -1,5 +1,5 @@
 # Choice of algorithm
-In this section, we empirically assess the efficiency of the different algorithms provided for irregular histograms, and show how heuristics can be used to speed up the computations.[^1]
+In this section, we empirically assess the efficiency of the dynamic programming algorithm provided for irregular histograms, and show how heuristics can be used to speed up the computations.[^1]
 
 [^1]: **Note:** The benchmarks presented here were performed on a Windows machine with a 12th Gen Intel® Core™ i7-1255U CPU. Results may vary on systems with different hardware configurations.
 
@@ -57,36 +57,3 @@ fit(
 nothing # hide
 ```
 Due to the superior runtime complexity of the exact algorithm for cross-validation criteria, the exact solution is by default computed when the number of total candidate cutpoints is less than ``3001``, and the greedy search heuristic is used thereafter to build a smaller candidate set as previously. By default `gr_maxbins` is set to ``\max\{3000, \sqrt{n}\}``, but this can be replaced with a user-defined value if better performance or additional accuracy is desired.
-
-## Greedy pruned dynamic programming
-The other algorithm supported by this library is a heuristic variant of the cubic-time dynamic programming algorithm, available as [`GPDP`](@ref). This algorithm introduces a greedy step within the dynamic programming recursion which reduces the amount of computation and yields an overall ``\mathcal{O}(k_n^2)`` runtime. The faster asymptotic runtime comes at the cost of no longer being guaranteed to compute the optimal solution. As previously, the `GPDP` algorithm can be combined with the same greedy search heuristic that was used for the [exact dynamic programming algorithm](#dynamic-programming) to reduce the computational burden for larger sample sizes.
-
-The main advantage of using the greedy variant of dynamic programming is that the faster asymptotic runtime makes it feasible to consider a larger number of candidate cutpoints in the dynamic programming algorithm. This means that when encountering larger sample sizes, we can allow for the greedy preprocessing algorithm to select a larger number of candidate cutpoints.
-
-Since this algorithm includes some additional operations at each iteration of the dynamic programming recursion, most of the computational benefits are mostly relevant for larger sample sizes, and running the exact dynamic programming algorithm will therefore often be faster unless the number of candidate changepoints is moderately large.
-
-To showcase the use of the `GPDP` algorithm, consider the following code snippet, which fits an `AutmaticHistogram` to a normal random sample using the `GPDP` algorithm without a greedy search.
-```@example algorithm
-n = 10^3
-fit(
-    AutomaticHistogram, 
-    rand(Normal(), n);
-    grid = :data,
-    alg = GPDP(greedy=false)
-)
-nothing # hide
-```
-The above code block clocks in with an average runtime of about ``104\ \text{ms}``. By default, the greedy search heuristic will only be used if the `gr_maxbins` keyword takes a value greater than ``1000``. By default, `gr_maxbins` is set to ``\max\{1000, \sqrt{n}\}``, so the greedy algorithm is only used for sample sizes greater than ``1000``.
-
-The `GPDP` algorithm comes with the additional keyword `max_cand`, which controls the level of greediness of the algorithm. When set to a larger value, the greedy algorithm will consider a larger set of candidate cutpoints in each iteration of the dynamic programming recursion, potentially leading to solutions of higher quality at the cost of increased computation. By default, `max_cand` is set to a value of ``15``. The below code snippet shows how to run the `GPDP` algorithms with `max_cand` set to ``30``.
-```@example algorithm
-n = 10^3
-fit(
-    AutomaticHistogram, 
-    rand(Normal(), n);
-    grid = :data,
-    alg = GPDP(greedy=false, max_cand = 30)
-)
-nothing # hide
-```
-This code snippet clocks in at about ``150\ \text{ms}`` on average.

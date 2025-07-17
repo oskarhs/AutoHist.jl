@@ -3,7 +3,7 @@ module AutoHist
 export AutomaticHistogram
 export fit, convert, loglikelihood, logmarginallikelihood, minimum, maximum, extrema, peaks, pdf, insupport, length, distance
 export histogram_regular, histogram_irregular
-export DP, GPDP
+export DP
 
 using StatsBase, Base.Threads, Distributions
 import StatsBase: modes

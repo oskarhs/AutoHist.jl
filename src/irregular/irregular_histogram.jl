@@ -100,16 +100,12 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::Symbol=:bayes, gri
     end
 
     if alg.greedy
-        if typeof(alg) == DP && alg.gr_maxbins == :default
+        if alg.gr_maxbins == :default
             gr_maxbins = ifelse(
                 rule in [:klcv, :l2cv],
                 min(maxbins, max(ceil(Int, n^(1.0/2.0)), 3000)),
                 min(maxbins, max(ceil(Int, n^(1.0/3.0)), 500))
             )
-        elseif typeof(alg) == DP
-            gr_maxbins = min(maxbins, alg.gr_maxbins)
-        elseif alg.gr_maxbins == :default
-            gr_maxbins = min(maxbins, max(ceil(Int, n^(1.0/2.0)), 1000))
         else
             gr_maxbins = min(maxbins, alg.gr_maxbins)
         end
@@ -138,16 +134,7 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::Symbol=:bayes, gri
         optimal, ancestor = optimal_partitioning(phi, k_max)
         bin_edges_norm = compute_bounds_op(ancestor, mesh, k_max)
     else # use a variant of the segment neighbourhood algorithm
-        if typeof(alg) == DP
-            optimal, ancestor = segment_neighborhood(phi, k_max)
-        else
-            if alg.max_cand == :default
-                max_cand = 15
-            else
-                max_cand = alg.max_cand
-            end
-            optimal, ancestor = segment_neighborhood_greedy(phi, k_max, max_cand)
-        end
+        optimal, ancestor = segment_neighborhood(phi, k_max)
         psi = Vector{Float64}(undef, k_max)
         if rule == :penb   
             @simd for k = 1:k_max

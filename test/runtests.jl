@@ -1,4 +1,5 @@
 import Plots; Plots.gr() # avoid namespace pollution
+import Makie, CairoMakie
 using AutoHist, Distributions
 using Test
 import StatsBase: Histogram, fit
@@ -59,7 +60,7 @@ end
 @testset "algorithms" begin
     x = collect(LinRange(0,1,11))
 
-    for alg in [DP(), GPDP()]
+    for alg in [DP()]
         for rule in [:penr, :bayes]
             h = histogram_irregular(x; rule=rule, alg=alg)
             @test typeof(h) <: AutomaticHistogram
@@ -70,20 +71,9 @@ end
         @test typeof(h) <: AutomaticHistogram
     end
 
-    for alg in [DP(gr_maxbins=5), GPDP(gr_maxbins=5, max_cand=10)]
-        h = histogram_irregular(x; alg=alg)
-        @test typeof(h) <: AutomaticHistogram
-    end
-
     # Error handling
     @test_throws ArgumentError DP(gr_maxbins = :nonsense)
-    @test_throws ArgumentError GPDP(gr_maxbins = :nonsense)
     @test_throws DomainError DP(gr_maxbins = -1)
-    @test_throws DomainError GPDP(gr_maxbins = -1)
-    @test_throws ArgumentError GPDP(max_cand = :nonsense)
-    @test_throws DomainError GPDP(max_cand = -1)
-
-    @test_throws ArgumentError histogram_irregular(x; rule=:l2cv, alg=GPDP())
 end
 
 @testset "estimated support" begin
@@ -179,19 +169,15 @@ end
     h = AutomaticHistogram(breaks, density, counts, :irregular, :right, 1.0)
     @test typeof(Plots.plot(h)) == Plots.Plot{Plots.GRBackend}    # check that Plots extension works
     
-    @static if VERSION ≥ v"1.10"
-        import Makie, CairoMakie
+    @test typeof(Makie.plot(h)) == Makie.FigureAxisPlot # check that Makie extension works
+    @test typeof(Makie.plot!(h)) == Makie.PlotList{Tuple{Makie.PlotSpec}}
+    @test typeof(Makie.barplot(h)) == Makie.FigureAxisPlot
+    @test typeof(Makie.hist(h)) == Makie.FigureAxisPlot
+    @test typeof(Makie.stephist(h)) == Makie.FigureAxisPlot
 
-        @test typeof(Makie.plot(h)) == Makie.FigureAxisPlot # check that Makie extension works
-        @test typeof(Makie.plot!(h)) == Makie.PlotList{Tuple{Makie.PlotSpec}}
-        @test typeof(Makie.barplot(h)) == Makie.FigureAxisPlot
-        @test typeof(Makie.hist(h)) == Makie.FigureAxisPlot
-        @test typeof(Makie.stephist(h)) == Makie.FigureAxisPlot
-
-        F = Makie.Figure(); ax = Makie.Axis(F[1,1])
-        Makie.plot!(ax, h)
-        @test length(ax.scene.plots) == 1 && typeof(ax.scene.plots[1]) == Makie.PlotList{Tuple{Makie.PlotSpec}}
-    end
+    F = Makie.Figure(); ax = Makie.Axis(F[1,1])
+    Makie.plot!(ax, h)
+    @test length(ax.scene.plots) == 1 && typeof(ax.scene.plots[1]) == Makie.PlotList{Tuple{Makie.PlotSpec}}
 
     io = IOBuffer() # just checks that we can call the show method
     show(io, h)

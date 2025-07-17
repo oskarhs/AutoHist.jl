@@ -16,9 +16,3 @@ The choice `alg = DP()` results in the use of the exact dynamic programming algo
 ```@docs
 DP
 ```
-
-## Greedy pruned dynamic programming
-The choice `alg = GPDP()` results in the use of the heuristic greedy dynamic programming algorithm of [Simensen et al. (2025)](https://doi.org/10.48550/ARXIV.2505.22034) for finding an approximately optimal histogram partition. Runtime complexity is quadratic in the number of candidate cutpoints.
-```@docs
-GPDP
-```
