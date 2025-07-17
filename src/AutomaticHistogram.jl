@@ -145,8 +145,8 @@ Base.convert(::Type{Histogram}, h::AutomaticHistogram) = Histogram(h.breaks, h.d
 Compute the log-likelihood (up to proportionality) of an `h`.
 
 The value of the log-likelihood is
-    ∑ⱼ Nⱼ log (dⱼ),
-where Nⱼ, dⱼ are the bin counts and estimated densities for bin j.
+    ``\\sum_j N_j \\log (d_j)``
+where ``N_j``, ``d_j`` are the bin counts and estimated densities for bin j.
 """
 function loglikelihood(h::AutomaticHistogram)
     llik = 0.0
@@ -166,8 +166,8 @@ Compute the log-marginal likelihood (up to proportionality) of `h` when the valu
 
 Assumes that the Dirichlet prior is centered on the uniform distribution, so that aⱼ = a/k for a scalar a>0 and all j.
 The value of the log-marginal likelihood is
-    ∑ⱼ {log Γ(Nⱼ+aⱼ) - log Γ(aⱼ) - Nⱼlog(dⱼ)} - log Γ(a+n) + log Γ(a),
-where where Nⱼ is the bin count for bin j.
+``\\sum_j \\{ \\log \\Gamma (a_j + N_j) - \\log \\Gamma (a_j) - N_j\\log (d_j) \\} - \\log \\Gamma (a+n) + \\log \\Gamma (a)``
+, where ``N_j`` is the bin count for bin j.
 """
 function logmarginallikelihood(h::AutomaticHistogram, a::Real)
     k = length(h.counts)

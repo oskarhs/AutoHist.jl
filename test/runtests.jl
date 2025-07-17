@@ -74,6 +74,9 @@ end
     # Error handling
     @test_throws ArgumentError DP(gr_maxbins = :nonsense)
     @test_throws DomainError DP(gr_maxbins = -1)
+
+    # Greedy
+    @test typeof(histogram_irregular(LinRange(0.0, 1.0, 10^4); alg=DP(greedy=true))) <: AutomaticHistogram
 end
 
 @testset "estimated support" begin
