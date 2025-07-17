@@ -3,3 +3,4 @@
 docs/build/
 src/irregular/test_methods.jl
 src/irregular/greedy_topdown.jl
+paper/figures/makefigs.jl

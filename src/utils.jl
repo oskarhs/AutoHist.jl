@@ -201,8 +201,7 @@ function kl_divergence(h1::AutomaticHistogram, h2::AutomaticHistogram)
         else
             d2 = dens2[bin_ind2]
         end
-        kl += (disc[j+1]-disc[j])*ifelse(d1 == 0.0, 0.0, d1*log(d1))
-        kl -= (disc[j+1]-disc[j])*d1*log(d2)
+        kl += (disc[j+1]-disc[j])*ifelse(d1 == 0.0, 0.0, d1*log(d1) - d1*log(d2))
     end
     return kl
 end

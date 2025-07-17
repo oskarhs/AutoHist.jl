@@ -26,6 +26,7 @@ maximum(::AutomaticHistogram)
 extrema(::AutomaticHistogram)
 insupport(::AutomaticHistogram, ::Real)
 pdf(::AutomaticHistogram, ::Real)
+cdf(::AutomaticHistogram, ::Real)
 length(::AutomaticHistogram)
 loglikelihood(::AutomaticHistogram)
 logmarginallikelihood

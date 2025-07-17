@@ -258,6 +258,49 @@ function Base.Broadcast.broadcasted(::typeof(pdf), h::AutomaticHistogram, x::Abs
 end
 
 """
+    cdf(h::AutomaticHistogram, x::Real)
+
+Evaluate the cumulative distribution function of `h` at `x`.
+"""
+function cdf(h::AutomaticHistogram, x::Real)
+    val = 0.0
+    xmin, xmax = extrema(h)
+    if xmin < x < xmax
+        k = length(h)
+        if h.type == :irregular
+            if h.closed == :right
+                idx = max(1, searchsortedfirst(h.breaks, x) - 1)
+                @inbounds val = h.density[idx] * (x - h.breaks[idx]) + sum(diff(h.breaks[1:idx]) .* h.density[1:idx-1])
+            else 
+                idx = min(k, searchsortedlast(h.breaks, x))
+                @inbounds val = h.density[idx] * (x - h.breaks[idx]) + sum(diff(h.breaks[1:idx]) .* h.density[1:idx-1])
+            end
+        else
+            edges_inc = k/(xmax-xmin)
+            if h.closed == :right
+                idx = max(0, floor(Int, (x-xmin)*edges_inc-10.0*edges_inc*eps())) + 1
+                @inbounds val = h.density[idx] * (x - h.breaks[idx]) + sum(diff(h.breaks[1:idx]) .* h.density[1:idx-1])
+            else 
+                idx = min(k-1, floor(Int, (x-xmin)*edges_inc+10.0*edges_inc*eps())) + 1
+                @inbounds val = h.density[idx] * (x - h.breaks[idx]) + sum(diff(h.breaks[1:idx]) .* h.density[1:idx-1])
+            end
+        end
+    elseif x ≥ xmax
+        val = 1.0
+    end
+    return val
+end
+
+# Allows for cdf.(h, x) where x is a vector.
+function Base.Broadcast.broadcasted(::typeof(cdf), h::AutomaticHistogram, x::AbstractVector)
+    vals = Vector{Float64}(undef, length(x))
+    @inbounds for i in eachindex(x)
+        vals[i] = cdf(h, x[i])
+    end
+    return vals
+end
+
+"""
     peaks(h::AutomaticHistogram)
 
 Return the location of the modes/peaks of `h` as a Vector, sorted in increasing order.

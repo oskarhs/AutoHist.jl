@@ -1,7 +1,7 @@
 module AutoHist
 
 export AutomaticHistogram
-export fit, convert, loglikelihood, logmarginallikelihood, minimum, maximum, extrema, peaks, pdf, insupport, length, distance
+export fit, convert, loglikelihood, logmarginallikelihood, minimum, maximum, extrema, peaks, pdf, cdf, insupport, length, distance
 export histogram_regular, histogram_irregular
 export DP
 
