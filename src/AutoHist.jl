@@ -26,7 +26,14 @@ include(joinpath("irregular", "dynprog.jl"))
 include(joinpath("irregular", "compute_bounds.jl"))
 
 include(joinpath("regular", "regular_histogram.jl"))
+include(joinpath("regular", "regular_rules.jl"))
 include(joinpath("irregular", "irregular_histogram.jl"))
+
+abstract type AbstractRule end
+
+abstract type AbstractRegularRule end
+
+abstract type AbstractIrregularRule end
 
 function __init__()
     return nothing

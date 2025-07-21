@@ -93,11 +93,10 @@ function histogram_regular( x::AbstractVector{<:Real}; rule::Symbol=:knuth, clos
             else 
                 for k = 1:k_max
                     a_curr = a(k)
-                    if a_curr ≤ 0.0
-                        throw(DomainError("Supplied function a(k) must return strictly positive values."))
-                    else
-                        aₖ[k] = a_curr
-                    end
+                    aₖ[k] = a_curr
+                end
+                if min(a_curr) ≤ 0.0
+                    throw(DomainError("Supplied function a(k) must return strictly positive values."))
                 end
             end
         elseif rule == :knuth

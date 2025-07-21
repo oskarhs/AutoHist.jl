@@ -205,3 +205,24 @@ function kl_divergence(h1::AutomaticHistogram, h2::AutomaticHistogram)
     end
     return kl
 end
+
+# Check if all observations are contained in the provided support
+function check_support(x::AbstractVector{<:Real}, xmin::Real, xmax::Real)
+    xmin, xmax = extrema(x)
+
+    if support[1] > -Inf       # estimate lower bound of support if unknown,
+        if xmin > support[1]
+            xmin = support[1]  # use known lower bound
+        else 
+            throw(DomainError("The supplied lower bound is greater than the smallest value of the sample."))
+        end
+    end
+    if support[2] < Inf
+        if xmax < support[2]
+            xmax = support[2]  # use known upper bound
+        else 
+            throw(DomainError("The supplied upper bound is smaller than the smallest value of the sample."))
+        end
+    end
+    return xmin, xmax
+end
