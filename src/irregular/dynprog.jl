@@ -68,3 +68,23 @@ function segment_neighborhood(phi::Function, k_max::Int)
 
     return optimal, ancestor
 end
+
+
+function dynprog(alg::OptPart, rule::AbstractIrregularRule, phi::Function, mesh::AbstractVector{<:Real}, k_max::Int, maxbins::Int, n::Int)
+    optimal, ancestor = optimal_partitioning(phi, k_max)
+    bin_edges_norm = compute_bounds_op(ancestor, mesh, k_max)
+    return bin_edges_norm
+end
+
+
+function dynprog(alg::SegNeig, rule::AbstractIrregularRule, phi::Function, mesh::AbstractVector{<:Real}, k_max::Int, maxbins::Int, n::Int)
+    optimal, ancestor = segment_neighborhood(phi, k_max)
+    psi = get_psi(rule, maxbins, n)
+    dep_k = Vector{Float64}(undef, k_max)
+    @simd for k in 1:k_max
+        @inbounds dep_k[k] = psi(k)
+    end
+    k_opt = argmax(optimal + dep_k)
+    bin_edges_norm = compute_bounds_sn(ancestor, mesh, k_opt)
+    return bin_edges_norm
+end

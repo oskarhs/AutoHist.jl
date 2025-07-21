@@ -5,6 +5,8 @@ export fit, convert, loglikelihood, logmarginallikelihood, minimum, maximum, ext
 export histogram_regular, histogram_irregular
 export DP
 export RRH, Knuth, AIC, BIC, BR, MDL, NML_R, L2CV_R, KLCV_R, Sturges, FD, Scott, Wand
+export RIH, RMG_penA, RMG_penB, RMG_penR, NML_I, L2CV_I, KLCV_I
+export OptPart, SegNeig
 
 using StatsBase, Base.Threads, Distributions
 import StatsBase: modes
@@ -28,6 +30,7 @@ include(joinpath("regular", "wand_num_bins.jl"))
 
 include(joinpath("irregular", "algorithms.jl"))
 include(joinpath("irregular" ,"greedy_grid.jl"))
+include(joinpath("irregular", "irregular_rules.jl"))
 include(joinpath("irregular", "objective_functions_irregular.jl"))
 include(joinpath("irregular", "dynprog.jl"))
 include(joinpath("irregular", "compute_bounds.jl"))

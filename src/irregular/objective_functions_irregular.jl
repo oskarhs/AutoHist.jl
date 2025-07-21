@@ -65,3 +65,66 @@ function get_objective(rule::Symbol, N_cum::AbstractVector{<:Real}, mesh::Abstra
     end
     return phi
 end
+
+function get_phi(rule::RIH, N_cum::AbstractVector{<:Real}, mesh::AbstractVector{<:Real}, n::Real)
+    phi = let N_cum = N_cum, mesh = mesh
+        f(i,j) = phi_bayes(i, j, N_cum, mesh, rule.a)
+    end
+    return phi
+end
+
+function get_phi(rule::RMG_penB, N_cum::AbstractVector{<:Real}, mesh::AbstractVector{<:Real}, n::Real)
+    phi = let N_cum = N_cum, mesh = mesh
+        f(i,j) = phi_penB(i, j, N_cum, mesh)
+    end
+    return phi
+end
+
+function get_phi(rule::RMG_penA, N_cum::AbstractVector{<:Real}, mesh::AbstractVector{<:Real}, n::Real)
+    phi = let N_cum = N_cum, mesh = mesh
+        f(i,j) = phi_penB(i, j, N_cum, mesh)
+    end
+    return phi
+end
+
+function get_phi(rule::NML_I, N_cum::AbstractVector{<:Real}, mesh::AbstractVector{<:Real}, n::Real)
+    phi = let N_cum = N_cum, mesh = mesh
+        f(i,j) = phi_penB(i, j, N_cum, mesh)
+    end
+    return phi
+end
+
+function get_phi(rule::RMG_penR, N_cum::AbstractVector{<:Real}, mesh::AbstractVector{<:Real}, n::Real)
+    phi = let N_cum = N_cum, mesh = mesh
+        f(i,j) = phi_penR(i, j, N_cum, mesh, n)
+    end
+    return phi
+end
+
+function get_phi(rule::L2CV_I, N_cum::AbstractVector{<:Real}, mesh::AbstractVector{<:Real}, n::Real)
+    minlength = ifelse(rule.use_min_length, log(n)^(1.5)/n, 0.0)
+    phi = let N_cum = N_cum, mesh = mesh, n = n, minlength=minlength
+        f(i,j) = phi_L2CV(i, j, N_cum, mesh, n; minlength=minlength)
+    end
+    return phi
+end
+
+function get_phi(rule::KLCV_I, N_cum::AbstractVector{<:Real}, mesh::AbstractVector{<:Real}, n::Real)
+    minlength = ifelse(rule.use_min_length, log(n)^(1.5)/n, 0.0)
+    phi = let N_cum = N_cum, mesh = mesh, n = n, minlength=minlength
+        f(i,j) = phi_KLCV(i, j, N_cum, mesh, n; minlength=minlength)
+    end
+    return phi
+end
+
+get_psi(rule::RIH, maxbins::Int, n::Int) = k-> rule.logprior(k) - logabsbinomial(maxbins-1, k-1)[1] + loggamma(rule.a) - loggamma(rule.a + n)
+get_psi(rule::RMG_penB, maxbins::Int, n::Int) = k-> -logabsbinomial(maxbins-1, k-1)[1] - k - log(k)^(2.5)
+get_psi(rule::RMG_penA, maxbins::Int, n::Int) = k-> -logabsbinomial(maxbins-1, k-1)[1] - k - 2.0*log(k) -
+                        2.0 * sqrt(1.0*0.5*(k-1)*(logabsbinomial(maxbins-1, k-1)[1] + 2.0*log(k)))
+get_psi(rule::RMG_penR, maxbins::Int, n::Int) = k-> -logabsbinomial(maxbins-1, k-1)[1] - k - log(k)^(2.5)
+get_psi(rule::NML_I, maxbins::Int, n::Int) = k-> -( 0.5*k*log(0.5*n) - loggamma(0.5*k) +
+                1.0/sqrt(n) * sqrt(2.0)*k/3.0 * exp(loggamma(0.5*k) - loggamma(0.5*k-0.5)) +
+                1.0/n * ((3.0 + k*(k-2.0)*(2.0*k+1.0))/36.0 - k^2/9.0*exp(2.0*loggamma(0.5*k) - 2.0*loggamma(0.5*k-0.5)))
+                ) - logabsbinomial(maxbins-1, k-1)[1]
+get_psi(rule::L2CV_I, maxbins::Int, n::Int) = k-> 0.0
+get_psi(rule::KLCV_I, maxbins::Int, n::Int) = k-> 0.0

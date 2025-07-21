@@ -89,10 +89,9 @@ function histogram_irregular(x::AbstractVector{<:Real}; rule::Symbol=:bayes, gri
         finestgrid[1] = -eps()
         finestgrid[end] = 1.0+eps()
     elseif grid == :quantile
-        sort!(y)
         finestgrid[1] = -eps()
         finestgrid[end] = 1.0 + eps()
-        finestgrid[2:end-1] = quantile(y, LinRange(1.0/maxbins, 1.0-1.0/maxbins, maxbins-1); sorted=true)
+        finestgrid[2:end-1] = quantile(y, LinRange(1.0/maxbins, 1.0-1.0/maxbins, maxbins-1); sorted=false)
         N_cum[2:end] = cumsum(bin_irregular(y, finestgrid, closed == :right))
     end
 

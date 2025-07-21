@@ -42,6 +42,23 @@ end
     @test typeof(h) <: AutomaticHistogram
 end
 
+
+
+@testset "irregular new API" begin
+    x = collect(LinRange(0,1,11))
+
+    for rule in [RMG_penA(), RMG_penB(), RMG_penR(), RIH(), KLCV_I(), L2CV_I(), NML_I()]
+        h = fit(AutomaticHistogram, x, rule)
+        @test typeof(h) <: AutomaticHistogram
+    end
+    for grid in [:regular, :data, :quantile] # test grid, right-left open interval combinations
+        for closed in [:left, :right]
+            h = fit(AutomaticHistogram, x, RIH(grid=grid); closed=closed)
+            @test typeof(h) <: AutomaticHistogram
+        end
+    end
+end
+
 @testset "left open and right open intervals" begin
     x = collect(LinRange(0,1,11))
     h1 = fit(AutomaticHistogram, x, Knuth(); closed=:right)

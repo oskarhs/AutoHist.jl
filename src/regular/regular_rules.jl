@@ -10,7 +10,7 @@ end
     RRH(; a::Union{Real, Function}, logprior::Function, maxbins::Union{Int, Symbol}=:default)
     Knuth(; maxbins::Union{Int, Symbol}=:default)
 
-The random regular histogram criterion for regular histograms.
+The random regular histogram criterion.
 
 The number ``k`` of bins is chosen as the maximizer of the marginal log-posterior,
 ```math

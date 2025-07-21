@@ -20,145 +20,102 @@ The goal of an automatic histogram procedure is to find a partition ``\mathcal{I
 ## Irregular histograms
 The following section describes how each value of the `rule` keyword supported by the `histogram_irregular` function selects the optimal histogram partition. In each case, the best partition is selected among the subset of interval partitions of the unit interval that have cut points belonging to a discrete set of cardinality ``k_n-1``. The construction of the candidate cut point set can be controlled through the `grid` keyword argument, with options `:regular` (default), `:data` and `:quantile`.
 
-#### bayes
-Consists of maximizing the log-marginal likelihood conditional on the partition ``\mathcal{I} = (\mathcal{I}_1, \ldots, \mathcal{I}_k)``,
-```math
-    \sum_{j=1}^k \big\{\log \Gamma(a_j + N_j) - \log \Gamma(a_j) - N_j\log|\mathcal{I}_j|\big\} + \log p_n(k) - \log \binom{k_n-1}{k-1}
+#### Random irregular histogram
+```@docs
+RIH
 ```
-Here ``p_n(k)`` is the prior distribution on the number ``k`` of bins, which can be controlled by supplying a function to the `logprior` keyword argument. The default value is ``p_n(k) \propto 1``. Here, ``a_j = a/k``, for a scalar ``a > 0`` which can be controlled by the user through the keyword argument `a` (default `a=5.0`).
 
-This approach to irregular histograms was pioneered by [Simensen et al. (2025)](https://doi.org/10.48550/ARXIV.2505.22034).
-
-
-#### pena
-Consists of maximizing a penalized log-likelihood,
-```math
-    \sum_{j=1}^k N_j \log (N_j/|\mathcal{I}_j|) - \log \binom{k_n-1}{k-1} - k - 2\log(k) - \sqrt{2(k-1)\Big[\log \binom{k_n-1}{k-1}+ 2\log(k)\Big]}.
+#### Rozenholc, Mildenberger & Gather penalty A.
+```@docs
+RMG_penA
 ```
-This approach was suggested by [Rozenholc et al. (2010)](https://doi.org/10.1016/j.csda.2010.04.021).
 
-#### penb
-Consists of maximizing a penalized log-likelihood,
-```math
-    \sum_{j=1}^k N_j \log (N_j/|\mathcal{I}_j|) - \log \binom{k_n-1}{k-1} - k - \log^{2.5}(k).
+#### Rozenholc, Mildenberger & Gather penalty B.
+```@docs
+RMG_penB
 ```
-This approach was suggested by [Rozenholc et al. (2010)](https://doi.org/10.1016/j.csda.2010.04.021).
-#### penr
-Consists of maximizing a penalized log-likelihood,
-```math
-    \sum_{j=1}^k N_j \log (N_j/|\mathcal{I}_j|) - \frac{1}{2n}\sum_{j=1}^k \frac{N_j}{|\mathcal{I}_j|} - \log \binom{k_n-1}{k-1} - \log^{2.5}(k).
+
+#### Rozenholc, Mildenberger & Gather penalty R.
+```@docs
+RMG_penR
 ```
-This criterion was also suggested by [Rozenholc et al. (2010)](https://doi.org/10.1016/j.csda.2010.04.021).
+
 #### l2cv (irregular)
-Consists of maximization of an L2 leave-one-out cross-validation criterion,
-```math
-    \frac{n+1}{n}\sum_{j=1}^k \frac{N_j^2}{|\mathcal{I}_j|} - 2\sum_{j=1}^k \frac{N_j}{|\mathcal{I}_j|}.
+```@docs
+L2CV_I
 ```
-This approach dates back to [Rudemo (1982)](https://www.jstor.org/stable/4615859).
+
 #### klcv (irregular)
-Consists of maximization of a Kullback-Leibler cross-validation criterion,
-```math
-    \sum_{j=1}^k N_j\log(N_j-1) - \sum_{j=1}^k N_j\log |I_j|,
+```@docs
+KLCV_I
 ```
-where the maximmization is over all partitions with ``N_j \geq 2`` for all ``j``.
-This approach was, to our knowledge, first pursued by [Simensen et al. (2025)](https://doi.org/10.48550/ARXIV.2505.22034).
+
 #### nml (irregular)
-Consists of maximization of a penalized likelihood,
-```math
-\begin{aligned}
-    &\sum_{j=1}^k N_j\log \frac{N_j}{|\mathcal{I}_j|} - \frac{k-1}{2}\log(n/2) - \log\frac{\sqrt{\pi}}{\Gamma(k/2)} - n^{-1/2}\frac{\sqrt{2}k\Gamma(k/2)}{3\Gamma(k/2-1/2)} \\
-    &- n^{-1}\left(\frac{3+k(k-2)(2k+1)}{36} - \frac{\Gamma(k/2)^2 k^2}{9\Gamma(k/2-1/2)^2} \right)  - \log \binom{k_n-1}{k-1}
-\end{aligned}
+```@docs
+NML_I
 ```
-This a variant of this criterion first suggested by [Kontkanen and Myllymäki (2007)](https://proceedings.mlr.press/v2/kontkanen07a.html). The above criterion uses an asymptotic expansion of their proposed penalty term, as their proposed penalty can be quite expensive to evaluate.
 
 ## Regular histograms
-The following section details how each value of the `rule` keyword supported by the `histogram_regular` function selects the number ``k`` of bins to draw a histogram automatically based on a random sample. In the following, ``\mathcal{I} = (\mathcal{I}_1, \mathcal{I}_2, \ldots, \mathcal{I}_k)`` is the corresponding partition of ``[0,1]`` consisting of ``k`` equal-length bins. In cases where the value of the number of bins is computed by maximizing an expression, we look for the best regular partition among all regular partitions consisting of no more than ``k_n`` bins.
+The following section details how each value of the `rule` argument selects the number ``k`` of bins to draw a regular histogram automatically based on a random sample. In the following, ``\mathcal{I} = (\mathcal{I}_1, \mathcal{I}_2, \ldots, \mathcal{I}_k)`` is the corresponding partition of ``[0,1]`` consisting of ``k`` equal-length bins. In cases where the value of the number of bins is computed by maximizing an expression, we look for the best regular partition among all regular partitions consisting of no more than ``k_n`` bins. For rules falling under this umbrella, ``k_n`` can be controlled through the `maxbins` keyword, as detailed below.
 
-#### bayes, knuth
-Consists of maximizing the log-marginal likelihood for given ``k``,
-```math
-   n\log (k) + \sum_{j=1}^k \big\{\log \Gamma(a_j + N_j) - \log \Gamma(a_j)\big\} + \log p_n(k).
-```
-Here ``p_n(k)`` is the prior distribution on the number ``k`` of bins, which can be controlled by supplying a function to the `logprior` keyword argument. The default value is ``p_n(k) \propto 1``. Here, ``a_j = a/k``, for a scalar ``a > 0``, possibly depending on ``k``. The value of ``a`` can be set by supplying a fixed, positive scalar or a function ``a(k)`` to the keyword argument `a`. For `rule=:bayes`, the default value is `a=5.0`.
+#### Random regular histogram (RRH), Knuth
 
-The default regular procedure is `rule=:knuth`, which corresponds to the particular choices ``a_j = 0.5`` and ``p_n(k)\propto 1`` which is the suggestion of [Knuth (2019)](https://doi.org/10.1016/j.dsp.2019.102581). Note that if `a` and `logprior` will both be overridden in this case.
+```@docs
+RRH
+```
 
-#### aic
-Consists of maximizing a penalized log-likelihood,
-```math
-    n\log (k) + \sum_{j=1}^k N_j \log (N_j/n) - k.
-```
-The aic criterion was proposed by [Taylor (1987)](https://doi.org/10.1093/biomet/74.3.636) for histograms.
-#### bic
-Consists of maximizing a penalized log-likelihood,
-```math
-    n\log (k) + \sum_{j=1}^k N_j \log (N_j/n) - \frac{k}{2}\log(n).
-```
-#### br
-Consists of maximizing a penalized log-likelihood,
-```math
-    n\log (k) + \sum_{j=1}^k N_j \log (N_j/n) - k - \log^{2.5}(k).
-```
-This criterion was proposed by [Birgé and Rozenholc (2006)](https://doi.org/10.1051/ps:2006001).
-#### l2cv (regular)
-Consists of maximizing a L2 leave-one-out cross-validation criterion,
-```math
-    -2k + k\frac{n+1}{n^2}\sum_{j=1}^k N_j^2.
-```
-This approach to histogram density estimation was first considered by [Rudemo (1982)](https://www.jstor.org/stable/4615859
-).
-#### klcv (regular)
-Consists of maximizing a Kullback-Leibler leave-one-out cross-validation criterion,
-```math
-    n\log(k) + \sum_{j=1}^k N_j\log (N_j-1),
-```
-where the maximmization is over all regular partitions with ``N_j \geq 2`` for all ``j``.
-This approach was first studied by [Hall (1990)](https://doi.org/10.1007/BF01203164).
-#### mdl
-Consists of finding the model providing the shortest encoding of the data, which is equivalent to maximization of
-```math
-    n\log(k) + \sum_{j=1}^k \big(N_j-\frac{1}{2}\big)\log\big(N_j-\frac{1}{2}\big) - \big(n-\frac{k}{2}\big)\log\big(n-\frac{k}{2}\big) - \frac{k}{2}\log(n),
-```
-where the maximmization is over all regular partitions with ``N_j \geq 1`` for all ``j``.
-The minimum description length principle was first applied to histogram estimation by [Hall and Hannan (1988)](https://doi.org/10.1093/biomet/75.4.705).
+#### AIC
 
-#### nml (regular)
-Consists of maximization of a penalized likelihood,
-```math
-\begin{aligned}
-    &\sum_{j=1}^k N_j\log \frac{N_j}{|\mathcal{I}_j|} - \frac{k-1}{2}\log(n/2) - \log\frac{\sqrt{\pi}}{\Gamma(k/2)} - n^{-1/2}\frac{\sqrt{2}k\Gamma(k/2)}{3\Gamma(k/2-1/2)} \\
-    &- n^{-1}\left(\frac{3+k(k-2)(2k+1)}{36} - \frac{\Gamma(k/2)^2 k^2}{9\Gamma(k/2-1/2)^2} \right).
-\end{aligned}
+```@docs
+AIC
 ```
-This is a regular variant of the normalized maximum likelihood criterion considered by [Kontkanen and Myllymäki (2007)](https://proceedings.mlr.press/v2/kontkanen07a.html).
+
+#### BIC
+```@docs
+BIC
+```
+
+#### Birgé-Rozenholc (BR)
+```@docs
+BR
+```
+
+#### Regular leave-one-out ``L_2`` cross-validation (L2CV_R)
+```@docs
+L2CV_R
+```
+
+#### Regular leave-one-out Kullback-Leibler cross-validation (KLCV_R)
+```@docs
+KLCV_R
+```
+
+#### Minimum description length (MDL)
+```@docs
+MDL
+```
+
+#### Normalized maximum likelihood, regular (NML_R)
+```@docs
+NML_R
+```
 
 #### Sturges' rule
-The number ``k`` of bins is computed according to the formula
-```math
-    k = \lceil \log_2(n) \rceil + 1.
+```@docs
+Sturges
 ```
-This classical rule, due to [Sturges (1926)](https://doi.org/10.1080/01621459.1926.10502161), is the default for determining the number of bins in R.
 
 #### Freedman and Diaconis' rule
-The number ``k`` of bins is computed according to the formula
-```math
-    k = \big\lceil\frac{n^{1/3}}{2\mathrm{IQR}(\boldsymbol{x})}\big\rceil,
+```@docs
+FD
 ```
-where ``\mathrm{IQR}(\boldsymbol{x})`` is the sample interquartile range. This rule dates back to [Freedman and Diaconis (1982)](https://doi.org/10.1007/BF01025868) and is the default bin selection rule used by the `histogram()` function from Plots.jl.
 
 #### Scott's rule
-The number ``k`` of bins is computed according to the formula
-```math
-    k = \big\lceil \hat{\sigma}^{-1}(24\sqrt{\pi})^{-1/3}n^{1/3}\big\rceil,
+```@docs
+Scott
 ```
-where ``\hat{\sigma}`` is the sample standard deviation. Scott's normal reference rule was first proposed by [Scott (1979)](https://doi.org/10.1093/biomet/66.3.605).
 
 #### Wand's rule
-A more sophisticated version of Scott's rule, Wand's rule proceeds by determining the bin width ``h`` as
-```math
-    h = \Big(\frac{6}{\hat{C}(f_0) n}\Big)^{1/3},
+```@docs
+Wand
 ```
-where ``\hat{C}(f_0)`` is an estimate of the functional ``C(f_0) = \int \{f_0'(x)\}^2\, \text{d}x``. The corresponding number of bins is ``k = \lceil h^{-1}\rceil``. The full details on this method are given in [Wand (1997)](https://doi.org/10.2307/2684697).
-The density estimate is computed based on a scale estimate, which can be controlled through the `scale` keyword argument. Possible choices are `:stdev`, `:iqr` which uses an estimate based on the sample standard deviation or the sample interquartile range as a scale estimate. The default choice `:minim` uses the minimum of the above estimates.
-The `level` keyword controls the number of stages of functional estimation used to compute ``\hat{C}``, and can take values `0, 1, 2, 3, 4, 5`, with the default value being `level=2`. The choice `level=0` corresponds to Scott's rule under the chosen scale estimate.

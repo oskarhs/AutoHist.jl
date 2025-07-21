@@ -206,34 +206,113 @@ function kl_divergence(h1::AutomaticHistogram, h2::AutomaticHistogram)
     return kl
 end
 
-# Check if all observations are contained in the provided support
-#= function check_support(x::AbstractVector{<:Real}, xmin::Real, xmax::Real)
-    xmin, xmax = extrema(x)
-
-    if support[1] > -Inf       # estimate lower bound of support if unknown,
-        if xmin > support[1]
-            xmin = support[1]  # use known lower bound
-        else 
-            throw(DomainError("The supplied lower bound is greater than the smallest value of the sample."))
-        end
-    end
-    if support[2] < Inf
-        if xmax < support[2]
-            xmax = support[2]  # use known upper bound
-        else 
-            throw(DomainError("The supplied upper bound is smaller than the smallest value of the sample."))
-        end
-    end
-    return xmin, xmax
-end =#
-
-# Perform if maxbins is positive and compute default if applicable
+# Check that maxbins is positive and compute default if applicable
 function get_maxbins_regular(maxbins::Union{Symbol, Int}, n::Int)
     if typeof(maxbins) <: Symbol && maxbins != :default
         throw(ArgumentError("maxbins must either be a positive integer or :default."))
     elseif typeof(maxbins) <: Int && maxbins < 1             # maximal number of bins must be positive
-        throw(DomainError("Maximal number of bins must be positive."))
+        throw(DomainError("maxbins bins must be positive."))
     end
     k_max = ifelse(maxbins == :default, ceil(Int, 4.0*n / log(n)^2), maxbins)
     return k_max
+end
+
+# Check that maxbins is positive and compute default if applicable
+function get_maxbins_irregular!(y::AbstractVector{<:Real}, maxbins::Union{Symbol, Int}, n::Int, grid::Symbol)
+    if typeof(maxbins) <: Symbol && maxbins != :default
+        throw(ArgumentError("maxbins must either be a positive integer or :default."))
+    elseif typeof(maxbins) <: Int && maxbins < 1             # maximal number of bins must be positive
+        throw(DomainError("maxbins must be positive."))
+    end
+    if !(grid in [:data, :regular, :quantile])
+        throw(ArgumentError("The supplied grid, :$grid, is not supported. The grid kwarg must be one of :data, :regular or :quantile"))
+    end
+
+    k_max = if grid == :data
+        sort!(y)
+        z = unique(y)
+        length(z)-1
+    else
+        ifelse(maxbins == :default, min(n, ceil(Int, 4.0*n/log(n)^2)), maxbins)     
+    end
+    return k_max
+end
+
+function maximize_additive_crit(x::AbstractVector{T}, rule::AbstractIrregularRule, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
+    y = @. (x - xmin) / (xmax - xmin)
+    n = length(x)
+    if typeof(rule.maxbins) <: Symbol && rule.maxbins != :default
+        throw(ArgumentError("maxbins must either be a positive integer or :default."))
+    elseif typeof(rule.maxbins) <: Int && rule.maxbins < 1             # maximal number of bins must be positive
+        throw(DomainError("maxbins must be positive."))
+    end
+    if !(rule.grid in [:data, :regular, :quantile])
+        throw(ArgumentError("The supplied grid, :$grid, is not supported. The grid kwarg must be one of :data, :regular or :quantile"))
+    end
+
+    maxbins = if rule.grid == :data
+        sort!(y)
+        z = unique(y)
+        length(z)-1
+    else
+        ifelse(rule.maxbins == :default, min(n, ceil(Int, 4.0*n/log(n)^2)), rule.maxbins)     
+    end
+    if hasfield(typeof(rule), :use_min_length)
+        use_min_length = rule.use_min_length
+    else
+        use_min_length = false
+    end
+
+    finestgrid = Vector{Float64}(undef, maxbins+1)
+    N_cum = Vector{Float64}(undef, length(finestgrid)) # cumulative cell counts
+    N_cum[1] = 0.0
+    if rule.grid == :data
+        finestgrid[1] = -eps()
+        finestgrid[2:end-1] = z[2:end-1]
+        finestgrid[end] = 1.0 + eps()
+        N_cum[2:end] = cumsum(bin_irregular(y, finestgrid, closed == :right))
+    elseif rule.grid == :regular
+        N_cum[2:end] = cumsum(bin_regular(y, 0.0, 1.0, maxbins, closed == :right))
+        finestgrid[1:end] = LinRange(0.0, 1.0, maxbins+1)
+        finestgrid[1] = -eps()
+        finestgrid[end] = 1.0+eps()
+    elseif rule.grid == :quantile
+        finestgrid[1] = -eps()
+        finestgrid[end] = 1.0 + eps()
+        finestgrid[2:end-1] = quantile(y, LinRange(1.0/maxbins, 1.0-1.0/maxbins, maxbins-1); sorted=false)
+        N_cum[2:end] = cumsum(bin_irregular(y, finestgrid, closed == :right))
+    end
+
+    if rule.alg.greedy
+        if rule.alg.gr_maxbins == :default
+            gr_maxbins = ifelse(
+                typeof(rule.alg) == OptPart,
+                min(maxbins, max(ceil(Int, n^(1.0/2.0)), 3000)),
+                min(maxbins, max(ceil(Int, n^(1.0/3.0)), 500))
+            )
+        else
+            gr_maxbins = min(maxbins, rule.alg.gr_maxbins)
+        end
+        if gr_maxbins == maxbins # no reason to use the greedy algorithm in this case
+            k_max = maxbins
+            mesh = finestgrid
+        else
+            grid_ind = greedy_grid(
+                get_phi(ifelse(typeof(rule) != KLCV_I, rule, RMG_penB), N_cum, finestgrid, n), 
+                maxbins,
+                gr_maxbins
+            )
+            mesh = finestgrid[grid_ind]
+            k_max = length(mesh) - 1
+
+            # Update bin counts to the newly constructed grid
+            N_cum = N_cum[grid_ind]
+        end
+    else
+        k_max = maxbins
+        mesh = finestgrid
+    end
+    phi = get_phi(rule, N_cum, mesh, n)
+
+    return dynprog(rule.alg, rule, phi, mesh, k_max, maxbins, n)
 end
