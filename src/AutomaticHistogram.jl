@@ -79,6 +79,7 @@ function Base.show(io::IO, h::AutomaticHistogram)
     println(io, "a: ", h.a)
 end
 
+# Old
 """
     fit(AutomaticHistogram, x::AbstractVector{x<:Real}; rule=:default, type=:irregular, kwargs...)
 
@@ -130,6 +131,54 @@ function fit(::Type{AutomaticHistogram}, x::AbstractVector{<:Real}; rule::Symbol
         h = histogram_regular(x; rule=rule, kwargs...)
     end
     return h
+end
+
+
+# New
+"""
+    fit(AutomaticHistogram, x::AbstractVector{x<:Real}, rule<:AbstractRule=RIH(); support::Tuple{Real,Real}=(-Inf,Inf), closed::Symbol=:right)
+
+Fit a histogram to a one-dimensional vector `x` with an automatic and data-based selection of the histogram partition.
+
+# Arguments
+- `x`: 1D vector of data for which a histogram is to be constructed.
+
+# Keyword arguments
+- `rule`: The criterion used to determine the optimal number of bins. Default value is `rule=RIH()`, the random irregular histogram.
+- `closed`: Symbol indicating whether the drawn intervals should be right-inclusive or not. Possible values are `:right` (default) and `:left`.
+- `support`: Tuple specifying the the support of the histogram estimate. If the first element is `-Inf`, then `minimum(x)` is taken as the leftmost cutpoint. Likewise, if the second element is `Inf`, then the rightmost cutpoint is `maximum(x)`. Default value is `(-Inf, Inf)`, which estimates the support of the data.
+
+# Returns
+- `h`: An object of type [`AutomaticHistogram`](@ref), corresponding to the fitted histogram.
+
+# Examples
+```julia
+julia> x = randn(10^3)
+julia> h1 = fit(AutomaticHistogram, x)                                   # fits an irregular histogram via RIH criterion
+julia> h2 = fit(AutomaticHistogram, x, Wand(scalest=:stdev, level=4))    # fits a regular histogram, with Wands rule
+```
+"""
+function fit(::Type{AutomaticHistogram}, x::AbstractVector{<:Real}, rule::AbstractRule; support::Tuple{Real,Real}=(-Inf,Inf), closed::Symbol=:right)
+    if !(closed in [:right, :left]) # if supplied symbol is nonsense, just use default
+        throw(ArgumentError("The supplied value of the closed keyword, :$closed, is invalid. Valid values are :left or :right."))
+    end
+    xmin, xmax = extrema(x)
+
+    if support[1] > -Inf       # estimate lower bound of support if unknown,
+        if xmin > support[1]
+            xmin = support[1]  # use known lower bound
+        else 
+            throw(DomainError("The supplied lower bound is greater than the smallest value of the sample."))
+        end
+    end
+    if support[2] < Inf
+        if xmax < support[2]
+            xmax = support[2]  # use known upper bound
+        else 
+            throw(DomainError("The supplied upper bound is smaller than the smallest value of the sample."))
+        end
+    end
+    return fit_autohist(x, rule, xmin, xmax, closed)
 end
 
 """

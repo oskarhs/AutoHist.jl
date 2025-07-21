@@ -1,3 +1,5 @@
+# ------------------------------
+# Random regular histogram 
 struct RRH <: AbstractRegularRule
     a::Union{Real, Function}
     logprior::Function
@@ -35,28 +37,22 @@ RRH, Knuth
 
 RRH(; a::Union{Real, Function}=5.0, logprior::Function=k->0.0, maxbins::Union{Int, Symbol}=:default) = RRH(a, logprior, maxbins)
 
-function fit(::Type{AutomaticHistogram}, x::AbstractVector{<:Real}, rule::RRH; support::Tuple{Real,Real}=(-Inf,Inf), closed::Symbol=:right)
-    if !(closed in [:right, :left]) # if supplied symbol is nonsense, just use default
-        throw(ArgumentError("The supplied value of the closed keyword, :$closed, is invalid. Valid values are :left or :right."))
-    end
-    if maxbins < 1             # maximal number of bins must be positive
-        throw(DomainError("Maximal number of bins must be positive."))
-    end
-    xmin, xmax = check_support(x, support[1], support[2])
+function fit_autohist(x::AbstractVector{T}, rule::RRH, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
     n = length(x)
-    aₖ = Vector{Float64}(undef, k_max)
-    if !isa(a, Function) # create constant function if typeof(a) <: Real
-        if a ≤ 0.0
+    k_max = get_maxbins_regular(rule.maxbins, n)
+    a_vec = Vector{Float64}(undef, k_max)
+    if !isa(rule.a, Function) # create constant function if typeof(a) <: Real
+        if rule.a ≤ 0.0
             throw(DomainError("Supplied value of a must be positive."))
         else 
-            aₖ[1:end] .= a
+            a_vec[1:end] .= rule.a
         end
     else 
         for k = 1:k_max
-            a_curr = a(k)
-            aₖ[k] = a_curr
+            a_curr = rule.a(k)
+            a_vec[k] = a_curr
         end
-        if min(a_curr) ≤ 0.0
+        if minimum(a_vec) ≤ 0.0
             throw(DomainError("Supplied function a(k) must return strictly positive values."))
         end
     end
@@ -64,21 +60,27 @@ function fit(::Type{AutomaticHistogram}, x::AbstractVector{<:Real}, rule::RRH; s
     z = @. (x - xmin) / (xmax - xmin)         # Scale data to the interval [0,1]
     Threads.@threads for k = 1:k_max
         N = bin_regular(z, 0.0, 1.0, k, closed == :right)
-        @inbounds criterion[k] = logposterior_k(N, k, ones(k)/k, aₖ[k], n, logprior)
+        @inbounds criterion[k] = logposterior_k(N, k, ones(k)/k, a_vec[k], n, rule.logprior)
     end
+    k_opt = argmax(criterion)
     N = bin_irregular_int(x, LinRange(xmin, xmax, k_opt+1), closed == :right)
-    a_opt = aₖ[k_opt]
+    a_opt = a_vec[k_opt]
     dens = k_opt/(xmax-xmin) * (N .+ a_opt/k_opt) / (a_opt + n) # Estimated density
-    h = AutomaticHistogram(LinRange(xmin, xmax, k_opt+1), dens, N, :regular, closed, ifelse(a_opt > 0.0, a_opt, NaN))
+    h = AutomaticHistogram(LinRange(xmin, xmax, k_opt+1), dens, N, :regular, closed, a_opt)
     return h
 end
 
+
+# ------------------------------
+# Knuth's rule
 struct Knuth <: AbstractRegularRule
     maxbins::Union{Int, Symbol}
 end
-Knuth(; maxbins::Union{Int, Symbol}=:default) = RRH(a=k->0.5*k, logprior=k->0.0, maxbins)
+Knuth(; maxbins::Union{Int, Symbol}=:default) = RRH(k->0.5*k, k->0.0, maxbins)
 
 
+# ------------------------------
+# AIC histogram
 struct AIC <: AbstractRegularRule
     maxbins::Union{Int, Symbol}
 end
@@ -102,28 +104,25 @@ The aic criterion was proposed by [Taylor (1987)](https://doi.org/10.1093/biomet
 """
 AIC(; maxbins::Union{Int, Symbol}=:default) = AIC(maxbins)
 
-function fit(::Type{AutomaticHistogram}, x::AbstractVector{<:Real}, rule::AIC; support::Tuple{Real,Real}=(-Inf,Inf), closed::Symbol=:right)
-    if !(closed in [:right, :left]) # if supplied symbol is nonsense, just use default
-        throw(ArgumentError("The supplied value of the closed keyword, :$closed, is invalid. Valid values are :left or :right."))
-    end
-    if maxbins < 1             # maximal number of bins must be positive
-        throw(DomainError("Maximal number of bins must be positive."))
-    end
-    xmin, xmax = check_support(x, support[1], support[2])
+function fit_autohist(x::AbstractVector{T}, rule::AIC, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
     n = length(x)
+    k_max = get_maxbins_regular(rule.maxbins, n)
     criterion = Vector{Float64}(undef, k_max) # Criterion to be maximized depending on the specified rule
     z = @. (x - xmin) / (xmax - xmin)         # Scale data to the interval [0,1]
     Threads.@threads for k = 1:k_max
         N = bin_regular(z, 0.0, 1.0, k, closed == :right)
         @inbounds criterion[k] = compute_AIC(N, k, n) # Note: negative of AIC is computed
     end
+    k_opt = argmax(criterion)
     N = bin_irregular_int(x, LinRange(xmin, xmax, k_opt+1), closed == :right)
     dens = k_opt/(xmax-xmin) * N / n # Estimated density
-    h = AutomaticHistogram(LinRange(xmin, xmax, k_opt+1), dens, N, :regular, closed, ifelse(a_opt > 0.0, a_opt, NaN))
+    h = AutomaticHistogram(LinRange(xmin, xmax, k_opt+1), dens, N, :regular, closed, NaN)
     return h
 end
 
 
+# ------------------------------
+# BIC histogram
 struct BIC <: AbstractRegularRule
     maxbins::Union{Int, Symbol}
 end
@@ -144,23 +143,362 @@ where ``n`` is the sample size.
 """
 BIC(; maxbins::Union{Int, Symbol}=:default) = BIC(maxbins)
 
-function fit(::Type{AutomaticHistogram}, x::AbstractVector{<:Real}, rule::BIC; support::Tuple{Real,Real}=(-Inf,Inf), closed::Symbol=:right)
-    if !(closed in [:right, :left]) # if supplied symbol is nonsense, just use default
-        throw(ArgumentError("The supplied value of the closed keyword, :$closed, is invalid. Valid values are :left or :right."))
-    end
-    if maxbins < 1             # maximal number of bins must be positive
-        throw(DomainError("Maximal number of bins must be positive."))
-    end
-    xmin, xmax = check_support(x, support[1], support[2])
+function fit_autohist(x::AbstractVector{T}, rule::BIC, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
     n = length(x)
+    k_max = get_maxbins_regular(rule.maxbins, n)
     criterion = Vector{Float64}(undef, k_max) # Criterion to be maximized depending on the specified rule
     z = @. (x - xmin) / (xmax - xmin)         # Scale data to the interval [0,1]
     Threads.@threads for k = 1:k_max
         N = bin_regular(z, 0.0, 1.0, k, closed == :right)
         @inbounds criterion[k] = compute_BIC(N, k, n) # Note: negative of BIC is computed
     end
+    k_opt = argmax(criterion)
     N = bin_irregular_int(x, LinRange(xmin, xmax, k_opt+1), closed == :right)
     dens = k_opt/(xmax-xmin) * N / n # Estimated density
-    h = AutomaticHistogram(LinRange(xmin, xmax, k_opt+1), dens, N, :regular, closed, ifelse(a_opt > 0.0, a_opt, NaN))
+    h = AutomaticHistogram(LinRange(xmin, xmax, k_opt+1), dens, N, :regular, closed, NaN)
+    return h
+end
+
+# ------------------------------
+# Birgé-Rozenholc histogram
+struct BR <: AbstractRegularRule
+    maxbins::Union{Int, Symbol}
+end
+
+"""
+    BR(; maxbins::Union{Int, Symbol}=:default)
+
+Birgé-Rozenholc criterion for regular histograms.
+
+The number ``k`` of bins is chosen as the maximizer of the penalized log-likelihood,
+```math
+    n\\log (k) + \\sum_{j=1}^k N_j \\log (N_j/n) - k - \\log^{2.5} (k),
+```
+where ``n`` is the sample size.
+
+# Keyword arguments
+- `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)`.
+
+# References
+This criterion was proposed by [Birgé and Rozenholc (2006)](https://doi.org/10.1051/ps:2006001).
+"""
+BR(; maxbins::Union{Int, Symbol}=:default) = BR(maxbins)
+
+function fit_autohist(x::AbstractVector{T}, rule::BR, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
+    n = length(x)
+    k_max = get_maxbins_regular(rule.maxbins, n)
+    criterion = Vector{Float64}(undef, k_max) # Criterion to be maximized depending on the specified rule
+    z = @. (x - xmin) / (xmax - xmin)         # Scale data to the interval [0,1]
+    Threads.@threads for k = 1:k_max
+        N = bin_regular(z, 0.0, 1.0, k, closed == :right)
+        @inbounds criterion[k] = compute_BR(N, k, n) # Note: negative of AIC is computed
+    end
+    k_opt = argmax(criterion)
+    N = bin_irregular_int(x, LinRange(xmin, xmax, k_opt+1), closed == :right)
+    dens = k_opt/(xmax-xmin) * N / n # Estimated density
+    h = AutomaticHistogram(LinRange(xmin, xmax, k_opt+1), dens, N, :regular, closed, NaN)
+    return h
+end
+
+
+# ------------------------------
+# MDL regular histogram
+struct MDL <: AbstractRegularRule
+    maxbins::Union{Int, Symbol}
+end
+
+"""
+    MDL(; maxbins::Union{Int, Symbol}=:default)
+
+MDL criterion for regular histograms.
+
+The number ``k`` of bins is chosen as the minimizer of an encoding length of the data, and is equivalent to the maximizer of
+```math
+    n\\log(k) + \\sum_{j=1}^k \\big(N_j-\\frac{1}{2}\\big)\\log\\big(N_j-\\frac{1}{2}\\big) - \\big(n-\\frac{k}{2}\\big)\\log\\big(n-\\frac{k}{2}\\big) - \\frac{k}{2}\\log(n),
+```
+where ``n`` is the sample size and the maximmization is over all regular partitions with ``N_j \\geq 1`` for all ``j``.
+
+# Keyword arguments
+- `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)`.
+
+# References
+The minimum description length principle was first applied to histogram estimation by [Hall and Hannan (1988)](https://doi.org/10.1093/biomet/75.4.705).
+"""
+MDL(; maxbins::Union{Int, Symbol}=:default) = MDL(maxbins)
+
+function fit_autohist(x::AbstractVector{T}, rule::MDL, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
+    n = length(x)
+    k_max = get_maxbins_regular(rule.maxbins, n)
+    criterion = Vector{Float64}(undef, k_max) # Criterion to be maximized depending on the specified rule
+    z = @. (x - xmin) / (xmax - xmin)         # Scale data to the interval [0,1]
+    Threads.@threads for k = 1:k_max
+        N = bin_regular(z, 0.0, 1.0, k, closed == :right)
+        @inbounds criterion[k] = compute_MDL(N, k, n) # Note: negative of AIC is computed
+    end
+    k_opt = argmax(criterion)
+    N = bin_irregular_int(x, LinRange(xmin, xmax, k_opt+1), closed == :right)
+    dens = k_opt/(xmax-xmin) * N / n # Estimated density
+    h = AutomaticHistogram(LinRange(xmin, xmax, k_opt+1), dens, N, :regular, closed, NaN)
+    return h
+end
+
+
+# ------------------------------
+# NML regular histogram
+struct NML_R <: AbstractRegularRule
+    maxbins::Union{Int, Symbol}
+end
+
+"""
+    NML_R(; maxbins::Union{Int, Symbol}=:default)
+
+NML_R criterion for regular histograms.
+
+The number ``k`` of bins is chosen by maximizing a penalized likelihood,
+```math
+\\begin{aligned}
+    &\\sum_{j=1}^k N_j\\log \\frac{N_j}{|\\mathcal{I}_j|} - \\frac{k-1}{2}\\log(n/2) - \\log\\frac{\\sqrt{\\pi}}{\\Gamma(k/2)} - n^{-1/2}\\frac{\\sqrt{2}k\\Gamma(k/2)}{3\\Gamma(k/2-1/2)} \\\\
+    &- n^{-1}\\left(\\frac{3+k(k-2)(2k+1)}{36} - \\frac{\\Gamma(k/2)^2 k^2}{9\\Gamma(k/2-1/2)^2} \\right).
+\\end{aligned}
+```
+where ``n`` is the sample size.
+
+# Keyword arguments
+- `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)`.
+
+# References
+This is a regular variant of the normalized maximum likelihood criterion considered by [Kontkanen and Myllymäki (2007)](https://proceedings.mlr.press/v2/kontkanen07a.html).
+"""
+NML_R(; maxbins::Union{Int, Symbol}=:default) = NML_R(maxbins)
+
+function fit_autohist(x::AbstractVector{T}, rule::NML_R, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
+    n = length(x)
+    k_max = get_maxbins_regular(rule.maxbins, n)
+    criterion = Vector{Float64}(undef, k_max) # Criterion to be maximized depending on the specified rule
+    z = @. (x - xmin) / (xmax - xmin)         # Scale data to the interval [0,1]
+    Threads.@threads for k = 1:k_max
+        N = bin_regular(z, 0.0, 1.0, k, closed == :right)
+        @inbounds criterion[k] = compute_NML(N, k, n) # Note: negative of AIC is computed
+    end
+    k_opt = argmax(criterion)
+    N = bin_irregular_int(x, LinRange(xmin, xmax, k_opt+1), closed == :right)
+    dens = k_opt/(xmax-xmin) * N / n # Estimated density
+    h = AutomaticHistogram(LinRange(xmin, xmax, k_opt+1), dens, N, :regular, closed, NaN)
+    return h
+end
+
+
+# ------------------------------
+# L2CV for regular histograms
+struct L2CV_R <: AbstractRegularRule
+    maxbins::Union{Int, Symbol}
+end
+
+"""
+    L2CV_R(; maxbins::Union{Int, Symbol}=:default)
+
+L2 cross-validation criterion for regular histograms.
+
+The number ``k`` of bins is chosen by maximizing a leave-one-out L2 cross-validation criterion,
+```math
+    -2k + k\\frac{n+1}{n^2}\\sum_{j=1}^k N_j^2.
+```
+where ``n`` is the sample size.
+
+# Keyword arguments
+- `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)`.
+
+# References
+This approach to histogram density estimation was first considered by [Rudemo (1982)](https://www.jstor.org/stable/4615859).
+"""
+L2CV_R(; maxbins::Union{Int, Symbol}=:default) = L2CV_R(maxbins)
+
+function fit_autohist(x::AbstractVector{T}, rule::L2CV_R, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
+    n = length(x)
+    k_max = get_maxbins_regular(rule.maxbins, n)
+    criterion = Vector{Float64}(undef, k_max) # Criterion to be maximized depending on the specified rule
+    z = @. (x - xmin) / (xmax - xmin)         # Scale data to the interval [0,1]
+    Threads.@threads for k = 1:k_max
+        N = bin_regular(z, 0.0, 1.0, k, closed == :right)
+        @inbounds criterion[k] = compute_L2CV(N, k, n) # Note: negative of AIC is computed
+    end
+    k_opt = argmax(criterion)
+    N = bin_irregular_int(x, LinRange(xmin, xmax, k_opt+1), closed == :right)
+    dens = k_opt/(xmax-xmin) * N / n # Estimated density
+    h = AutomaticHistogram(LinRange(xmin, xmax, k_opt+1), dens, N, :regular, closed, NaN)
+    return h
+end
+
+# ------------------------------
+# KLCV for regular histograms
+struct KLCV_R <: AbstractRegularRule
+    maxbins::Union{Int, Symbol}
+end
+
+"""
+    KLCV_R(; maxbins::Union{Int, Symbol}=:default)
+
+Kullback-Leibler cross-validation criterion for regular histograms.
+
+The number ``k`` of bins is chosen by maximizing a leave-one-out Kullback-Leibler cross-validation criterion,
+```math
+    n\\log(k) + \\sum_{j=1}^k N_j\\log (N_j-1),
+```
+where ``n`` is the sample size and the maximmization is over all regular partitions with ``N_j \\geq 2`` for all ``j``.
+
+# Keyword arguments
+- `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)`.
+
+# References
+This approach was first studied by [Hall (1990)](https://doi.org/10.1007/BF01203164).
+"""
+KLCV_R(; maxbins::Union{Int, Symbol}=:default) = KLCV_R(maxbins)
+
+function fit_autohist(x::AbstractVector{T}, rule::KLCV_R, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
+    n = length(x)
+    k_max = get_maxbins_regular(rule.maxbins, n)
+    criterion = Vector{Float64}(undef, k_max) # Criterion to be maximized depending on the specified rule
+    z = @. (x - xmin) / (xmax - xmin)         # Scale data to the interval [0,1]
+    Threads.@threads for k = 1:k_max
+        N = bin_regular(z, 0.0, 1.0, k, closed == :right)
+        @inbounds criterion[k] = compute_KLCV(N, k, n) # Note: negative of AIC is computed
+    end
+    k_opt = argmax(criterion)
+    N = bin_irregular_int(x, LinRange(xmin, xmax, k_opt+1), closed == :right)
+    dens = k_opt/(xmax-xmin) * N / n # Estimated density
+    h = AutomaticHistogram(LinRange(xmin, xmax, k_opt+1), dens, N, :regular, closed, NaN)
+    return h
+end
+
+
+# ------------------------------
+# Sturges' rule
+"""
+    Sturges()
+
+Sturges' rule for regular histograms.
+
+The number ``k`` of bins is chosen as
+```math
+    k = \\lceil \\log_2(n) \\rceil + 1.,
+```
+where ``n`` is the sample size.
+
+This is the default procedure used by the `hist()` function in base R.
+
+# References
+This classical rule is due to [Sturges (1926)](https://doi.org/10.1080/01621459.1926.10502161).
+"""
+struct Sturges <: AbstractRegularRule end
+
+function fit_autohist(x::AbstractVector{T}, rule::Sturges, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
+    n = length(x)
+    k = ceil(Int64, log2(n))
+    N = bin_irregular_int(x, LinRange(xmin, xmax, k+1), closed == :right)
+    dens = k/(xmax-xmin) * N / n # Estimated density
+    h = AutomaticHistogram(LinRange(xmin, xmax, k+1), dens, N, :regular, closed, NaN)
+    return h
+end
+
+
+# ------------------------------
+# Scott's rule
+"""
+    Scott()
+
+Scott's rule for regular histograms.
+
+The number ``k`` of bins is computed according to the formula
+```math
+    k = \\big\\lceil \\hat{\\sigma}^{-1}(24\\sqrt{\\pi})^{-1/3}n^{1/3}\\big\\rceil,
+```
+where ``\\hat{\\sigma}`` is the sample standard deviation and ``n`` is the sample size.
+
+# References
+This classical rule is due to [Scott (1979)](https://doi.org/10.1093/biomet/66.3.605).
+"""
+struct Scott <: AbstractRegularRule end
+
+function fit_autohist(x::AbstractVector{T}, rule::Scott, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
+    n = length(x)
+    h_scott = std(x)*((24.0*sqrt(π))/n)^(1.0/3.0)
+    k = ceil(Int64, (xmax-xmin)/h_scott)
+    N = bin_irregular_int(x, LinRange(xmin, xmax, k+1), closed == :right)
+    dens = k/(xmax-xmin) * N / n # Estimated density
+    h = AutomaticHistogram(LinRange(xmin, xmax, k+1), dens, N, :regular, closed, NaN)
+    return h
+end
+
+
+# ------------------------------
+# Freedman and Diaconis' rule
+"""
+    FD()
+
+Freedman and Diaconis' rule for regular histograms.
+
+The number ``k`` of bins is computed according to the formula
+```math
+    k = \\big\\lceil\\frac{n^{1/3}}{2\\text{IQR}(\\boldsymbol{x})}\\big\\rceil,
+```
+where ``\\text{IQR}(\\boldsymbol{x})`` is the sample interquartile range and ``n`` is the sample size.
+
+This is the default procedure used by the `histogram()` function in `Plots.jl`.
+
+# References
+This rule dates back to [Freedman and Diaconis (1982)](https://doi.org/10.1007/BF01025868).
+"""
+struct FD <: AbstractRegularRule end
+
+function fit_autohist(x::AbstractVector{T}, rule::FD, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
+    n = length(x)
+    h_fd = 2.0*iqr(x)/n^(1.0/3.0)
+    k = ceil(Int64, (xmax - xmin)/h_fd)
+    N = bin_irregular_int(x, LinRange(xmin, xmax, k+1), closed == :right)
+    dens = k/(xmax-xmin) * N / n # Estimated density
+    h = AutomaticHistogram(LinRange(xmin, xmax, k+1), dens, N, :regular, closed, NaN)
+    return h
+end
+
+
+# ------------------------------
+# Wand's rule (see wand_num_bins.jl for the implementation)
+struct Wand <: AbstractRegularRule
+    level::Int
+    scalest::Symbol
+end
+
+"""
+    Wand(; level::Int=2, scalest::Symbol=:minim)
+
+Wand's rule for regular histograms.
+
+A more sophisticated version of Scott's rule, Wand's rule proceeds by determining the bin width ``h`` as
+```math
+    h = \\Big(\\frac{6}{\\hat{C}(f_0) n}\\Big)^{1/3},
+```
+where ``\\hat{C}(f_0)`` is an estimate of the functional ``C(f_0) = \\int \\{f_0'(x)\\}^2\\, \\text{d}x``. The corresponding number of bins is ``k = \\lceil h^{-1}\\rceil``.
+
+# Keyword arguments
+`level`: The `level` keyword controls the number of stages of functional estimation used to compute ``\\hat{C}``, and can take values `0, 1, 2, 3, 4, 5`, with the default value being `level=2`. The choice `level=0` corresponds to a varation on Scott's rule, with a custom scale estimate.
+`scalest`: Estimate of scale parameter. Possible choices are `:minim` `:stdev` and `:iqr`. The latter two use sample standard deviation or the sample interquartile range, respectively, to estimate the scale. The default choice `:minim` uses the minimum of the above estimates.
+
+# References
+The full details on this method are given in [Wand (1997)](https://doi.org/10.2307/2684697).
+"""
+Wand(; level::Int=2, scalest::Symbol=:minim) = Wand(level, scalest)
+
+function fit_autohist(x::AbstractVector{T}, rule::Wand, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
+    if !(rule.scalest in [:minim, :stdev, :iqr])     # check that supplied scale-estimate is a valid option
+        throw(ArgumentError("Supplied scalest value, :$(rule.scalest), is not supported. Use one of :minim, :stdev or :iqr."))
+    end
+    if !(rule.level in [0, 1, 2, 3, 4, 5])           # check that supplied level is a valid option
+        throw(ArgumentError("Supplied level, $(rule.level), is not supported. Use one of 0, 1, 2, 3, 4 or 5."))
+    end
+    n = length(x)
+    k = wand_num_bins(x, rule.level, rule.scalest, 401, (xmin, xmax))
+    N = bin_irregular_int(x, LinRange(xmin, xmax, k+1), closed == :right)
+    dens = k/(xmax-xmin) * N / n # Estimated density
+    h = AutomaticHistogram(LinRange(xmin, xmax, k+1), dens, N, :regular, closed, NaN)
     return h
 end

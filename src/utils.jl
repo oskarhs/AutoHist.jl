@@ -207,7 +207,7 @@ function kl_divergence(h1::AutomaticHistogram, h2::AutomaticHistogram)
 end
 
 # Check if all observations are contained in the provided support
-function check_support(x::AbstractVector{<:Real}, xmin::Real, xmax::Real)
+#= function check_support(x::AbstractVector{<:Real}, xmin::Real, xmax::Real)
     xmin, xmax = extrema(x)
 
     if support[1] > -Inf       # estimate lower bound of support if unknown,
@@ -225,4 +225,15 @@ function check_support(x::AbstractVector{<:Real}, xmin::Real, xmax::Real)
         end
     end
     return xmin, xmax
+end =#
+
+# Perform if maxbins is positive and compute default if applicable
+function get_maxbins_regular(maxbins::Union{Symbol, Int}, n::Int)
+    if typeof(maxbins) <: Symbol && maxbins != :default
+        throw(ArgumentError("maxbins must either be a positive integer or :default."))
+    elseif typeof(maxbins) <: Int && maxbins < 1             # maximal number of bins must be positive
+        throw(DomainError("Maximal number of bins must be positive."))
+    end
+    k_max = ifelse(maxbins == :default, ceil(Int, 4.0*n / log(n)^2), maxbins)
+    return k_max
 end

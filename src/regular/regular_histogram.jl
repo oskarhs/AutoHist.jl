@@ -60,7 +60,7 @@ function histogram_regular( x::AbstractVector{<:Real}; rule::Symbol=:knuth, clos
     end
 
     k_opt = if rule == :sturges # Sturges' rule
-        k = min(ceil(Int64, log2(length(n))) + 1, maxbins)
+        k = min(ceil(Int64, log2(n)) + 1, maxbins)
         k
     elseif rule == :fd # Freedman and Diaconis' rule
         h_fd = 2.0*iqr(x)/n^(1.0/3.0)
@@ -95,7 +95,7 @@ function histogram_regular( x::AbstractVector{<:Real}; rule::Symbol=:knuth, clos
                     a_curr = a(k)
                     aₖ[k] = a_curr
                 end
-                if min(a_curr) ≤ 0.0
+                if minimum(aₖ) ≤ 0.0
                     throw(DomainError("Supplied function a(k) must return strictly positive values."))
                 end
             end

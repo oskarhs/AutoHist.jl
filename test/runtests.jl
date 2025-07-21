@@ -7,23 +7,21 @@ import StatsBase: Histogram, fit
 @testset "return type regular" begin
     x = collect(LinRange(0,1,11))
 
-    for rule in [:bayes, :knuth, :aic, :bic, :br, :mdl, :nml, :l2cv, :klcv,
-                 :sturges, :fd, :scott]
+    for rule in [RRH(), Knuth(), AIC(), BIC(), BR(), MDL(), NML_R(), 
+                 L2CV_R(), KLCV_R(), Sturges(), FD(), Scott()]
         for closed in [:left, :right]
-            h = histogram_regular(x; rule=rule, closed=closed)
+            h = fit(AutomaticHistogram, x, rule; closed=closed)
             @test typeof(h) <: AutomaticHistogram
         end
     end
     for scalest in [:minim, :iqr, :stdev]
         for level in [0,1,2,3,4,5]
             for closed in [:left, :right]
-                h = histogram_regular(x; rule=:wand, closed=closed, scalest=scalest, level=level)
+                h = fit(AutomaticHistogram, x, Wand(level=level, scalest=scalest); closed=closed)
                 @test typeof(h) <: AutomaticHistogram
             end
         end
     end
-    h = histogram_regular(x; rule=:wand)
-    @test typeof(h) <: AutomaticHistogram
 end
 
 @testset "return type irregular" begin
@@ -46,8 +44,8 @@ end
 
 @testset "left open and right open intervals" begin
     x = collect(LinRange(0,1,11))
-    h1 = histogram_regular(x; closed=:right)
-    h2 = histogram_regular(x; closed=:left)
+    h1 = fit(AutomaticHistogram, x, Knuth(); closed=:right)
+    h2 = fit(AutomaticHistogram, x, Knuth(); closed=:left)
     h3 = histogram_irregular(x; closed=:right)
     h4 = histogram_irregular(x; closed=:left)
 
@@ -84,7 +82,7 @@ end
 @testset "estimated support" begin
     n = 100
     x = [-5.0, 4.5]
-    h1 = histogram_regular(x)
+    h1 = fit(AutomaticHistogram, x, Knuth())
     breaks1 = h1.breaks
     h2 = histogram_irregular(x)
     breaks2 = h2.breaks
@@ -98,7 +96,7 @@ end
     n = 100
     x = rand(n)
 
-    h1 = histogram_regular(x; support=(0.0, 1.0))
+    h1 = fit(AutomaticHistogram, x, Knuth(); support=(0.0, 1.0))
     breaks1 = h1.breaks
     h2 = histogram_irregular(x; support=(0.0, 1.0))
     breaks2 = h2.breaks
@@ -112,7 +110,7 @@ end
     n = 100
     x = randn(n)
 
-    h1 = histogram_regular(x)
+    h1 = fit(AutomaticHistogram, x, Knuth())
     breaks1 = h1.breaks
     dens1 = h1.density
     h2 = histogram_irregular(x)
@@ -127,24 +125,25 @@ end
     # In this case, the function should throw an appropriate error
     x = randn(10^3)
 
-    @test_throws ArgumentError histogram_regular(x; rule=:nonsense, maxbins=-100)
-    @test_throws DomainError histogram_regular(x; rule=:bayes, a=-1.0)
-    @test_throws DomainError histogram_regular(x; rule=:bayes, a=k->-2.0*k)
+    @test_throws DomainError fit(AutomaticHistogram, x, RRH(a=-1.0))
+    @test_throws DomainError fit(AutomaticHistogram, x, RRH(a=k->-2.0*k))
     @test_throws DomainError histogram_irregular(x; a=-1.0)
-    @test_throws ArgumentError histogram_irregular(x; rule=:nonsense)
+    @test_throws ArgumentError histogram_irregular(x; rule=:nonsense) # redundant in the future
     @test_throws ArgumentError histogram_irregular(x; grid=:nonsense)
-    @test_throws ArgumentError histogram_regular(x; rule=:wand, scalest=:nonsense)
-    @test_throws ArgumentError histogram_regular(x; rule=:wand, level=100)
+
+    @test_throws ArgumentError fit(AutomaticHistogram, x, Wand(level=100))
+    @test_throws ArgumentError fit(AutomaticHistogram, x, Wand(scalest=:nonsense))
     @test_throws ArgumentError histogram_irregular(x; closed=:nonsense)
-    @test_throws ArgumentError histogram_regular(x; closed=:nonsense)
-    @test_throws DomainError histogram_regular(x; maxbins=-100)
+    @test_throws ArgumentError fit(AutomaticHistogram, x, Knuth(); closed=:nonsense)
+    @test_throws DomainError fit(AutomaticHistogram, x, Knuth(maxbins=-100))
+    @test_throws ArgumentError fit(AutomaticHistogram, x, Knuth(maxbins=:nonsense))
 end
 
 @testset "a as function" begin
     x = randn(10^3)
 
-    @test histogram_regular(x; a = k->8.0) == histogram_regular(x; a=8.0)
-    @test histogram_regular(x; a = k->8.0) ≈ histogram_regular(x; a=8.0)
+    @test fit(AutomaticHistogram, x, RRH(a=k->8.0)) == fit(AutomaticHistogram, x, RRH(a=8.0))
+    @test fit(AutomaticHistogram, x, RRH(a=k->8.0)) ≈ fit(AutomaticHistogram, x, RRH(a=8.0))
 end
 
 @testset "min length" begin
@@ -162,8 +161,9 @@ end
     x = [-1.0, 1.0]
     @test_throws DomainError histogram_irregular(x; support=(-0.5, Inf))
     @test_throws DomainError histogram_irregular(x; support=(-Inf, 0.5))
-    @test_throws DomainError histogram_regular(x; support=(-0.5, Inf))
-    @test_throws DomainError histogram_regular(x; support=(-Inf, 0.5))
+
+    @test_throws DomainError fit(AutomaticHistogram, x, Knuth(); support=(-0.5, Inf))
+    @test_throws DomainError fit(AutomaticHistogram, x, Knuth(); support=(-Inf, 0.5))
 end
 
 @testset "AutomaticHistogram Plots and string" begin
@@ -194,21 +194,17 @@ end
     breaks = [0.0, 0.4, 0.6, 1.0]
     counts = [2, 5, 10]
     density = counts ./ ((breaks[2:end] - breaks[1:end-1])*sum(counts))
-    h = AutomaticHistogram(breaks, density, counts, :irregular, :right, 1.0)
-    
-    @static if VERSION ≥ v"1.10"
-        import Makie, CairoMakie
+    h = AutomaticHistogram(breaks, density, counts, :irregular, :right, 1.0)        
 
-        @test typeof(Makie.plot(h)) == Makie.FigureAxisPlot # check that Makie extension works
-        @test typeof(Makie.plot!(h)) == Makie.PlotList{Tuple{Makie.PlotSpec}}
-        @test typeof(Makie.barplot(h)) == Makie.FigureAxisPlot
-        @test typeof(Makie.hist(h)) == Makie.FigureAxisPlot
-        @test typeof(Makie.stephist(h)) == Makie.FigureAxisPlot
+    @test typeof(Makie.plot(h)) == Makie.FigureAxisPlot # check that Makie extension works
+    @test typeof(Makie.plot!(h)) == Makie.PlotList{Tuple{Makie.PlotSpec}}
+    @test typeof(Makie.barplot(h)) == Makie.FigureAxisPlot
+    @test typeof(Makie.hist(h)) == Makie.FigureAxisPlot
+    @test typeof(Makie.stephist(h)) == Makie.FigureAxisPlot
 
-        F = Makie.Figure(); ax = Makie.Axis(F[1,1])
-        Makie.plot!(ax, h)
-        @test length(ax.scene.plots) == 1 && typeof(ax.scene.plots[1]) == Makie.PlotList{Tuple{Makie.PlotSpec}}
-    end
+    F = Makie.Figure(); ax = Makie.Axis(F[1,1])
+    Makie.plot!(ax, h)
+    @test length(ax.scene.plots) == 1 && typeof(ax.scene.plots[1]) == Makie.PlotList{Tuple{Makie.PlotSpec}}
 end
 
 @testset "AutomaticHistogram approx different dims" begin
@@ -225,6 +221,7 @@ end
     @test !(AutomaticHistogram(breaks1, density1, counts1, :irregular, :right) ≈ AutomaticHistogram(breaks2, density2, counts2, :irregular, :right, 1.0))
 end
 
+# this is likely redundant in the future, as the non-fit fitting functions will no longer be part of the public API.
 @testset "AutomaticHistogram fit" begin
     x = randn(10^3)
 
