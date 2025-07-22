@@ -1,7 +1,7 @@
 """
     AutomaticHistogram
 
-A type for representing a histogram where the histogram partition has been chosen automatically based on the sample. Can be fitted to data using the [`fit`](@ref), [`histogram_irregular`](@ref) or [`histogram_regular`](@ref) methods.
+A type for representing a histogram where the histogram partition has been chosen automatically based on the sample. Can be fitted to data using the [`fit`](@ref) method.
 
 # Fields
 - `breaks`: AbstractVector consisting of the cut points in the chosen partition.
@@ -19,8 +19,8 @@ julia> x = LinRange(eps(), 1.0-eps(), 5000) .^(1.0/4.0);
 
 julia> h = fit(AutomaticHistogram, x)
 AutomaticHistogram
-breaks: [0.00012207031249977798, 0.17763663029325183, 0.29718725232110504, 0.4022468898607337, 0.4928155429121377, 0.5797614498414855, 0.6667073567708333, 0.7572760098222373, 0.8405991706295289, 0.9202995853147645, 1.0000000000000002]
-density: [0.00662683597412854, 0.057821970706400425, 0.17596277991076312, 0.36279353706969375, 0.6214544825215076, 0.9730458529384184, 1.4481767793920146, 2.0440057561776532, 2.733509595364622, 3.545742066060367]
+breaks: [0.0001220703125, 0.17763663029325183, 0.29718725232110504, 0.4022468898607337, 0.4928155429121377, 0.5797614498414855, 0.6667073567708333, 0.7572760098222373, 0.8405991706295289, 0.9202995853147645, 1.0]
+density: [0.006626835974128547, 0.057821970706400425, 0.17596277991076312, 0.36279353706969375, 0.6214544825215076, 0.9730458529384184, 1.4481767793920146, 2.0440057561776532, 2.733509595364622, 3.545742066060377]
 counts: [5, 34, 92, 164, 270, 423, 656, 852, 1090, 1414]
 type: irregular
 closed: right
@@ -79,8 +79,9 @@ function Base.show(io::IO, h::AutomaticHistogram)
     println(io, "a: ", h.a)
 end
 
+
 """
-    fit(AutomaticHistogram, x::AbstractVector{x<:Real}; rule=:default, type=:irregular, kwargs...)
+    fit(AutomaticHistogram, x::AbstractVector{x<:Real}, rule::AbstractRule=RIH(); support::Tuple{Real,Real}=(-Inf,Inf), closed::Symbol=:right)
 
 Fit a histogram to a one-dimensional vector `x` with an automatic and data-based selection of the histogram partition.
 
@@ -88,48 +89,53 @@ Fit a histogram to a one-dimensional vector `x` with an automatic and data-based
 - `x`: 1D vector of data for which a histogram is to be constructed.
 
 # Keyword arguments
-- `rule`: The criterion used to determine the optimal number of bins. Default value is `rule=:default` which uses the default rule for the regular or irregular histogram procedure depending on the value of `type`.
-- `type`: Symbol indicating whether the fitted method is a regular and irregular one. The rules `:bayes`, `:l2cv`, `:klcv` and `:nml` are implemented for both regular and irregular histograms, and this keyword specifies whether the regular or irregular version should be used. For other rules, this function automatically infers the type from the `rule` keyword, and misspecifying the rule in this case has no effect. Possible values are `:irregular` (default) and `:regular`.
-- `kwargs`: Additional keyword arguments passed to [`histogram_regular`](@ref) or [`histogram_irregular`](@ref) depending on the specified or inferred type.
+- `rule`: The criterion used to determine the optimal number of bins. Default value is `rule=RIH()`, the random irregular histogram.
+- `closed`: Symbol indicating whether the drawn intervals should be right-inclusive or not. Possible values are `:right` (default) and `:left`.
+- `support`: Tuple specifying the the support of the histogram estimate. If the first element is `-Inf`, then `minimum(x)` is taken as the leftmost cutpoint. Likewise, if the second element is `Inf`, then the rightmost cutpoint is `maximum(x)`. Default value is `(-Inf, Inf)`, which estimates the support of the data.
 
 # Returns
 - `h`: An object of type [`AutomaticHistogram`](@ref), corresponding to the fitted histogram.
 
 # Examples
-```julia
-julia> x = randn(10^3)
-julia> h1 = fit(AutomaticHistogram, x)                                      # fits an irregular histogram
-julia> h2 = fit(AutomaticHistogram, x; rule=:wand, scalest=:stdev, level=4) # fits a regular histogram
+```jldoctest
+julia> using AutoHist
+
+julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 5000)) .^(1/3)).^(1/3);
+
+julia> fit(AutomaticHistogram, x) == fit(AutomaticHistogram, x, RIH())
+true
+
+julia> h = fit(AutomaticHistogram, x, Wand(scalest=:stdev, level=4))
+AutomaticHistogram
+breaks: LinRange{Float64}(0.0, 1.0, 27)
+density: [0.0052, 0.0312, 0.0884, 0.1612, 0.2652, 0.4004, 0.5408, 0.7176, 0.8944, 1.0868  …  2.0072, 1.9656, 1.8616, 1.69, 1.4508, 1.1596, 0.8372, 0.5044, 0.2184, 0.0364]
+counts: [1, 6, 17, 31, 51, 77, 104, 138, 172, 209  …  386, 378, 358, 325, 279, 223, 161, 97, 42, 7]
+type: regular
+closed: right
+a: NaN
 ```
 """
-function fit(::Type{AutomaticHistogram}, x::AbstractVector{<:Real}; rule::Symbol=:default, type::Symbol=:irregular, kwargs...)
-    if rule == :default
-        if type == :irregular
-            rule = :bayes
-        elseif type == :regular
-            rule = :knuth
-        else 
-            throw(ArgumentError("The supplied type, :$type, is not supported and the supplied rule=:default could as such not be inferred. Valid types are :irregular and :regular."))
-        end
-    elseif rule in [:aic, :bic, :br, :mdl, :sturges, :fd, :scott, :wand]
-        type = :regular
-    elseif rule in [:pena, :penb, :penr]
-        type = :irregular
-    elseif rule in [:bayes, :l2cv, :klcv, :nml]
-        if !(type in [:regular, :irregular]) # if type is not specified correctly for any of these methods, throw an ArgumentError as type is ambiguous in this case.
-            throw(ArgumentError("Unable to infer type automatically from the supplied rule and the supplied type is not supported. Valid types are :irregular and :regular."))
-        end
-    else
-        throw(ArgumentError("The supplied rule, :$rule, is not supported. The rule kwarg must be one of :aic, :bic, :br, :bayes, :mdl, :klcv, :nml, :l2cv, :sturges, :fd, :scott, :wand, :pena, :penb or :penr."))
+function fit(::Type{AutomaticHistogram}, x::AbstractVector{<:Real}, rule::AbstractRule=RIH(); support::Tuple{Real,Real}=(-Inf,Inf), closed::Symbol=:right)
+    if !(closed in [:right, :left]) # if supplied symbol is nonsense, just use default
+        throw(ArgumentError("The supplied value of the closed keyword, :$closed, is invalid. Valid values are :left or :right."))
     end
+    xmin, xmax = extrema(x)
 
-    # Fit the histogram here
-    if type == :irregular
-        h = histogram_irregular(x; rule=rule, kwargs...)
-    elseif type == :regular
-        h = histogram_regular(x; rule=rule, kwargs...)
+    if support[1] > -Inf       # estimate lower bound of support if unknown,
+        if xmin > support[1]
+            xmin = support[1]  # use known lower bound
+        else 
+            throw(DomainError("The supplied lower bound is greater than the smallest value of the sample."))
+        end
     end
-    return h
+    if support[2] < Inf
+        if xmax < support[2]
+            xmax = support[2]  # use known upper bound
+        else 
+            throw(DomainError("The supplied upper bound is smaller than the smallest value of the sample."))
+        end
+    end
+    return fit_autohist(x, rule, xmin, xmax, closed)
 end
 
 """
@@ -352,10 +358,10 @@ Compute a statistical distance between two histogram probability densities.
 
 # Arguments
 - `h1`, `h2`: The two histograms for which the distance should be computed
-- `dist`: The name of the distance to compute. Valid options are `:iae` (default), `:ise`, `:hellinger`, `:sup`, `:kl`, `:lp`. For the ``l_p``-metric, a given power `p` can be specified as a keyword argument. 
+- `dist`: The name of the distance to compute. Valid options are `:iae` (default), `:ise`, `:hellinger`, `:sup`, `:kl`, `:lp`. For the ``L_p``-metric, a given power `p` can be specified as a keyword argument. 
 
 # Keyword arguments
-- `p`: Power of the ``l_p``-metric, which should be a number in the interval ``[1, \\infty]``. Ignored if `dist != :lp`. Defaults to `p=1.0`.
+- `p`: Power of the ``L_p``-metric, which should be a number in the interval ``[1, \\infty]``. Ignored if `dist != :lp`. Defaults to `p=1.0`.
 """
 function distance(h1::AutomaticHistogram, h2::AutomaticHistogram, dist::Symbol=:iae; p::Real=1.0)
     if !(dist in [:iae, :ise, :lp, :hell, :sup, :kl])

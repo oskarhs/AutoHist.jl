@@ -13,7 +13,8 @@ makedocs(
         ],
         "API" => "api.md",
         "Algorithms" => "algorithms.md"
-    ]
+    ],
+    checkdocs=:none
 )
 
 deploydocs(;

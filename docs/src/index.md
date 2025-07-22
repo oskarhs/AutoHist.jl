@@ -8,21 +8,18 @@ Despite being the oldest nonparametric density estimator, the histogram remains 
 The AutoHist.jl package makes it easy to construct both regular and irregular histograms automatically based on a given one-dimensional sample. It currently supports 7 different methods for irregular histograms and 12 criteria for regular histograms from the statistical literature. In addition, the package provides a number of convenience functions for automatic histograms, such as methods for evaluating the histogram probability density function or identifying the location of modes.
 
 ## Quick Start
-The three main functions exported by this package are [`fit`](@ref), [`histogram_irregular`](@ref) and [`histogram_regular`](@ref), which constructs an irregular or regular histogram with automatic selection of the number of bins based on the sample. The following example shows how to compute and display an irregular and a regular histogram, with an automatic selection of the number of bins.
+The main function exported by this package is [`fit`](@ref), which allows the user to fit a histogram to 1-dimensional data with an automatic and data-based choice of bins. The following short example shows how the `fit` method is used in practice
 
 ```@example index; continued=true
 using AutoHist, Random, Distributions
-x = rand(Xoshiro(1812), Normal(), 10^6)     # simulate some data
-h_irr = histogram_irregular(x)              # compute an automatic irregular histogram
-h_reg = histogram_regular(x)                # compute an automatic regular histogram
+x = rand(Xoshiro(1812), Normal(), 10^6)    # simulate some data
+h_irr = fit(AutomaticHistogram, x)         # compute an automatic irregular histogram
 ```
-Alternatively, irregular and regular automatic histograms can be fitted to data using the `fit` method by controlling the `type` keyword argument.
+The third argument to `fit` controls the rule used to select the histogram partition, with the default being the [`RIH`](@ref) method. To fit an automatic histogram with a specific rule, e.g. Knuth's rule, all we have to do is change the value of the `rule` argument.
 ```@example index; continued=true
-h_irr = fit(AutomaticHistogram, x; type=:irregular)  # equivalent to h_irr = histogram_irregular(x)
-h_reg = fit(AutomaticHistogram, x; type=:regular)    # equivalent to h_reg = histogram_regular(x)
+h_reg = fit(AutomaticHistogram, x, Knuth()) # compute an automatic regular histogram
 ```
-
-All of the above functions return an object of type [`AutomaticHistogram`](@ref), with weights normalized so that the resulting histograms are probability densities. This type represents the histogram in a similar fashion to [StatsBase.Histogram](https://juliastats.org/StatsBase.jl/stable/empirical/#Histograms), but has more fields to enable the use of several convenience functions.
+The above calls to `fit` returns an object of type [`AutomaticHistogram`](@ref), with weights normalized so that the resulting histograms are probability densities. This type represents the histogram in a similar fashion to [StatsBase.Histogram](https://juliastats.org/StatsBase.jl/stable/empirical/#Histograms), but has more fields to enable the use of several convenience functions.
 ```@example index
 h_irr
 ```
@@ -51,32 +48,26 @@ fig
 Both the regular and the irregular procedure support a large number of criteria to select the histogram partition. The keyword argument `rule` controls the criterion used to choose the best partition, and includes the following options:
 
 - Regular Histograms:
-    - Knuth's rule, [:knuth](methods.md#bayes,-knuth) (default)
-    - Random regular histogram, [:bayes](methods.md#bayes,-knuth)
-    - L2 cross-validation, [:l2cv](methods.md#l2cv-(regular))
-    - Kullback-Leibler cross-validation: [:klcv](methods.md#klcv-(regular))
-    - AIC, [:aic](methods.md#aic)
-    - BIC, [:bic](methods.md#bic)
-    - Birgé and Rozenholc's criterion, [:br](methods.md#br)
-    - Normalized Maximum Likelihood, [:nml](methods.md#nml-(regular))
-    - Minimum Description Length, [:mdl](methods.md#mdl)
-    - Sturges' rule, [:sturges](methods.md##Sturges'-rule)
-    - Freedman and Diaconis' rule, [:fd](methods.md#Freedman-and-Diaconis'-rule)
-    - Scott's rule, [:scott](methods.md#Scott's-rule)
-    - Wand's rule, [:wand](methods.md#Wand's-rule)
+    - Knuth's rule
+    - Random regular histogram
+    - L2 cross-validation
+    - Kullback-Leibler cross-validation
+    - AIC
+    - BIC
+    - Birgé and Rozenholc's criterion
+    - Normalized Maximum Likelihood
+    - Minimum Description Length
+    - Sturges' rule
+    - Freedman and Diaconis' rule
+    - Scott's rule
+    - Wand's rule
 - Irregular Histograms:
-    - Random irregular histogram, [:bayes](methods.md#bayes) (default)
-    - L2 cross-validation, [:l2cv](methods.md#l2cv-(irregular))
-    - Kullback-Leibler cross-validation: [:klcv](methods.md#klcv-(irregular))
-    - Rozenholc et al. penalty R: [:penr](methods.md#penr)
-    - Rozenholc et al. penalty B: [:penb](methods.md#penb)
-    - Rozenholc et al. penalty A: [:pena](methods.md#pena)
-    - Normalized Maximum Likelihood: [:nml](methods.md#nml-(irregular))
+    - Random irregular histogram
+    - L2 cross-validation
+    - Kullback-Leibler cross-validation
+    - Rozenholc et al. penalty R
+    - Rozenholc et al. penalty B
+    - Rozenholc et al. penalty A
+    - Normalized Maximum Likelihood
 
 A more detailed description along with references for each method can be found on the [methods page](methods.md).
-
-Example usage with different rules:
-```julia
-histogram_irregular(x; rule=:penr)
-histogram_regular(x; rule=:aic)
-```

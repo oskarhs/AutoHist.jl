@@ -8,13 +8,7 @@ AutomaticHistogram
 ## Fitting an automatic histogram to data
 An automatic histogram based on regular or irregular partitions can be fitted to the data by calling the `fit` method.
 ```@docs
-fit(::Type{AutomaticHistogram}, x::AbstractVector{<:Real}; rule::Symbol=:bayes, type::Symbol=:irregular, kwargs...)
-```
-
-Alternatively, an automatic histogram can be fitted to the data by the following methods:
-```@docs
-histogram_irregular
-histogram_regular
+fit(::Type{AutomaticHistogram}, x::AbstractVector{<:Real}, rule::AutoHist.AbstractRule; support::Tuple{Real,Real}, closed::Symbol)
 ```
 
 ### Additional methods for AutomaticHist

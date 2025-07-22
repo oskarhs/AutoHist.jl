@@ -6,65 +6,47 @@ function bin_regular(x::AbstractVector{<:Real}, xmin::Real, xmax::Real, k::Int, 
     edges_inc = k/R
     if right
         for val in x
-            idval = max(0, floor(Int, (val-xmin)*edges_inc-10.0*edges_inc*eps())) + 1
-            @inbounds bincounts[idval] += 1.0
+            idval = min(max(1, ceil(Int, (val-xmin)*edges_inc)), k)
+            bincounts[idval] += 1.0
         end
     else
         for val in x
-            idval = min(k-1, floor(Int, (val-xmin)*edges_inc+10.0*edges_inc*eps())) + 1
-            @inbounds bincounts[idval] += 1.0
+            idval = max(min(k-1, floor(Int, (val-xmin)*edges_inc)) + 1, 1)
+            bincounts[idval] += 1.0
         end
     end
     return bincounts
 end
 
-#= function bin_regular_int(x::AbstractVector{<:Real}, xmin::Real, xmax::Real, k::Int, right::Bool)
-    R = xmax - xmin
-    bincounts = zeros(Int64, k)
-    edges_inc = k/R
-    if right
-        for val in x
-            idval = max(0, floor(Int, (val-xmin)*edges_inc-10.0*edges_inc*eps())) + 1
-            @inbounds bincounts[idval] += 1
-        end
-    else
-        for val in x
-            idval = min(k-1, floor(Int, (val-xmin)*edges_inc+10.0*edges_inc*eps())) + 1
-            @inbounds bincounts[idval] += 1
-        end
-    end
-    return bincounts
-end =#
-
 function bin_irregular(x::AbstractVector{<:Real}, edges::AbstractVector{<:Real}, right::Bool)
+    k = length(edges)-1
     bincounts = zeros(Float64, length(edges)-1)
     if right
         for val in x
-            idval = max(1, searchsortedfirst(edges, val) - 1)
-            @inbounds bincounts[idval] += 1.0
+            idval = min(max(1, searchsortedfirst(edges, val) - 1), k)
+            bincounts[idval] += 1.0
         end
     else
-        k = length(edges)-1
         for val in x
-            idval = min(k, searchsortedlast(edges, val))
-            @inbounds bincounts[idval] += 1.0
+            idval = max(min(k, searchsortedlast(edges, val)), 1)
+            bincounts[idval] += 1.0
         end
     end
     return bincounts
 end
 
 function bin_irregular_int(x::AbstractVector{<:Real}, edges::AbstractVector{<:Real}, right::Bool)
+    k = length(edges)-1
     bincounts = zeros(Int64, length(edges)-1)
     if right
         for val in x
-            idval = max(1, searchsortedfirst(edges, val) - 1)
-            @inbounds bincounts[idval] += 1
+            idval = min(max(1, searchsortedfirst(edges, val) - 1), k)
+            bincounts[idval] += 1
         end
     else
-        k = length(edges)-1
         for val in x
-            idval = min(k, searchsortedlast(edges, val))
-            @inbounds bincounts[idval] += 1
+            idval = max(min(k, searchsortedlast(edges, val)), 1)
+            bincounts[idval] += 1
         end
     end
     return bincounts
@@ -204,4 +186,15 @@ function kl_divergence(h1::AutomaticHistogram, h2::AutomaticHistogram)
         kl += (disc[j+1]-disc[j])*ifelse(d1 == 0.0, 0.0, d1*log(d1) - d1*log(d2))
     end
     return kl
+end
+
+# Check that maxbins is positive and compute default if applicable
+function get_maxbins_regular(maxbins::Union{Symbol, Int}, n::Int)
+    if typeof(maxbins) <: Symbol && maxbins != :default
+        throw(ArgumentError("maxbins must either be a positive integer or :default."))
+    elseif typeof(maxbins) <: Int && maxbins < 1             # maximal number of bins must be positive
+        throw(DomainError("maxbins bins must be positive."))
+    end
+    k_max = min(ifelse(maxbins == :default, ceil(Int, 4.0*n / log(n)^2), maxbins), 1000)
+    return k_max
 end

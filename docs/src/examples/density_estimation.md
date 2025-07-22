@@ -8,21 +8,21 @@ We start by considering an example with some simulated data from the [LogNormal-
 ```@example LogNormal; continued=true
 using AutoHist, Random, Distributions
 x = rand(Xoshiro(1812), LogNormal(), 10^4)
-h1 = fit(AutomaticHistogram, x; rule=:br)
+h1 = fit(AutomaticHistogram, x, BR())
 ```
 Alternatively, since the standard LogNormal pdf has known support ``[0,\infty)``, we can incorporate this knowledge in our histogram estimate through the `support` keyword.
 ```@example LogNormal; continued = true
-h2 = fit(AutomaticHistogram, x; rule=:br, support=(0.0, Inf))
+h2 = fit(AutomaticHistogram, x, BR(); support=(0.0, Inf))
 ```
 To quantify the difference of using the correct, known support in this case, we compute the integrated absolute error between the two densities in the following code snippet, which is given by ``\int |f(x) - g(x)|\text{d}x``.
 ```@example LogNormal
 distance(h1, h2, :iae)
 ```
-The resulting ``l_1`` distance of ``0.042`` indicates that the new bin origin at ``0`` has a moderate effect on the resulting density estimate.
+The resulting ``L_1`` distance of ``0.042`` indicates that the new bin origin at ``0`` has a moderate effect on the resulting density estimate.
 
-The standard LogNormal is quite challenging to estimate well using a regular histogram procedure due to its heavy tails. These two factors make irregular methods an appealing alternative in this case. Here, we use the penalized log-likelihood approach from [Rozenholc et al. (2010)](https://doi.org/10.1016/j.csda.2010.04.021) with penalty `:penr` and a data-based grid to construct the histogram.
+The standard LogNormal is quite challenging to estimate well using a regular histogram procedure due to its heavy tails. These two factors make irregular methods an appealing alternative in this case. Here, we use the penalized log-likelihood approach from [Rozenholc et al. (2010)](https://doi.org/10.1016/j.csda.2010.04.021) with penalty R and a data-based grid to construct the histogram, (implemented in AutoHist.jl via `rule = RMG_penR()`).
 ```@example LogNormal; continued = true
-h3 = fit(AutomaticHistogram, x; rule=:penr, grid=:data)
+h3 = fit(AutomaticHistogram, x, RMG_penR(grid=:data))
 ```
 
 To compare the two approaches, we can plot the resulting histograms along with the true density:
@@ -112,8 +112,8 @@ import .TestDistributions as TD
 using AutoHist, Distributions, Random
 x = rand(Xoshiro(1812), TD.Harp(), 5000)
 
-h_reg = fit(AutomaticHistogram, x; rule=:bic)
-h_irr = fit(AutomaticHistogram, x; rule=:bayes)
+h_reg = fit(AutomaticHistogram, x, BIC())
+h_irr = fit(AutomaticHistogram, x, RIH())
 ```
 
 We can now add the two fitted histograms along with the location of their modes to the plot of the Harp density above:
