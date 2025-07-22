@@ -51,8 +51,6 @@ function OptPart(; greedy::Bool=true, gr_maxbins::Union{Int, Symbol}=:default)
     return OptPart(greedy, gr_maxbins)
 end
 
-
-
 struct SegNeig <: AbstractAlgorithm
     greedy::Bool
     gr_maxbins::Union{Int, Symbol}
