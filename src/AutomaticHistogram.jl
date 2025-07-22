@@ -170,10 +170,10 @@ end
 
 Compute the log-marginal likelihood (up to proportionality) of `h` when the value of the Dirichlet concentration parameter equals `a`. This can be automatically inferred if the histogram was fitted with `rule=:bayes`, and does not have to be explicitly passed as an argument in this case.
 
-Assumes that the Dirichlet prior is centered on the uniform distribution, so that aⱼ = a/k for a scalar a>0 and all j.
+Assumes that the Dirichlet prior is centered on the uniform distribution, so that ``a_j = a/k`` for a scalar ``a>0`` and all ``j``.
 The value of the log-marginal likelihood is
-``\\sum_j \\{ \\log \\Gamma (a_j + N_j) - \\log \\Gamma (a_j) - N_j\\log (d_j) \\} - \\log \\Gamma (a+n) + \\log \\Gamma (a)``
-, where ``N_j`` is the bin count for bin j.
+``\\sum_j \\{ \\log \\Gamma (a_j + N_j) - \\log \\Gamma (a_j) - N_j\\log |\\mathcal{I}_j| \\} - \\log \\Gamma (a+n) + \\log \\Gamma (a)``
+, where ``N_j`` is the bin count for bin ``j`` .
 """
 function logmarginallikelihood(h::AutomaticHistogram, a::Real)
     k = length(h.counts)
