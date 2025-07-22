@@ -39,22 +39,6 @@ end
     end
 end
 
-
-@testset "irregular new API" begin
-    x = randn(10^4)
-    rules = [RMG_penA(), RMG_penB(), RMG_penR(), RIH(), KLCV_I(), L2CV_I(), NML_I()]
-    rules_symb = [:pena, :penb, :penr, :bayes, :klcv, :l2cv, :nml]
-
-    for j in eachindex(rules)
-        @test fit(AutomaticHistogram, x, rules[j]) == histogram_irregular(x; rule=rules_symb[j]) 
-    end
-    for grid in [:regular, :data, :quantile] # test grid, right-left open interval combinations
-        for closed in [:left, :right]
-            @test fit(AutomaticHistogram, x, RIH(grid=grid); closed=closed) == histogram_irregular(x; rule=:bayes, grid=grid, closed=closed)
-        end
-    end
-end
-
 @testset "left open and right open intervals" begin
     x = collect(LinRange(0,1,11))
     h1 = fit(AutomaticHistogram, x, Knuth(); closed=:right)
@@ -125,7 +109,7 @@ end
     h1 = fit(AutomaticHistogram, x, Knuth())
     breaks1 = h1.breaks
     dens1 = h1.density
-    h2 = histogram_irregular(x)
+    h2 = fit(AutomaticHistogram, x, RIH())
     breaks2 = h2.breaks
     dens2 = h2.density
     @test sum(dens1 .* (breaks1[2:end] - breaks1[1:end-1])) ≈ 1.0

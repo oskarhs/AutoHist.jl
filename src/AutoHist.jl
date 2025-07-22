@@ -25,7 +25,7 @@ abstract type AbstractIrregularRule <: AbstractRule end
 include("AutomaticHistogram.jl")
 include("utils.jl")
 
-include(joinpath("regular", "objective_functions.jl"))
+include(joinpath("regular", "objective_functions_regular.jl"))
 include(joinpath("regular", "wand_num_bins.jl"))
 
 include(joinpath("irregular", "algorithms.jl"))

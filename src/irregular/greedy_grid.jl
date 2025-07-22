@@ -45,6 +45,7 @@ function greedy_grid(phi::Function, maxbins::Int, gr_maxbins::Int)
         max_new, amax_new = if argmax_val+1 < next_val findmax(@views incr[argmax_val+1:next_val-1]) else (-Inf, 0) end
         dctn[argmax_val] = (next_val, amax_new+argmax_val, max_new)
     end
+    println(grid_ind)
     return sort!(grid_ind)
 end
 

@@ -6,35 +6,17 @@ function bin_regular(x::AbstractVector{<:Real}, xmin::Real, xmax::Real, k::Int, 
     edges_inc = k/R
     if right
         for val in x
-            idval = max(0, floor(Int, (val-xmin)*edges_inc-10.0*edges_inc*eps())) + 1
-            @inbounds bincounts[idval] += 1.0
+            idval = min(max(1, ceil(Int, (val-xmin)*edges_inc)), k)
+            bincounts[idval] += 1.0
         end
     else
         for val in x
-            idval = min(k-1, floor(Int, (val-xmin)*edges_inc+10.0*edges_inc*eps())) + 1
-            @inbounds bincounts[idval] += 1.0
+            idval = max(min(k-1, floor(Int, (val-xmin)*edges_inc)) + 1, 1)
+            bincounts[idval] += 1.0
         end
     end
     return bincounts
 end
-
-#= function bin_regular_int(x::AbstractVector{<:Real}, xmin::Real, xmax::Real, k::Int, right::Bool)
-    R = xmax - xmin
-    bincounts = zeros(Int64, k)
-    edges_inc = k/R
-    if right
-        for val in x
-            idval = max(0, floor(Int, (val-xmin)*edges_inc-10.0*edges_inc*eps())) + 1
-            @inbounds bincounts[idval] += 1
-        end
-    else
-        for val in x
-            idval = min(k-1, floor(Int, (val-xmin)*edges_inc+10.0*edges_inc*eps())) + 1
-            @inbounds bincounts[idval] += 1
-        end
-    end
-    return bincounts
-end =#
 
 function bin_irregular(x::AbstractVector{<:Real}, edges::AbstractVector{<:Real}, right::Bool)
     bincounts = zeros(Float64, length(edges)-1)
@@ -275,18 +257,16 @@ function maximize_additive_crit(x::AbstractVector{T}, rule::A, xmin::T, xmax::T,
     N_cum = Vector{Float64}(undef, length(finestgrid)) # cumulative cell counts
     N_cum[1] = 0.0
     if grid == :data
-        finestgrid[1] = -eps()
+        finestgrid[1] = 0.0
         finestgrid[2:end-1] = z[2:end-1]
-        finestgrid[end] = 1.0 + eps()
+        finestgrid[end] = 1.0
         N_cum[2:end] = cumsum(bin_irregular(y, finestgrid, closed == :right))
     elseif grid == :regular
-        N_cum[2:end] = cumsum(bin_regular(y, 0.0, 1.0, maxbins, closed == :right))
         finestgrid[1:end] = LinRange(0.0, 1.0, maxbins+1)
-        finestgrid[1] = -eps()
-        finestgrid[end] = 1.0+eps()
+        N_cum[2:end] = cumsum(bin_irregular(y, finestgrid, closed == :right))
     elseif grid == :quantile
-        finestgrid[1] = -eps()
-        finestgrid[end] = 1.0 + eps()
+        finestgrid[1] = 0.0
+        finestgrid[end] = 1.0
         finestgrid[2:end-1] = quantile(y, LinRange(1.0/maxbins, 1.0-1.0/maxbins, maxbins-1); sorted=false)
         N_cum[2:end] = cumsum(bin_irregular(y, finestgrid, closed == :right))
     end
