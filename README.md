@@ -27,16 +27,10 @@ h1 = fit(AutomaticHistogram, x)
 
 Several rules are available to select the histogram partition, and can be controlled through the use of the `rule` keyword argument. For instance, a regular histogram based on maximizing the AIC can be fit as follows:
 ```julia
-h2 = fit(AutomaticHistogram, x; rule=:aic)
+h2 = fit(AutomaticHistogram, x, AIC())
 ```
 
-Alternatively, we can fit regular and irregular histograms by calling the functions `histogram_regular` or `histogram_regular`.
-```julia
-h3 = histogram_regular(x; rule=:wand, scalest=:iqr)
-h4 = histogram_irregular(x; rule=:penr)
-```
-
-A detailed exposition of the keyword arguments passed to each of these functions can be found by typing `?fit`, `?histogram_irregular` and `?histogram_regular` in the repl or in the [API documentation](https://oskarhs.github.io/AutoHist.jl/stable/api/).
+A detailed exposition of the keyword arguments passed to each of these functions can be found by typing `?fit` in the repl or in the [API documentation](https://oskarhs.github.io/AutoHist.jl/stable/api/).
 
 The fitted histograms can be displayed through the [Plots.jl](https://github.com/JuliaPlots/Plots.jl) or [Makie.jl](https://github.com/MakieOrg/Makie.jl) packages as follows:
 
@@ -48,10 +42,15 @@ Makie.plot(h)
 
 ## Supported criteria
 
-The keyword argument `rule` determines the method used to construct the histogram for both of the histogram functions. The rule used to construct the histogram can be changed by setting `rule` equal to a symbol indicating the method to be used, e.g. `rule=:aic`.
+The argument `rule` determines the method used to construct the histogram for both of the histogram functions. The rule used to construct the histogram can be changed by setting `rule` equal to a symbol indicating the method to be used, e.g. `BIC()` which yields an automatic regular histogram based on the BIC criterion.
 
 The default method is the Bayesian approach of [Simensen et al. (2025)](#simensen2025random), corresponding to keyword `rule=:bayes`.
 A detailed description of the supported methods can be found in the [methods documentation](https://oskarhs.github.io/AutoHist.jl/stable/methods/).
+
+# Contributing
+If you encounter a bug when using this software or have a feature request, then feel free to open a github issue.
+
+Coding contributions are also very much welcome, especially if you are looking to add a new automatic histogram rule or a new algorithm. To make sure that your proposed new feature is a good fit for the AutoHist package, please open a new issue to discuss how your contribution could elevate AutoHist.jl.
 
 ## References
 <a name="simensen2025random"></a> Simensen, O. H., Christensen, D. & Hjort, N. L. (2025). Random Irregular Histograms. _arXiv preprint_. doi: [10.48550/ARXIV.2505.22034](https://doi.org/10.48550/ARXIV.2505.22034)
