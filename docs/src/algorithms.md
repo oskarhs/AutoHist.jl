@@ -9,10 +9,18 @@ All the irregular histogram methods supported by this library are the product of
 ```
 where the inner maximum is over integer vectors ``\boldsymbol{t}_{0:k}`` satisfying ``0 = t_0 < t_1 < \cdots < t_{k-1} < t_k = k_n`` and ``\{\tau_{n,j}\colon 0\leq j \leq k_n\}`` are the candidate cutpoints between the partition intervals. While it is generally desirable to use a moderate number of possible cutpoints relative to the number of samples, this comes at a heavy computational cost if an exact solution of the above optimization is desired as the runtime complexity of the algorithm is cubic in the number of candidates. We note that for the special case where ``\Psi(k) = 0`` for all ``k``, a more efficient algorithm is available, allowing for a quadratic-time solution. In both cases, computing the exact solution becomes unfeasible for larger sample sizes.
 
-To ease the computational burden we adopt a greedy search heuristic to construct a subset of possible cutpoints when the number of candidates is large, and then run the optimization algorithm of choice on this smaller set. To find the optimal partition for a given set of candidate cutpoints, this package includes two solvers; an [exact dynamic programming algorithm](#Dynamic-programming) and a heuristic [greedy pruned dynamic programming algorithm](#Greedy-pruned-dynamic-programming). The algorithm used can be controlled via the `alg` keyword passed to [`fit`](@ref) or [`histogram_irregular`](@ref).
+To ease the computational burden we adopt a greedy search heuristic to construct a subset of possible cutpoints when the number of candidates is large, and then run the optimization algorithm of choice on this smaller set. To find the optimal partition for a given set of candidate cutpoints, this package includes two solvers; an [exact dynamic programming algorithm](#Dynamic-programming) and a heuristic [greedy pruned dynamic programming algorithm](#Greedy-pruned-dynamic-programming). The algorithm used can be controlled via the `alg` keyword passed to the rule argument of [`fit`](@ref).
 
-## Dynamic programming
-The choice `alg = DP()` results in the use of the exact dynamic programming algorithm of [Kanazawa (1988)](https://doi.org/10.1080/03610928808829688) or, if applicable, the exact optimal partitioning algorithm of [Jackson et al. (2005)](https://doi.org/10.1109/LSP.2001.838216) to find the optimal histogram partition. Runtime complexity is cubic in the number of candidate cutpoints for the former and quadratic for the latter.
+
+## Segment neighbourhood
+The choice `alg = SegNeig()` results in the use of the exact dynamic programming algorithm of [Kanazawa (1988)](https://doi.org/10.1080/03610928808829688) to find the optimal partition.
+Runtime complexity is cubic in the number of candidate cutpoints.
 ```@docs
-DP
+SegNeig
+```
+
+## Optimal partitioning
+The choice `alg = OptPart()` results in the use of the exact optimal partitioning algorithm of [Jackson et al. (2005)](https://doi.org/10.1109/LSP.2001.838216) to find the optimal histogram partition. This algorithm solves a less general optimization problem than the `SegNeig` algorithm. Runtime complexity is quadratic in the number of candidate cutpoints.
+```@docs
+OptPart
 ```

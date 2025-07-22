@@ -4,15 +4,17 @@ In this section, we empirically assess the efficiency of the dynamic programming
 [^1]: **Note:** The benchmarks presented here were performed on a Windows machine with a Intel® Core™ Ultra 5 125U CPU. Results may vary on systems with different hardware configurations.
 
 ## The cubic-time dynamic programming algorithm
-As a toy problem, we consider standard normal random samples of using a data-based grid. In this case, the number of candidate cutpoints are ``k_n = n+1``, where ``n`` is the sample size. For smaller samples, we can just compute the exact solution using the default dynamic programming algorithm, available as [`DP`](@ref). The code snippet below illustrates how this algorithm can be explicitly specified when calling `fit`:
+As a toy problem, we consider standard normal random samples of using a data-based grid. In this case, the number of candidate cutpoints are ``k_n = n+1``, where ``n`` is the sample size. For smaller samples, we can just compute the exact solution using the default dynamic programming algorithm, available as [`SegNeig`](@ref). The code snippet below illustrates how this algorithm can be explicitly specified when calling `fit`:
 ```julia
 using AutoHist, Distributions, BenchmarkTools
 n = 500
 @benchmark fit(
     AutomaticHistogram, 
-    $rand(Normal(), n);
-    grid = :data,
-    alg = DP(greedy=false)
+    $rand(Normal(), n),
+    RRH(
+        grid = :data,
+        alg = SegNeig(greedy=false)
+    )
 )
 
 # Output
@@ -30,9 +32,11 @@ The ``\mathcal{O}(k_n^3)`` runtime of dynamic programming means that computing t
 n = 10^6
 @benchmark fit(
     AutomaticHistogram, 
-    $rand(Normal(), n);
-    grid = :data,
-    alg = DP(greedy=true) # NB! greedy=true is the default option
+    $rand(Normal(), n),
+    RRH(
+        grid = :data,
+        alg = SegNeig(greedy=true) # NB! greedy=true is the default option
+    )
 )
 
 # Output
@@ -48,9 +52,11 @@ The number candidate cutpoints constructed by the greedy search heuristic can be
 n = 10^6
 @benchmark fit(
     AutomaticHistogram, 
-    $rand(Normal(), n);
-    grid = :data,
-    alg = DP(greedy=true, gr_maxbins=10^3)
+    $rand(Normal(), n),
+    RRH(
+        grid = :data,
+        alg = SegNeig(greedy=true, gr_maxbins=10^3)
+    )
 )
 
 # Output
@@ -62,15 +68,16 @@ BenchmarkTools.Trial: 5 samples with 1 evaluation per sample.
 The above code snippet averages a runtime of about ``1.1\ \text{s}`` on my machine.
 
 ## The quadratic-time dynamic programming algorithm
-For the [L2CV](../methods.md#l2cv-(irregular)) and [KLCV](../methods.md#klcv-(irregular)) criteria, it becomes possible to compute the exact solution via a quadratic-time dynamic programming algorithm instead of the cubic-time algorithm used for the other problems. In practice, this means that computing the exact solution is often feasible even as the number of candidate cutpoints becomes quite large. For example, consider the following benchmark:
+For the [`L2CV_I`](@ref) and [`KLCV_I`](@ref) criteria, it becomes possible to compute the exact solution via the quadratic-time dynamic programming algorithm `OptPart` instead of the cubic-time `SegNeig` algorithm used for the other problems. In practice, this means that computing the exact solution is often feasible even as the number of candidate cutpoints becomes quite large. Both the `OptPart` and `SegNeig` algorithms can be used to fit `L2CV_I`, allowing us to get a direct comparison between the performance of the two algorithms.
 ```julia
 n = 10^3
 @benchmark fit(
     AutomaticHistogram, 
-    $rand(Normal(), n);
-    rule = :l2cv,
-    grid = :data,
-    alg = DP(greedy=false)
+    $rand(Normal(), n),
+    L2CV_I(
+        grid = :data,
+        alg = OptPart(greedy=false)
+    )
 )
 
 # Output

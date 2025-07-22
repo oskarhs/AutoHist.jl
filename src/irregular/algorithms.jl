@@ -53,8 +53,6 @@ function DP(; greedy::Bool=true, gr_maxbins::Union{Int, Symbol}=:default)
 end
 
 
-
-
 struct OptPart <: AbstractAlgorithm
     greedy::Bool
     gr_maxbins::Union{Int, Symbol}

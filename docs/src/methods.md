@@ -15,27 +15,27 @@ where ``\mathbf{1}_{\mathcal{I}_j}`` is the indicator function, ``\widehat{\thet
 
 For most of the methods considered here, the estimated bin probabilities are the maximum likelihood estimates ``\widehat{\theta}_j = N_j/n``, where ``N_j = \sum_{i=1}^n \mathbb{1}_{\mathcal{I}_j}(x_i)`` is number of observations landing in interval ``\mathcal{I}_j`` . The exception to this rule is are the two Bayesian approaches, which uses the Bayes estimator ``\widehat{\theta}_j = (a_j + N_j)/(a+n)`` for ``(a_1, \ldots, a_k) \in (0,\infty)^k`` and ``a = \sum_{j=1}^k a_j`` instead.
 
-The goal of an automatic histogram procedure is to find a partition ``\mathcal{I}`` based on the sample alone which produces a reasonable density estimate. Regular histogram procedures only consider regular partitions, where all intervals in the partition are of equal length, so that one only needs to determine the number ``k`` of bins. Irregular histograms allow for partitions with intervals of unequal length, and try to determine both the number of bins and the locations of the cutpoints between the intervals. In all the irregular procedures covered here, we attempt to find best partition according to a criterion among all partitions with endpoints belonging to a given discrete mesh.
+The goal of an automatic histogram procedure is to find a partition ``\mathcal{I}`` based on the sample alone which produces a reasonable density estimate. Regular histogram procedures only consider regular partitions, where all intervals in the partition are of equal length, so that one only needs to determine the number ``k`` of bins. Irregular histograms allow for partitions with intervals of unequal length, and try to determine both the number of bins and the locations of the cutpoints between the intervals.
 
 ## Irregular histograms
-The following section describes how each value of the `rule` keyword supported by the `histogram_irregular` function selects the optimal histogram partition. In each case, the best partition is selected among the subset of interval partitions of the unit interval that have cut points belonging to a discrete set of cardinality ``k_n-1``. The construction of the candidate cut point set can be controlled through the `grid` keyword argument, with options `:regular` (default), `:data` and `:quantile`.
+The following section provides a description of all the irregular histogram rules that have been implemented in AutoHist.jl. In each case, the best partition is selected among the subset of interval partitions of the unit interval that have cut points belonging to a discrete set of cardinality ``k_n-1``. In all the irregular procedures covered here, we attempt to find best partition according to a goodness-of-fit criterion among all partitions with endpoints belonging to a given discrete mesh ``\{\tau_{j}\colon 0\leq j \leq k_n\}``.
 
 #### Random irregular histogram
 ```@docs
 RIH
 ```
 
-#### Rozenholc, Mildenberger & Gather penalty A.
+#### Rozenholc, Mildenberger & Gather penalty A
 ```@docs
 RMG_penA
 ```
 
-#### Rozenholc, Mildenberger & Gather penalty B.
+#### Rozenholc, Mildenberger & Gather penalty B
 ```@docs
 RMG_penB
 ```
 
-#### Rozenholc, Mildenberger & Gather penalty R.
+#### Rozenholc, Mildenberger & Gather penalty R
 ```@docs
 RMG_penR
 ```

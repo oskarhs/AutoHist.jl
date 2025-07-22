@@ -1,7 +1,7 @@
 """
     AutomaticHistogram
 
-A type for representing a histogram where the histogram partition has been chosen automatically based on the sample. Can be fitted to data using the [`fit`](@ref), [`histogram_irregular`](@ref) or [`histogram_regular`](@ref) methods.
+A type for representing a histogram where the histogram partition has been chosen automatically based on the sample. Can be fitted to data using the [`fit`](@ref) method.
 
 # Fields
 - `breaks`: AbstractVector consisting of the cut points in the chosen partition.
@@ -103,7 +103,7 @@ julia> h1 = fit(AutomaticHistogram, x)                                      # fi
 julia> h2 = fit(AutomaticHistogram, x; rule=:wand, scalest=:stdev, level=4) # fits a regular histogram
 ```
 """
-function fit(::Type{AutomaticHistogram}, x::AbstractVector{<:Real}; rule::Symbol=:default, type::Symbol=:irregular, kwargs...)
+#= function fit(::Type{AutomaticHistogram}, x::AbstractVector{<:Real}; rule::Symbol=:default, type::Symbol=:irregular, kwargs...)
     if rule == :default
         if type == :irregular
             rule = :bayes
@@ -131,12 +131,12 @@ function fit(::Type{AutomaticHistogram}, x::AbstractVector{<:Real}; rule::Symbol
         h = histogram_regular(x; rule=rule, kwargs...)
     end
     return h
-end
+end =#
 
 
 # New
 """
-    fit(AutomaticHistogram, x::AbstractVector{x<:Real}, rule<:AbstractRule; support::Tuple{Real,Real}=(-Inf,Inf), closed::Symbol=:right)
+    fit(AutomaticHistogram, x::AbstractVector{x<:Real}, rule::AbstractRule=RIH(); support::Tuple{Real,Real}=(-Inf,Inf), closed::Symbol=:right)
 
 Fit a histogram to a one-dimensional vector `x` with an automatic and data-based selection of the histogram partition.
 
@@ -158,7 +158,7 @@ julia> h1 = fit(AutomaticHistogram, x)                                   # fits 
 julia> h2 = fit(AutomaticHistogram, x, Wand(scalest=:stdev, level=4))    # fits a regular histogram, with Wands rule
 ```
 """
-function fit(::Type{AutomaticHistogram}, x::AbstractVector{<:Real}, rule::AbstractRule; support::Tuple{Real,Real}=(-Inf,Inf), closed::Symbol=:right)
+function fit(::Type{AutomaticHistogram}, x::AbstractVector{<:Real}, rule::AbstractRule=RIH(); support::Tuple{Real,Real}=(-Inf,Inf), closed::Symbol=:right)
     if !(closed in [:right, :left]) # if supplied symbol is nonsense, just use default
         throw(ArgumentError("The supplied value of the closed keyword, :$closed, is invalid. Valid values are :left or :right."))
     end

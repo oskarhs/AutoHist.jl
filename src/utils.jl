@@ -213,7 +213,7 @@ function get_maxbins_regular(maxbins::Union{Symbol, Int}, n::Int)
     elseif typeof(maxbins) <: Int && maxbins < 1             # maximal number of bins must be positive
         throw(DomainError("maxbins bins must be positive."))
     end
-    k_max = ifelse(maxbins == :default, ceil(Int, 4.0*n / log(n)^2), maxbins)
+    k_max = min(ifelse(maxbins == :default, ceil(Int, 4.0*n / log(n)^2), maxbins), 1000)
     return k_max
 end
 
@@ -238,25 +238,33 @@ function get_maxbins_irregular!(y::AbstractVector{<:Real}, maxbins::Union{Symbol
     return k_max
 end
 
-function maximize_additive_crit(x::AbstractVector{T}, rule::AbstractIrregularRule, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
+
+function maximize_additive_crit(x::AbstractVector{T}, rule::A, xmin::T, xmax::T, closed::Symbol) where {T <: Real, A<:AbstractIrregularRule}
     y = @. (x - xmin) / (xmax - xmin)
     n = length(x)
-    if typeof(rule.maxbins) <: Symbol && rule.maxbins != :default
-        throw(ArgumentError("maxbins must either be a positive integer or :default."))
-    elseif typeof(rule.maxbins) <: Int && rule.maxbins < 1             # maximal number of bins must be positive
-        throw(DomainError("maxbins must be positive."))
-    end
-    if !(rule.grid in [:data, :regular, :quantile])
-        throw(ArgumentError("The supplied grid, :$grid, is not supported. The grid kwarg must be one of :data, :regular or :quantile"))
+
+    if typeof(rule.grid) <: Symbol && rule.grid in (:data, :regular, :quantile)
+        grid = rule.grid
+    else
+        throw(ArgumentError("Invalid grid option: $(rule.grid)"))
     end
 
-    maxbins = if rule.grid == :data
+    if grid == :data
         sort!(y)
         z = unique(y)
-        length(z)-1
+        maxbins = length(z)-1
+    elseif typeof(rule.maxbins) <: Symbol && rule.maxbins == :default
+        maxbins = min(n, ceil(Int, 4.0*n/log(n)^2))
+    elseif isa(rule.maxbins, Int) && rule.maxbins > 0
+        maxbins = rule.maxbins
     else
-        ifelse(rule.maxbins == :default, min(n, ceil(Int, 4.0*n/log(n)^2)), rule.maxbins)     
+        if typeof(rule.maxbins) <: Symbol && rule.maxbins != :default
+            throw(ArgumentError("maxbins must either be a positive integer or :default."))
+        else
+            throw(DomainError("maxbins must be positive."))
+        end
     end
+
     if hasfield(typeof(rule), :use_min_length)
         use_min_length = rule.use_min_length
     else
@@ -266,17 +274,17 @@ function maximize_additive_crit(x::AbstractVector{T}, rule::AbstractIrregularRul
     finestgrid = Vector{Float64}(undef, maxbins+1)
     N_cum = Vector{Float64}(undef, length(finestgrid)) # cumulative cell counts
     N_cum[1] = 0.0
-    if rule.grid == :data
+    if grid == :data
         finestgrid[1] = -eps()
         finestgrid[2:end-1] = z[2:end-1]
         finestgrid[end] = 1.0 + eps()
         N_cum[2:end] = cumsum(bin_irregular(y, finestgrid, closed == :right))
-    elseif rule.grid == :regular
+    elseif grid == :regular
         N_cum[2:end] = cumsum(bin_regular(y, 0.0, 1.0, maxbins, closed == :right))
         finestgrid[1:end] = LinRange(0.0, 1.0, maxbins+1)
         finestgrid[1] = -eps()
         finestgrid[end] = 1.0+eps()
-    elseif rule.grid == :quantile
+    elseif grid == :quantile
         finestgrid[1] = -eps()
         finestgrid[end] = 1.0 + eps()
         finestgrid[2:end-1] = quantile(y, LinRange(1.0/maxbins, 1.0-1.0/maxbins, maxbins-1); sorted=false)
@@ -298,7 +306,7 @@ function maximize_additive_crit(x::AbstractVector{T}, rule::AbstractIrregularRul
             mesh = finestgrid
         else
             grid_ind = greedy_grid(
-                get_phi(ifelse(typeof(rule) != KLCV_I, rule, RMG_penB), N_cum, finestgrid, n), 
+                get_phi(ifelse(typeof(rule) != KLCV_I, rule, RMG_penB()), N_cum, finestgrid, n), 
                 maxbins,
                 gr_maxbins
             )

@@ -1,11 +1,11 @@
 # ------------------------------
 # Random irregular histogram 
-struct RIH <: AbstractIrregularRule
-    a::Real
+struct RIH{T<:Real, A<:AbstractAlgorithm} <: AbstractIrregularRule
+    a::T
     logprior::Function
     grid::Symbol
     maxbins::Union{Int, Symbol}
-    alg::AbstractAlgorithm
+    alg::A
 end
 
 """
@@ -32,7 +32,7 @@ The default value is ``p_n(k) \\propto 1``. Here, ``a_j = a/k``, for a scalar ``
 - `logprior`: Unnormalized logprior distribution on the number ``k`` of bins. Defaults to a uniform prior, e.g. `logprior(k) = 0` for all `k`.
 - `grid`: Symbol indicating how the finest possible mesh should be constructed. Options are `:data`, which uses each unique data point as a grid point, `:regular` (default) which constructs a fine regular grid, and `:quantile` which constructs the grid based on the sample quantiles.
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)` if `grid` is `regular` or `quantile`. Ignored if `grid=:data`.
-- `alg`: Algorithm used to fit the model. Currently, only `SegNeig()` for this rule. See [`DP`](@ref) for further details.
+- `alg`: Algorithm used to fit the model. Currently, only `SegNeig()` for this rule. See [`SegNeig`](@ref) for further details.
 
 # References
 This approach to irregular histograms first appeared in [Simensen et al. (2025)](https://doi.org/10.48550/ARXIV.2505.22034).
@@ -57,10 +57,10 @@ end
 
 # ------------------------------
 # RMG penA
-struct RMG_penA <: AbstractIrregularRule
+struct RMG_penA{A<:AbstractAlgorithm} <: AbstractIrregularRule
     grid::Symbol
     maxbins::Union{Int, Symbol}
-    alg::AbstractAlgorithm
+    alg::A
 end
 
 """
@@ -78,7 +78,7 @@ Consists of finding the partition ``\\mathcal{I}`` that maximizes a penalized lo
 # Keyword arguments
 - `grid`: Symbol indicating how the finest possible mesh should be constructed. Options are `:data`, which uses each unique data point as a grid point, `:regular` (default) which constructs a fine regular grid, and `:quantile` which constructs the grid based on the sample quantiles.
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)` if `grid` is `regular` or `quantile`. Ignored if `grid=:data`.
-- `alg`: Algorithm used to fit the model. Currently, only `SegNeig()` is supported for this rule. See [`DP`](@ref) for further details.
+- `alg`: Algorithm used to fit the model. Currently, only `SegNeig()` is supported for this rule. See [`SegNeig`](@ref) for further details.
 
 # References
 This approach was suggested by [Rozenholc et al. (2010)](https://doi.org/10.1016/j.csda.2010.04.021).
@@ -91,8 +91,7 @@ function fit_autohist(x::AbstractVector{T}, rule::RMG_penA, xmin::T, xmax::T, cl
     
     bin_edges = @. xmin + (xmax - xmin) * bin_edges_norm
     N = bin_irregular_int(x, bin_edges, closed == :right)
-    p0 = bin_edges_norm[2:end] - bin_edges_norm[1:end-1]
-    dens = N ./ ((n)*(bin_edges[2:end] - bin_edges[1:end-1]))
+    dens = N ./ (n*(bin_edges[2:end] - bin_edges[1:end-1]))
     h = AutomaticHistogram(bin_edges, dens, N, :irregular, closed, NaN)
     return h
 end
@@ -100,10 +99,10 @@ end
 
 # ------------------------------
 # RMG penB
-struct RMG_penB <: AbstractIrregularRule
+struct RMG_penB{A<:AbstractAlgorithm} <: AbstractIrregularRule
     grid::Symbol
     maxbins::Union{Int, Symbol}
-    alg::AbstractAlgorithm
+    alg::A
 end
 
 """
@@ -121,7 +120,7 @@ Consists of finding the partition ``\\mathcal{I}`` that maximizes a penalized lo
 # Keyword arguments
 - `grid`: Symbol indicating how the finest possible mesh should be constructed. Options are `:data`, which uses each unique data point as a grid point, `:regular` (default) which constructs a fine regular grid, and `:quantile` which constructs the grid based on the sample quantiles.
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)` if `grid` is `regular` or `quantile`. Ignored if `grid=:data`.
-- `alg`: Algorithm used to fit the model. Currently, only `SegNeig()` is supported for this rule. See [`DP`](@ref) for further details.
+- `alg`: Algorithm used to fit the model. Currently, only `SegNeig()` is supported for this rule. See [`SegNeig`](@ref) for further details.
 
 # References
 This approach was suggested by [Rozenholc et al. (2010)](https://doi.org/10.1016/j.csda.2010.04.021).
@@ -134,8 +133,7 @@ function fit_autohist(x::AbstractVector{T}, rule::RMG_penB, xmin::T, xmax::T, cl
     
     bin_edges = @. xmin + (xmax - xmin) * bin_edges_norm
     N = bin_irregular_int(x, bin_edges, closed == :right)
-    p0 = bin_edges_norm[2:end] - bin_edges_norm[1:end-1]
-    dens = N ./ ((n)*(bin_edges[2:end] - bin_edges[1:end-1]))
+    dens = N ./ (n*(bin_edges[2:end] - bin_edges[1:end-1]))
     h = AutomaticHistogram(bin_edges, dens, N, :irregular, closed, NaN)
     return h
 end
@@ -143,10 +141,10 @@ end
 
 # ------------------------------
 # RMG penB
-struct RMG_penR <: AbstractIrregularRule
+struct RMG_penR{A<:AbstractAlgorithm} <: AbstractIrregularRule
     grid::Symbol
     maxbins::Union{Int, Symbol}
-    alg::AbstractAlgorithm
+    alg::A
 end
 
 """
@@ -164,7 +162,7 @@ Consists of finding the partition ``\\mathcal{I}`` that maximizes a penalized lo
 # Keyword arguments
 - `grid`: Symbol indicating how the finest possible mesh should be constructed. Options are `:data`, which uses each unique data point as a grid point, `:regular` (default) which constructs a fine regular grid, and `:quantile` which constructs the grid based on the sample quantiles.
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)` if `grid` is `regular` or `quantile`. Ignored if `grid=:data`.
-- `alg`: Algorithm used to fit the model. Currently, only `SegNeig()` is supported for this rule. See [`DP`](@ref) for further details.
+- `alg`: Algorithm used to fit the model. Currently, only `SegNeig()` is supported for this rule. See [`SegNeig`](@ref) for further details.
 
 # References
 This approach was suggested by [Rozenholc et al. (2010)](https://doi.org/10.1016/j.csda.2010.04.021).
@@ -177,8 +175,7 @@ function fit_autohist(x::AbstractVector{T}, rule::RMG_penR, xmin::T, xmax::T, cl
     
     bin_edges = @. xmin + (xmax - xmin) * bin_edges_norm
     N = bin_irregular_int(x, bin_edges, closed == :right)
-    p0 = bin_edges_norm[2:end] - bin_edges_norm[1:end-1]
-    dens = N ./ ((n)*(bin_edges[2:end] - bin_edges[1:end-1]))
+    dens = N ./ (n*(bin_edges[2:end] - bin_edges[1:end-1]))
     h = AutomaticHistogram(bin_edges, dens, N, :irregular, closed, NaN)
     return h
 end
@@ -186,10 +183,10 @@ end
 
 # ------------------------------
 # NML_I
-struct NML_I <: AbstractIrregularRule
+struct NML_I{A<:AbstractAlgorithm} <: AbstractIrregularRule
     grid::Symbol
     maxbins::Union{Int, Symbol}
-    alg::AbstractAlgorithm
+    alg::A
 end
 
 """
@@ -212,7 +209,7 @@ Consists of finding the partition ``\\mathcal{I}`` that maximizes a penalized lo
 # Keyword arguments
 - `grid`: Symbol indicating how the finest possible mesh should be constructed. Options are `:data`, which uses each unique data point as a grid point, `:regular` (default) which constructs a fine regular grid, and `:quantile` which constructs the grid based on the sample quantiles.
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)` if `grid` is `regular` or `quantile`. Ignored if `grid=:data`.
-- `alg`: Algorithm used to fit the model. Currently, only `SegNeig()` is supported for this rule. See [`DP`](@ref) for further details.
+- `alg`: Algorithm used to fit the model. Currently, only `SegNeig()` is supported for this rule. See [`SegNeig`](@ref) for further details.
 
 # References
 This a variant of this criterion first suggested by [Kontkanen and Myllymäki (2007)](https://proceedings.mlr.press/v2/kontkanen07a.html).
@@ -225,18 +222,17 @@ function fit_autohist(x::AbstractVector{T}, rule::NML_I, xmin::T, xmax::T, close
     
     bin_edges = @. xmin + (xmax - xmin) * bin_edges_norm
     N = bin_irregular_int(x, bin_edges, closed == :right)
-    p0 = bin_edges_norm[2:end] - bin_edges_norm[1:end-1]
-    dens = N ./ ((n)*(bin_edges[2:end] - bin_edges[1:end-1]))
+    dens = N ./ (n*(bin_edges[2:end] - bin_edges[1:end-1]))
     h = AutomaticHistogram(bin_edges, dens, N, :irregular, closed, NaN)
     return h
 end
 
 # ------------------------------
 # L2CV_I
-struct L2CV_I <: AbstractIrregularRule
+struct L2CV_I{A<:AbstractAlgorithm} <: AbstractIrregularRule
     grid::Symbol
     maxbins::Union{Int, Symbol}
-    alg::AbstractAlgorithm
+    alg::A
     use_min_length::Bool
 end
 
@@ -256,7 +252,7 @@ Consists of finding the partition ``\\mathcal{I}`` that maximizes a L2 leave-one
 # Keyword arguments
 - `grid`: Symbol indicating how the finest possible mesh should be constructed. Options are `:data`, which uses each unique data point as a grid point, `:regular` (default) which constructs a fine regular grid, and `:quantile` which constructs the grid based on the sample quantiles.
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)` if `grid` is `regular` or `quantile`. Ignored if `grid=:data`.
-- `alg`: Algorithm used to fit the model. Currently, `OptPart()` and `SegNeig()` are supported, with the formed algorithm being the default. See [`DP`](@ref) for further details.
+- `alg`: Algorithm used to fit the model. Currently, [`OptPart](@ref) and [`SegNeig`](@ref) are supported for this rule, with the former algorithm being the default.
 - `use_min_length`: Boolean indicating whether or not to impose a restriction on the minimum bin length of the histogram. If set to true, the smallest allowed bin length is set to `(maximum(x)-minimum(x))/n*log(n)^(1.5)`.
 
 # References
@@ -270,7 +266,6 @@ function fit_autohist(x::AbstractVector{T}, rule::L2CV_I, xmin::T, xmax::T, clos
     
     bin_edges = @. xmin + (xmax - xmin) * bin_edges_norm
     N = bin_irregular_int(x, bin_edges, closed == :right)
-    p0 = bin_edges_norm[2:end] - bin_edges_norm[1:end-1]
     dens = N ./ (n*(bin_edges[2:end] - bin_edges[1:end-1]))
     h = AutomaticHistogram(bin_edges, dens, N, :irregular, closed, NaN)
     return h
@@ -279,10 +274,10 @@ end
 
 # ------------------------------
 # KLCV_I
-struct KLCV_I <: AbstractIrregularRule
+struct KLCV_I{A<:AbstractAlgorithm} <: AbstractIrregularRule
     grid::Symbol
     maxbins::Union{Int, Symbol}
-    alg::AbstractAlgorithm
+    alg::A
     use_min_length::Bool
 end
 
@@ -296,14 +291,14 @@ end
 
 Consists of finding the partition ``\\mathcal{I}`` that maximizes a Kullback-Leibler leave-one-out cross-validation criterion,
 ```math
-    \\sum_{j=1}^k N_j\\log(N_j-1) - \\sum_{j=1}^k N_j\\log |I_j|,
+    \\sum_{j=1}^k N_j\\log(N_j-1) - \\sum_{j=1}^k N_j\\log |\\mathcal{I}_j|,
 ```
 where the maximmization is over all partitions with ``N_j \\geq 2`` for all ``j``.
 
 # Keyword arguments
 - `grid`: Symbol indicating how the finest possible mesh should be constructed. Options are `:data`, which uses each unique data point as a grid point, `:regular` (default) which constructs a fine regular grid, and `:quantile` which constructs the grid based on the sample quantiles.
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)` if `grid` is `regular` or `quantile`. Ignored if `grid=:data`.
-- `alg`: Algorithm used to fit the model. Currently, `OptPart()` and `SegNeig()` are supported, with the formed algorithm being the default. See [`DP`](@ref) for further details.
+- `alg`: Algorithm used to fit the model. Currently, [`OptPart](@ref) and [`SegNeig`](@ref) are supported for this rule, with the former algorithm being the default.
 - `use_min_length`: Boolean indicating whether or not to impose a restriction on the minimum bin length of the histogram. If set to true, the smallest allowed bin length is set to `(maximum(x)-minimum(x))/n*log(n)^(1.5)`.
 
 # References
@@ -317,7 +312,6 @@ function fit_autohist(x::AbstractVector{T}, rule::KLCV_I, xmin::T, xmax::T, clos
     
     bin_edges = @. xmin + (xmax - xmin) * bin_edges_norm
     N = bin_irregular_int(x, bin_edges, closed == :right)
-    p0 = bin_edges_norm[2:end] - bin_edges_norm[1:end-1]
     dens = N ./ (n*(bin_edges[2:end] - bin_edges[1:end-1]))
     h = AutomaticHistogram(bin_edges, dens, N, :irregular, closed, NaN)
     return h

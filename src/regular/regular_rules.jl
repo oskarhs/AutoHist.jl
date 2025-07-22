@@ -1,7 +1,7 @@
 # ------------------------------
 # Random regular histogram 
-struct RRH <: AbstractRegularRule
-    a::Union{Real, Function}
+struct RRH{T} <: AbstractRegularRule
+    a::T
     logprior::Function
     maxbins::Union{Int, Symbol}
 end
