@@ -36,22 +36,23 @@ and typically do not provide any support for automatic irregular histogram const
 `AutoHist.jl` fills this gap by providing a fast implementation of state-of-the-art regular and irregular bin selection algorithms from the statistics literature. A complete overview of the bin selection procedures that have been implemented so far is given in **Table 1**.
 
 | Rule | Type (regular/irregular) | Reference |
-|-----------|:-----------|:--------------------|
-| :sturges | regular   | @sturges1926choice |
-| :scott   | regular   | @scott1979optimal   |
-| :fd      | regular   | @freedman1981histogram |
-| :aic     | regular   | @hall1990akaike    |
-| :bic     | regular   | @davies2009automatic  |
-| :br      | regular   | @birge2006bins |
-| :mdl     | regular   | @hall1988stochastic |
-| :wand    | regular   | @wand1997data |
-| :pena    | irregular | @rozenholc2010irregular |
-| :penb    | irregular | @rozenholc2010irregular |
-| :penr    | irregular | @rozenholc2010irregular |
-| :nml     | both      | @kontkanen2007mdl |
-| :l2cv    | both      | @rudemo1982empirical |
-| :klcv    | both      | @hall1990akaike, @simensen2025random |
-| :bayes   | both      | @knuth2019optimal, @simensen2025random |
+|---------------------|:-----------|:--------------------|
+| Sturges           | regular   | @sturges1926choice |
+| Scott             | regular   | @scott1979optimal   |
+| Freedman-Diaconis | regular   | @freedman1981histogram |
+| AIC               | regular   | @hall1990akaike    |
+| BIC               | regular   | @davies2009automatic  |
+| Birgé-Rozenholc   | regular   | @birge2006bins |
+| MDL               | regular   | @hall1988stochastic |
+| Wand              | regular   | @wand1997data |
+| RRH, Knuth        | regular   | @knuth2019optimal, @simensen2025random |
+| RMG penA          | irregular | @rozenholc2010irregular |
+| RMG penB          | irregular | @rozenholc2010irregular |
+| RMG penR          | irregular | @rozenholc2010irregular |
+| RIH               | irregular | @simensen2025random |
+| NML               | both      | @kontkanen2007mdl |
+| L2CV              | both      | @rudemo1982empirical |
+| KLCV              | both      | @hall1990akaike, @simensen2025random |
  
 
 Table: Implemented bin selection procedures so far. For methods with type=both, a regular and an irregular variant of the criterion is supported.
@@ -75,10 +76,10 @@ To illustrate the basic use of the software, we fit a histogram based on the irr
 using AutoHist, Random, Distributions
 
 n = 10^6
-x = rand(Xoshiro(1812), Normal(), n)            # synthetic data
+x = rand(Xoshiro(1812), Normal(), n)         # synthetic data
 
-h_irr = fit(AutomaticHistogram, x; rule=:bayes) # fit an irregular histogram
-h_reg = fit(AutomaticHistogram, x; rule=:aic)   # fit a regular histogram
+h_irr = fit(AutomaticHistogram, x, RIH())    # fit an irregular histogram
+h_reg = fit(AutomaticHistogram, x, AIC())    # fit a regular histogram
 ```
 
 The call to the `fit` method returns an object of type `AutomaticHistogram`, with fields recording the chosen histogram partition, estimated density and bin counts. `AutoHist` provides plotting recipes for `Plots.jl` and `Makie.jl`, which allows the user to easily visualize the fit. Here, we show how to plot the irregular and the regular histogram fitted in the aabove code snippet using `Makie`.
