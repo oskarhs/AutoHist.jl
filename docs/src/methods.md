@@ -40,17 +40,17 @@ RMG_penB
 RMG_penR
 ```
 
-#### l2cv (irregular)
+#### Irregular ``L_2`` leave-one-out cross-validation (L2CV_R)
 ```@docs
 L2CV_I
 ```
 
-#### klcv (irregular)
+#### Irregular Kullback-Leibler leave-one-out cross-validation (L2CV_R)
 ```@docs
 KLCV_I
 ```
 
-#### nml (irregular)
+#### Normalized maximum likelihood, regular (NML_R)
 ```@docs
 NML_I
 ```
@@ -80,12 +80,12 @@ BIC
 BR
 ```
 
-#### Regular leave-one-out ``L_2`` cross-validation (L2CV_R)
+#### Regular ``L_2`` leave-one-out cross-validation (L2CV_R)
 ```@docs
 L2CV_R
 ```
 
-#### Regular leave-one-out Kullback-Leibler cross-validation (KLCV_R)
+#### Regular Kullback-Leibler leave-one-out cross-validation (KLCV_R)
 ```@docs
 KLCV_R
 ```
