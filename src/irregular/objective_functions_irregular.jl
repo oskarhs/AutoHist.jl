@@ -39,33 +39,6 @@ end
     return contrib
 end
 
-function get_objective(rule::Symbol, N_cum::AbstractVector{<:Real}, mesh::AbstractVector{<:Real}, n::Real, a::Real=5.0, use_min_length::Bool=false)
-    if rule in [:pena, :penb, :nml]
-        phi = let N_cum = N_cum, mesh = mesh
-            f(i,j) = phi_penB(i, j, N_cum, mesh)
-        end
-    elseif rule == :bayes
-        phi = let N_cum = N_cum, mesh = mesh, a = a
-            f(i,j) = phi_bayes(i, j, N_cum, mesh, a)
-        end
-    elseif rule == :penr
-        phi = let N_cum = N_cum, mesh = mesh, n = n
-            f(i,j) = phi_penR(i, j, N_cum, mesh, n)
-        end
-    elseif rule == :klcv
-        minlength = ifelse(use_min_length, log(n)^(1.5)/n, 0.0)
-        phi = let N_cum = N_cum, mesh = mesh, n = n, minlength=minlength
-            f(i,j) = phi_KLCV(i, j, N_cum, mesh, n; minlength=minlength)
-        end
-    elseif rule == :l2cv
-        minlength = ifelse(use_min_length, log(n)^(1.5)/n, 0.0)
-        phi = let N_cum = N_cum, mesh = mesh, n = n, minlength=minlength
-            f(i,j) = phi_L2CV(i, j, N_cum, mesh, n; minlength=minlength)
-        end
-    end
-    return phi
-end
-
 function get_phi(rule::RIH, N_cum::AbstractVector{<:Real}, mesh::AbstractVector{<:Real}, n::Real)
     phi = let N_cum = N_cum, mesh = mesh
         f(i,j) = phi_bayes(i, j, N_cum, mesh, rule.a)

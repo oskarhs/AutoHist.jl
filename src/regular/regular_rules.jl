@@ -60,7 +60,6 @@ function fit_autohist(x::AbstractVector{T}, rule::RRH, xmin::T, xmax::T, closed:
     z = @. (x - xmin) / (xmax - xmin)         # Scale data to the interval [0,1]
     Threads.@threads for k = 1:k_max
         N = bin_regular(z, 0.0, 1.0, k, closed == :right)
-        #N = bin_regular(z, 0.0, 1.0, k, closed == :right)
         @inbounds criterion[k] = logposterior_k(N, k, ones(k)/k, a_vec[k], n, rule.logprior)
     end
     k_opt = argmax(criterion)
@@ -112,7 +111,6 @@ function fit_autohist(x::AbstractVector{T}, rule::AIC, xmin::T, xmax::T, closed:
     z = @. (x - xmin) / (xmax - xmin)         # Scale data to the interval [0,1]
     Threads.@threads for k = 1:k_max
         N = bin_regular(z, 0.0, 1.0, k, closed == :right)
-        #N = bin_regular(z, 0.0, 1.0, k, closed == :right)
         @inbounds criterion[k] = compute_AIC(N, k, n) # Note: negative of AIC is computed
     end
     k_opt = argmax(criterion)
@@ -152,7 +150,6 @@ function fit_autohist(x::AbstractVector{T}, rule::BIC, xmin::T, xmax::T, closed:
     z = @. (x - xmin) / (xmax - xmin)         # Scale data to the interval [0,1]
     Threads.@threads for k = 1:k_max
         N = bin_regular(z, 0.0, 1.0, k, closed == :right)
-        #N = bin_regular(z, 0.0, 1.0, k, closed == :right)
         @inbounds criterion[k] = compute_BIC(N, k, n) # Note: negative of BIC is computed
     end
     k_opt = argmax(criterion)
@@ -194,7 +191,6 @@ function fit_autohist(x::AbstractVector{T}, rule::BR, xmin::T, xmax::T, closed::
     z = @. (x - xmin) / (xmax - xmin)         # Scale data to the interval [0,1]
     Threads.@threads for k = 1:k_max
         N = bin_regular(z, 0.0, 1.0, k, closed == :right)
-        #N = bin_regular(z, 0.0, 1.0, k, closed == :right)
         @inbounds criterion[k] = compute_BR(N, k, n) # Note: negative of AIC is computed
     end
     k_opt = argmax(criterion)
@@ -237,7 +233,6 @@ function fit_autohist(x::AbstractVector{T}, rule::MDL, xmin::T, xmax::T, closed:
     z = @. (x - xmin) / (xmax - xmin)         # Scale data to the interval [0,1]
     Threads.@threads for k = 1:k_max
         N = bin_regular(z, 0.0, 1.0, k, closed == :right)
-        #N = bin_regular(z, 0.0, 1.0, k, closed == :right)
         @inbounds criterion[k] = compute_MDL(N, k, n) # Note: negative of AIC is computed
     end
     k_opt = argmax(criterion)
@@ -283,7 +278,6 @@ function fit_autohist(x::AbstractVector{T}, rule::NML_R, xmin::T, xmax::T, close
     z = @. (x - xmin) / (xmax - xmin)         # Scale data to the interval [0,1]
     Threads.@threads for k = 1:k_max
         N = bin_regular(z, 0.0, 1.0, k, closed == :right)
-        #N = bin_regular(z, 0.0, 1.0, k, closed == :right)
         @inbounds criterion[k] = compute_NML(N, k, n) # Note: negative of AIC is computed
     end
     k_opt = argmax(criterion)
@@ -367,7 +361,6 @@ function fit_autohist(x::AbstractVector{T}, rule::KLCV_R, xmin::T, xmax::T, clos
     z = @. (x - xmin) / (xmax - xmin)         # Scale data to the interval [0,1]
     Threads.@threads for k = 1:k_max
         N = bin_regular(z, 0.0, 1.0, k, closed == :right)
-        #N = bin_regular(z, 0.0, 1.0, k, closed == :right)
         @inbounds criterion[k] = compute_KLCV(N, k, n) # Note: negative of AIC is computed
     end
     k_opt = argmax(criterion)
