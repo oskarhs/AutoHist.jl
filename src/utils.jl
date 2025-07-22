@@ -19,34 +19,34 @@ function bin_regular(x::AbstractVector{<:Real}, xmin::Real, xmax::Real, k::Int, 
 end
 
 function bin_irregular(x::AbstractVector{<:Real}, edges::AbstractVector{<:Real}, right::Bool)
+    k = length(edges)-1
     bincounts = zeros(Float64, length(edges)-1)
     if right
         for val in x
-            idval = max(1, searchsortedfirst(edges, val) - 1)
-            @inbounds bincounts[idval] += 1.0
+            idval = min(max(1, searchsortedfirst(edges, val) - 1), k)
+            bincounts[idval] += 1.0
         end
     else
-        k = length(edges)-1
         for val in x
-            idval = min(k, searchsortedlast(edges, val))
-            @inbounds bincounts[idval] += 1.0
+            idval = max(min(k, searchsortedlast(edges, val)), 1)
+            bincounts[idval] += 1.0
         end
     end
     return bincounts
 end
 
 function bin_irregular_int(x::AbstractVector{<:Real}, edges::AbstractVector{<:Real}, right::Bool)
+    k = length(edges)-1
     bincounts = zeros(Int64, length(edges)-1)
     if right
         for val in x
-            idval = max(1, searchsortedfirst(edges, val) - 1)
-            @inbounds bincounts[idval] += 1
+            idval = min(max(1, searchsortedfirst(edges, val) - 1), k)
+            bincounts[idval] += 1
         end
     else
-        k = length(edges)-1
         for val in x
-            idval = min(k, searchsortedlast(edges, val))
-            @inbounds bincounts[idval] += 1
+            idval = max(min(k, searchsortedlast(edges, val)), 1)
+            bincounts[idval] += 1
         end
     end
     return bincounts
