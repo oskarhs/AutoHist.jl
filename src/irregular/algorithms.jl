@@ -12,7 +12,7 @@ The optimal partitioning algorithm for constructing an irregular histogram.
 
 # Keyword arguments
 - `greedy`: Boolean indicating whether or not the greedy cutpoint selection strategy of [Rozenholc et al. (2010)](https://doi.org/10.1016/j.csda.2010.04.021) should be used to select a smaller number of candidate cutpoints prior to running the dynamic programming algorithm. Defaults to `true`.
-- `gr_maxbins`: Number of candidate cutpoints chosen by the greedy algorithm. Supplying `gr_maxbins=:default` results in the selection of at most ``\\max \\{3000, n^(1/2))\\}+1`` candidate cutpoints (including edges).
+- `gr_maxbins`: Number of candidate cutpoints chosen by the greedy algorithm. Supplying `gr_maxbins=:default` results in the selection of at most ``\\max \\{ 3000, n^{1/2} \\}+1`` candidate cutpoints (including edges).
 
 !!! note
     This algorithm can be quite slow for large datasets when the `greedy` keyword is set to `false`.
@@ -63,7 +63,7 @@ The segment neighbourhood algorithm for constructing an irregular histogram.
 
 # Keyword arguments
 - `greedy`: Boolean indicating whether or not the greedy cutpoint selection strategy of [Rozenholc et al. (2010)](https://doi.org/10.1016/j.csda.2010.04.021) should be used to select a smaller number of candidate cutpoints prior to running the dynamic programming algorithm. Defaults to `true`.
-- `gr_maxbins`: Number of candidate cutpoints chosen by the greedy algorithm. Supplying `gr_maxbins=:default` results in the selection of at most ``\\max\\{500, n^(1/3))\\}+1 candidate cutpoints (including edges).
+- `gr_maxbins`: Number of candidate cutpoints chosen by the greedy algorithm. Supplying `gr_maxbins=:default` results in the selection of at most ``\\max\\{ 500, n^{1/3} \\}+1`` candidate cutpoints (including edges).
 
 !!! note
     This algorithm can be quite slow for large datasets when the `greedy` keyword is set to `false`.
