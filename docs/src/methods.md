@@ -122,3 +122,9 @@ Scott
 ```@docs
 Wand
 ```
+
+## Index
+
+```@index
+Pages = ["methods.md"]
+```
