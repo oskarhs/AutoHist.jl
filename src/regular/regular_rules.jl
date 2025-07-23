@@ -30,6 +30,27 @@ choices ``a_j = 0.5`` and ``p_n(k)\\propto 1``.
 - `logprior`: Unnormalized logprior distribution on the number ``k`` of bins. Defaults to a uniform prior, e.g. `logprior(k) = 0` for all `k`.
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)`.
 
+# Examples
+```jldoctest
+julia> using AutoHist
+
+julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
+
+julia> rule = RRH(a = k->0.5*k, logprior = k->0.0);
+
+julia> h = fit(AutomaticHistogram, x, rule)
+AutomaticHistogram
+breaks: LinRange{Float64}(0.0, 1.0, 11)
+density: [0.04950495049504951, 0.2079207920792079, 0.5643564356435643, 1.0, 1.495049504950495, 1.8712871287128714, 1.9702970297029703, 1.6732673267326732, 0.9603960396039604, 0.2079207920792079]
+counts: [2, 10, 28, 50, 75, 94, 99, 84, 48, 10]
+type: regular
+closed: right
+a: 5.0
+
+julia> h == fit(AutomaticHistogram, x, Knuth())
+true
+```
+
 # References
 The `Knuth` criterion for histograms was proposed by [Knuth (2019)](https://doi.org/10.1016/j.dsp.2019.102581). The random regular histogram criterion is a generalization.
 """
@@ -99,6 +120,22 @@ where ``n`` is the sample size.
 # Keyword arguments
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)`.
 
+# Examples
+```jldoctest
+julia> using AutoHist
+
+julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
+
+julia> fit(AutomaticHistogram, x, AIC())
+AutomaticHistogram
+breaks: LinRange{Float64}(0.0, 1.0, 11)
+density: [0.04, 0.2, 0.56, 1.0, 1.5, 1.88, 1.98, 1.68, 0.96, 0.2]
+counts: [2, 10, 28, 50, 75, 94, 99, 84, 48, 10]
+type: regular
+closed: right
+a: NaN
+```
+
 # References
 The aic criterion was proposed by [Taylor (1987)](https://doi.org/10.1093/biomet/74.3.636) for histograms.
 """
@@ -140,6 +177,22 @@ where ``n`` is the sample size.
 
 # Keyword arguments
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)`.
+
+# Examples
+```jldoctest
+julia> using AutoHist
+
+julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
+
+julia> fit(AutomaticHistogram, x, BIC())
+AutomaticHistogram
+breaks: LinRange{Float64}(0.0, 1.0, 9)
+density: [0.048, 0.336, 0.816, 1.44, 1.904, 1.904, 1.264, 0.288]
+counts: [3, 21, 51, 90, 119, 119, 79, 18]
+type: regular
+closed: right
+a: NaN
+```
 """
 BIC(; maxbins::Union{Int, Symbol}=:default) = BIC(maxbins)
 
@@ -178,6 +231,22 @@ where ``n`` is the sample size.
 
 # Keyword arguments
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)`.
+
+# Examples
+```jldoctest
+julia> using AutoHist
+
+julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
+
+julia> fit(AutomaticHistogram, x, BR())
+AutomaticHistogram
+breaks: LinRange{Float64}(0.0, 1.0, 11)
+density: [0.04, 0.2, 0.56, 1.0, 1.5, 1.88, 1.98, 1.68, 0.96, 0.2]
+counts: [2, 10, 28, 50, 75, 94, 99, 84, 48, 10]
+type: regular
+closed: right
+a: NaN
+```
 
 # References
 This criterion was proposed by [Birgé and Rozenholc (2006)](https://doi.org/10.1051/ps:2006001).
@@ -220,6 +289,22 @@ where ``n`` is the sample size and the maximmization is over all regular partiti
 
 # Keyword arguments
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)`.
+
+# Examples
+```jldoctest
+julia> using AutoHist
+
+julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
+
+julia> fit(AutomaticHistogram, x, MDL())
+AutomaticHistogram
+breaks: LinRange{Float64}(0.0, 1.0, 11)
+density: [0.04, 0.2, 0.56, 1.0, 1.5, 1.88, 1.98, 1.68, 0.96, 0.2]
+counts: [2, 10, 28, 50, 75, 94, 99, 84, 48, 10]
+type: regular
+closed: right
+a: NaN
+```
 
 # References
 The minimum description length principle was first applied to histogram estimation by [Hall and Hannan (1988)](https://doi.org/10.1093/biomet/75.4.705).
@@ -266,6 +351,22 @@ where ``n`` is the sample size.
 # Keyword arguments
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)`.
 
+# Examples
+```jldoctest
+julia> using AutoHist
+
+julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
+
+julia> fit(AutomaticHistogram, x, NML_R())
+AutomaticHistogram
+breaks: LinRange{Float64}(0.0, 1.0, 24)
+density: [0.046, 0.0, 0.138, 0.184, 0.368, 0.506, 0.69, 0.874, 1.104, 1.334  …  1.978, 1.978, 1.978, 1.84, 1.61, 1.334, 0.966, 0.644, 0.276, 0.046]
+counts: [1, 0, 3, 4, 8, 11, 15, 19, 24, 29  …  43, 43, 43, 40, 35, 29, 21, 14, 6, 1]
+type: regular
+closed: right
+a: NaN
+```
+
 # References
 This is a regular variant of the normalized maximum likelihood criterion considered by [Kontkanen and Myllymäki (2007)](https://proceedings.mlr.press/v2/kontkanen07a.html).
 """
@@ -308,6 +409,22 @@ where ``n`` is the sample size.
 # Keyword arguments
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)`.
 
+# Examples
+```jldoctest
+julia> using AutoHist
+
+julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
+
+julia> fit(AutomaticHistogram, x, L2CV_R())
+AutomaticHistogram
+breaks: LinRange{Float64}(0.0, 1.0, 11)
+density: [0.04, 0.2, 0.56, 1.0, 1.5, 1.88, 1.98, 1.68, 0.96, 0.2]
+counts: [2, 10, 28, 50, 75, 94, 99, 84, 48, 10]
+type: regular
+closed: right
+a: NaN
+```
+
 # References
 This approach to histogram density estimation was first considered by [Rudemo (1982)](https://www.jstor.org/stable/4615859).
 """
@@ -349,6 +466,22 @@ where ``n`` is the sample size and the maximmization is over all regular partiti
 # Keyword arguments
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)`.
 
+# Examples
+```jldoctest
+julia> using AutoHist
+
+julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
+
+julia> fit(AutomaticHistogram, x, KLCV_R())
+AutomaticHistogram
+breaks: LinRange{Float64}(0.0, 1.0, 11)
+density: [0.04, 0.2, 0.56, 1.0, 1.5, 1.88, 1.98, 1.68, 0.96, 0.2]
+counts: [2, 10, 28, 50, 75, 94, 99, 84, 48, 10]
+type: regular
+closed: right
+a: NaN
+```
+
 # References
 This approach was first studied by [Hall (1990)](https://doi.org/10.1007/BF01203164).
 """
@@ -380,11 +513,27 @@ Sturges' rule for regular histograms.
 
 The number ``k`` of bins is chosen as
 ```math
-    k = \\lceil \\log_2(n) \\rceil + 1.,
+    k = \\lceil \\log_2(n) \\rceil + 1,
 ```
 where ``n`` is the sample size.
 
 This is the default procedure used by the `hist()` function in base R.
+
+# Examples
+```jldoctest
+julia> using AutoHist
+
+julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
+
+julia> fit(AutomaticHistogram, x, Sturges())
+AutomaticHistogram
+breaks: LinRange{Float64}(0.0, 1.0, 10)
+density: [0.054, 0.252, 0.666, 1.206, 1.71, 1.98, 1.782, 1.098, 0.252]
+counts: [3, 14, 37, 67, 95, 110, 99, 61, 14]
+type: regular
+closed: right
+a: NaN
+```
 
 # References
 This classical rule is due to [Sturges (1926)](https://doi.org/10.1080/01621459.1926.10502161).
@@ -413,6 +562,22 @@ The number ``k`` of bins is computed according to the formula
     k = \\big\\lceil \\hat{\\sigma}^{-1}(24\\sqrt{\\pi})^{-1/3}n^{1/3}\\big\\rceil,
 ```
 where ``\\hat{\\sigma}`` is the sample standard deviation and ``n`` is the sample size.
+
+# Examples
+```jldoctest
+julia> using AutoHist
+
+julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
+
+julia> fit(AutomaticHistogram, x, Scott())
+AutomaticHistogram
+breaks: LinRange{Float64}(0.0, 1.0, 14)
+density: [0.026, 0.13, 0.338, 0.624, 0.988, 1.378, 1.716, 1.924, 2.002, 1.768, 1.3, 0.676, 0.13]
+counts: [1, 5, 13, 24, 38, 53, 66, 74, 77, 68, 50, 26, 5]
+type: regular
+closed: right
+a: NaN
+```
 
 # References
 This classical rule is due to [Scott (1979)](https://doi.org/10.1093/biomet/66.3.605).
@@ -444,6 +609,22 @@ The number ``k`` of bins is computed according to the formula
 where ``\\text{IQR}(\\boldsymbol{x})`` is the sample interquartile range and ``n`` is the sample size.
 
 This is the default procedure used by the `histogram()` function in `Plots.jl`.
+
+# Examples
+```jldoctest
+julia> using AutoHist
+
+julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
+
+julia> fit(AutomaticHistogram, x, FD())
+AutomaticHistogram
+breaks: LinRange{Float64}(0.0, 1.0, 16)
+density: [0.03, 0.09, 0.24, 0.48, 0.78, 1.08, 1.44, 1.71, 1.92, 2.01, 1.89, 1.59, 1.08, 0.54, 0.12]
+counts: [1, 3, 8, 16, 26, 36, 48, 57, 64, 67, 63, 53, 36, 18, 4]
+type: regular
+closed: right
+a: NaN
+```
 
 # References
 This rule dates back to [Freedman and Diaconis (1982)](https://doi.org/10.1007/BF01025868).
@@ -482,6 +663,24 @@ where ``\\hat{C}(f_0)`` is an estimate of the functional ``C(f_0) = \\int \\{f_0
 # Keyword arguments
 `level`: The `level` keyword controls the number of stages of functional estimation used to compute ``\\hat{C}``, and can take values `0, 1, 2, 3, 4, 5`, with the default value being `level=2`. The choice `level=0` corresponds to a varation on Scott's rule, with a custom scale estimate.
 `scalest`: Estimate of scale parameter. Possible choices are `:minim` `:stdev` and `:iqr`. The latter two use sample standard deviation or the sample interquartile range, respectively, to estimate the scale. The default choice `:minim` uses the minimum of the above estimates.
+
+# Examples
+```jldoctest
+julia> using AutoHist
+
+julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
+
+julia> rule = Wand(scalest=:stdev, level=5);
+
+julia> fit(AutomaticHistogram, x, rule)
+AutomaticHistogram
+breaks: LinRange{Float64}(0.0, 1.0, 13)
+density: [0.024, 0.144, 0.408, 0.72, 1.128, 1.536, 1.872, 1.992, 1.848, 1.416, 0.744, 0.168]
+counts: [1, 6, 17, 30, 47, 64, 78, 83, 77, 59, 31, 7]
+type: regular
+closed: right
+a: NaN
+```
 
 # References
 The full details on this method are given in [Wand (1997)](https://doi.org/10.2307/2684697).
