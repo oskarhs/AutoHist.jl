@@ -34,6 +34,24 @@ The default value is ``p_n(k) \\propto 1``. Here, ``a_j = a/k``, for a scalar ``
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)` if `grid` is `regular` or `quantile`. Ignored if `grid=:data`.
 - `alg`: Algorithm used to fit the model. Currently, only `SegNeig()` for this rule. See [`SegNeig`](@ref) for further details.
 
+# Examples
+```jldoctest
+julia> using AutoHist
+
+julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
+
+julia> rule = RIH(a = 5.0, logprior = k-> -log(k), grid = :data);
+
+julia> fit(AutomaticHistogram, x, rule)
+AutomaticHistogram
+breaks: [0.0, 0.18220071105959446, 0.3587941358096334, 0.8722292888743843, 1.0]
+density: [0.11858322346056327, 0.6490600487586273, 1.6066011289666577, 0.30436411114439915]
+counts: [10, 57, 414, 19]
+type: irregular
+closed: right
+a: 5.0
+```
+
 # References
 This approach to irregular histograms first appeared in [Simensen et al. (2025)](https://doi.org/10.48550/ARXIV.2505.22034).
 """
@@ -80,6 +98,24 @@ Consists of finding the partition ``\\mathcal{I}`` that maximizes a penalized lo
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)` if `grid` is `regular` or `quantile`. Ignored if `grid=:data`.
 - `alg`: Algorithm used to fit the model. Currently, only `SegNeig()` is supported for this rule. See [`SegNeig`](@ref) for further details.
 
+# Examples
+```jldoctest
+julia> using AutoHist
+
+julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
+
+julia> rule = RMG_penA(grid = :data);
+
+julia> fit(AutomaticHistogram, x, rule)
+AutomaticHistogram
+breaks: [0.0, 0.18875598171056715, 0.3644223879547405, 0.8696799410193466, 1.0]
+density: [0.116552597701164, 0.6717277510418354, 1.6229346697072502, 0.30693663211078037]
+counts: [11, 59, 410, 20]
+type: irregular
+closed: right
+a: NaN
+```
+
 # References
 This approach was suggested by [Rozenholc et al. (2010)](https://doi.org/10.1016/j.csda.2010.04.021).
 """
@@ -122,6 +158,24 @@ Consists of finding the partition ``\\mathcal{I}`` that maximizes a penalized lo
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)` if `grid` is `regular` or `quantile`. Ignored if `grid=:data`.
 - `alg`: Algorithm used to fit the model. Currently, only `SegNeig()` is supported for this rule. See [`SegNeig`](@ref) for further details.
 
+# Examples
+```jldoctest
+julia> using AutoHist
+
+julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
+
+julia> rule = RMG_penB(grid = :data);
+
+julia> fit(AutomaticHistogram, x, rule)
+AutomaticHistogram
+breaks: [0.0, 0.1948931612779725, 0.375258352661302, 0.8268306249022703, 0.9222490305512866, 1.0]
+density: [0.12314439276691318, 0.7096713008662634, 1.6962954704872724, 0.7545714006671028, 0.12861575966067232]
+counts: [12, 64, 383, 36, 5]
+type: irregular
+closed: right
+a: NaN
+```
+
 # References
 This approach was suggested by [Rozenholc et al. (2010)](https://doi.org/10.1016/j.csda.2010.04.021).
 """
@@ -148,7 +202,7 @@ struct RMG_penR{A<:AbstractAlgorithm} <: AbstractIrregularRule
 end
 
 """
-    RMG_penB(;
+    RMG_penR(;
         grid::Symbol=:regular,
         maxbins::Union{Int, Symbol}=:default,
         alg::AbstractAlgorithm=SegNeig()
@@ -156,13 +210,14 @@ end
 
 Consists of finding the partition ``\\mathcal{I}`` that maximizes a penalized log-likelihood,
 ```math
-    \\sum_{j=1}^k N_j \\log (N_j/|\\mathcal{I}_j|) - \\log \\binom{k_n-1}{k-1} - k - \\log^{2.5}(k).
+    \\sum_{j=1}^k \\big\\{N_j \\log (N_j/|\\mathcal{I}_j|) - \\frac{N_j}{2n}\\big\\} - \\log \\binom{k_n-1}{k-1} - \\log^{2.5}(k).
 ```
 
 # Keyword arguments
 - `grid`: Symbol indicating how the finest possible mesh should be constructed. Options are `:data`, which uses each unique data point as a grid point, `:regular` (default) which constructs a fine regular grid, and `:quantile` which constructs the grid based on the sample quantiles.
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)` if `grid` is `regular` or `quantile`. Ignored if `grid=:data`.
 - `alg`: Algorithm used to fit the model. Currently, only `SegNeig()` is supported for this rule. See [`SegNeig`](@ref) for further details.
+
 
 # References
 This approach was suggested by [Rozenholc et al. (2010)](https://doi.org/10.1016/j.csda.2010.04.021).
@@ -210,6 +265,24 @@ Consists of finding the partition ``\\mathcal{I}`` that maximizes a penalized lo
 - `grid`: Symbol indicating how the finest possible mesh should be constructed. Options are `:data`, which uses each unique data point as a grid point, `:regular` (default) which constructs a fine regular grid, and `:quantile` which constructs the grid based on the sample quantiles.
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)` if `grid` is `regular` or `quantile`. Ignored if `grid=:data`.
 - `alg`: Algorithm used to fit the model. Currently, only `SegNeig()` is supported for this rule. See [`SegNeig`](@ref) for further details.
+
+# Examples
+```jldoctest
+julia> using AutoHist
+
+julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
+
+julia> rule = NML_I(grid = :data);
+
+julia> fit(AutomaticHistogram, x, rule)
+AutomaticHistogram
+breaks: [0.0, 0.18875598171056715, 0.3644223879547405, 0.8696799410193466, 1.0]
+density: [0.116552597701164, 0.6717277510418354, 1.6229346697072502, 0.30693663211078037]
+counts: [11, 59, 410, 20]
+type: irregular
+closed: right
+a: NaN
+```
 
 # References
 This a variant of this criterion first suggested by [Kontkanen and Myllymäki (2007)](https://proceedings.mlr.press/v2/kontkanen07a.html).

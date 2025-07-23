@@ -94,7 +94,7 @@ get_psi(rule::RIH, maxbins::Int, n::Int) = k-> rule.logprior(k) - logabsbinomial
 get_psi(rule::RMG_penB, maxbins::Int, n::Int) = k-> -logabsbinomial(maxbins-1, k-1)[1] - k - log(k)^(2.5)
 get_psi(rule::RMG_penA, maxbins::Int, n::Int) = k-> -logabsbinomial(maxbins-1, k-1)[1] - k - 2.0*log(k) -
                         2.0 * sqrt(1.0*0.5*(k-1)*(logabsbinomial(maxbins-1, k-1)[1] + 2.0*log(k)))
-get_psi(rule::RMG_penR, maxbins::Int, n::Int) = k-> -logabsbinomial(maxbins-1, k-1)[1] - k - log(k)^(2.5)
+get_psi(rule::RMG_penR, maxbins::Int, n::Int) = k-> -logabsbinomial(maxbins-1, k-1)[1] - log(k)^(2.5)
 get_psi(rule::NML_I, maxbins::Int, n::Int) = k-> -( 0.5*k*log(0.5*n) - loggamma(0.5*k) +
                 1.0/sqrt(n) * sqrt(2.0)*k/3.0 * exp(loggamma(0.5*k) - loggamma(0.5*k-0.5)) +
                 1.0/n * ((3.0 + k*(k-2.0)*(2.0*k+1.0))/36.0 - k^2/9.0*exp(2.0*loggamma(0.5*k) - 2.0*loggamma(0.5*k-0.5)))
