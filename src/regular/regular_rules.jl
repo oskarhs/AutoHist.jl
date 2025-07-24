@@ -685,15 +685,17 @@ a: NaN
 # References
 The full details on this method are given in [Wand (1997)](https://doi.org/10.2307/2684697).
 """
-Wand(; level::Int=2, scalest::Symbol=:minim) = Wand(level, scalest)
+function Wand(; level::Int=2, scalest::Symbol=:minim)
+    if !(scalest in [:minim, :stdev, :iqr])     # check that supplied scale-estimate is a valid option
+        throw(ArgumentError("Supplied scalest value, :$(scalest), is not supported. Use one of :minim, :stdev or :iqr."))
+    end
+    if !(level in [0, 1, 2, 3, 4, 5])           # check that supplied level is a valid option
+        throw(ArgumentError("Supplied level, $(level), is not supported. Use one of 0, 1, 2, 3, 4 or 5."))
+    end
+    return Wand(level, scalest)
+end
 
 function fit_autohist(x::AbstractVector{T}, rule::Wand, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
-    if !(rule.scalest in [:minim, :stdev, :iqr])     # check that supplied scale-estimate is a valid option
-        throw(ArgumentError("Supplied scalest value, :$(rule.scalest), is not supported. Use one of :minim, :stdev or :iqr."))
-    end
-    if !(rule.level in [0, 1, 2, 3, 4, 5])           # check that supplied level is a valid option
-        throw(ArgumentError("Supplied level, $(rule.level), is not supported. Use one of 0, 1, 2, 3, 4 or 5."))
-    end
     n = length(x)
     k = wand_num_bins(x, rule.level, rule.scalest, 401, (xmin, xmax))
     N = bin_irregular_int(x, LinRange(xmin, xmax, k+1), closed == :right)

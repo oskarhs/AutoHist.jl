@@ -73,6 +73,17 @@ end
             RIH(grid=:data, alg=SegNeig(greedy=true, gr_maxbins=600))
     )
     @test typeof(h) <: AutomaticHistogram
+
+    # Check that error is thrown when attempting to pass OptPart to unsupported rules
+    @test_throws ArgumentError RIH(alg=OptPart())
+    @test_throws ArgumentError RMG_penA(alg=OptPart())
+    @test_throws ArgumentError RMG_penB(alg=OptPart())
+    @test_throws ArgumentError RMG_penR(alg=OptPart())
+    @test_throws ArgumentError NML_I(alg=OptPart())
+
+    struct NonsenseAlg <: AutoHist.AbstractAlgorithm end
+    @test_throws ArgumentError L2CV_I(alg=NonsenseAlg())
+    @test_throws ArgumentError KLCV_I(alg=NonsenseAlg())
 end
 
 @testset "estimated support" begin
@@ -123,10 +134,10 @@ end
 
     @test_throws DomainError fit(AutomaticHistogram, x, RRH(a=-1.0))
     @test_throws DomainError fit(AutomaticHistogram, x, RRH(a=k->-2.0*k))
-    @test_throws DomainError fit(AutomaticHistogram, x, RIH(a=-1.0))
+    @test_throws DomainError RIH(a=-1.0)
 
-    @test_throws ArgumentError fit(AutomaticHistogram, x, Wand(level=100))
-    @test_throws ArgumentError fit(AutomaticHistogram, x, Wand(scalest=:nonsense))
+    @test_throws ArgumentError Wand(level=100)
+    @test_throws ArgumentError Wand(scalest=:nonsense)
     @test_throws ArgumentError fit(AutomaticHistogram, x; closed=:nonsense)
     @test_throws ArgumentError fit(AutomaticHistogram, x, Knuth(); closed=:nonsense)
     @test_throws DomainError fit(AutomaticHistogram, x, Knuth(maxbins=-100))

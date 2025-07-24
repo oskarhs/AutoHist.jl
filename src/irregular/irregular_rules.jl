@@ -32,7 +32,7 @@ The default value is ``p_n(k) \\propto 1``. Here, ``a_j = a/k``, for a scalar ``
 - `logprior`: Unnormalized logprior distribution on the number ``k`` of bins. Defaults to a uniform prior, e.g. `logprior(k) = 0` for all `k`.
 - `grid`: Symbol indicating how the finest possible mesh should be constructed. Options are `:data`, which uses each unique data point as a grid point, `:regular` (default) which constructs a fine regular grid, and `:quantile` which constructs the grid based on the sample quantiles.
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)` if `grid` is `regular` or `quantile`. Ignored if `grid=:data`.
-- `alg`: Algorithm used to fit the model. Currently, only `SegNeig()` for this rule. See [`SegNeig`](@ref) for further details.
+- `alg`: Algorithm used to fit the model. Currently, only [`SegNeig`](@ref) is supported for this rule.
 
 # Examples
 ```jldoctest
@@ -55,12 +55,17 @@ a: 5.0
 # References
 This approach to irregular histograms first appeared in [Simensen et al. (2025)](https://doi.org/10.48550/ARXIV.2505.22034).
 """
-RIH(; a::Real=5.0, logprior::Function=k->0.0, grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default, alg::AbstractAlgorithm=SegNeig()) = RIH(a, logprior, grid, maxbins, alg)
-
-function fit_autohist(x::AbstractVector{T}, rule::RIH, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
-    if rule.a ≤ 0.0
+function RIH(; a::Real=5.0, logprior::Function=k->0.0, grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default, alg::AbstractAlgorithm=SegNeig())
+    if typeof(alg) != SegNeig
+        throw(ArgumentError("Algorithm $(typeof(alg)) not supported for rule RIH. Only the SegNeig algorithm is supported for this rule."))
+    end
+    if a ≤ 0.0
         throw(DomainError("Supplied value of a must be positive."))
     end
+    return RIH(a, logprior, grid, maxbins, alg)
+end
+
+function fit_autohist(x::AbstractVector{T}, rule::RIH, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
     n = length(x)
     bin_edges_norm = maximize_additive_crit(x, rule, xmin, xmax, closed)
     
@@ -96,7 +101,7 @@ Consists of finding the partition ``\\mathcal{I}`` that maximizes a penalized lo
 # Keyword arguments
 - `grid`: Symbol indicating how the finest possible mesh should be constructed. Options are `:data`, which uses each unique data point as a grid point, `:regular` (default) which constructs a fine regular grid, and `:quantile` which constructs the grid based on the sample quantiles.
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)` if `grid` is `regular` or `quantile`. Ignored if `grid=:data`.
-- `alg`: Algorithm used to fit the model. Currently, only `SegNeig()` is supported for this rule. See [`SegNeig`](@ref) for further details.
+- `alg`: Algorithm used to fit the model. Currently, only [`SegNeig`](@ref) is supported for this rule.
 
 # Examples
 ```jldoctest
@@ -119,7 +124,12 @@ a: NaN
 # References
 This approach was suggested by [Rozenholc et al. (2010)](https://doi.org/10.1016/j.csda.2010.04.021).
 """
-RMG_penA(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default, alg::AbstractAlgorithm=SegNeig()) = RMG_penA(grid, maxbins, alg)
+function RMG_penA(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default, alg::AbstractAlgorithm=SegNeig())
+    if typeof(alg) != SegNeig
+        throw(ArgumentError("Algorithm $(typeof(alg)) not supported for rule RMG_penA. Only the SegNeig algorithm is supported for this rule."))
+    end
+    return RMG_penA(grid, maxbins, alg)
+end
 
 function fit_autohist(x::AbstractVector{T}, rule::RMG_penA, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
     n = length(x)
@@ -156,7 +166,7 @@ Consists of finding the partition ``\\mathcal{I}`` that maximizes a penalized lo
 # Keyword arguments
 - `grid`: Symbol indicating how the finest possible mesh should be constructed. Options are `:data`, which uses each unique data point as a grid point, `:regular` (default) which constructs a fine regular grid, and `:quantile` which constructs the grid based on the sample quantiles.
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)` if `grid` is `regular` or `quantile`. Ignored if `grid=:data`.
-- `alg`: Algorithm used to fit the model. Currently, only `SegNeig()` is supported for this rule. See [`SegNeig`](@ref) for further details.
+- `alg`: Algorithm used to fit the model. Currently, only [`SegNeig`](@ref) is supported for this rule.
 
 # Examples
 ```jldoctest
@@ -179,7 +189,12 @@ a: NaN
 # References
 This approach was suggested by [Rozenholc et al. (2010)](https://doi.org/10.1016/j.csda.2010.04.021).
 """
-RMG_penB(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default, alg::AbstractAlgorithm=SegNeig()) = RMG_penB(grid, maxbins, alg)
+function RMG_penB(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default, alg::AbstractAlgorithm=SegNeig())
+    if typeof(alg) != SegNeig
+        throw(ArgumentError("Algorithm $(typeof(alg)) not supported for rule RMG_penB. Only the SegNeig algorithm is supported for this rule."))
+    end
+    return RMG_penB(grid, maxbins, alg)
+end
 
 function fit_autohist(x::AbstractVector{T}, rule::RMG_penB, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
     n = length(x)
@@ -216,7 +231,7 @@ Consists of finding the partition ``\\mathcal{I}`` that maximizes a penalized lo
 # Keyword arguments
 - `grid`: Symbol indicating how the finest possible mesh should be constructed. Options are `:data`, which uses each unique data point as a grid point, `:regular` (default) which constructs a fine regular grid, and `:quantile` which constructs the grid based on the sample quantiles.
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)` if `grid` is `regular` or `quantile`. Ignored if `grid=:data`.
-- `alg`: Algorithm used to fit the model. Currently, only `SegNeig()` is supported for this rule. See [`SegNeig`](@ref) for further details.
+- `alg`: Algorithm used to fit the model. Currently, only [`SegNeig`](@ref) is supported for this rule.
 
 # Examples
 ```jldoctest
@@ -239,7 +254,12 @@ a: NaN
 # References
 This approach was suggested by [Rozenholc et al. (2010)](https://doi.org/10.1016/j.csda.2010.04.021).
 """
-RMG_penR(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default, alg::AbstractAlgorithm=SegNeig()) = RMG_penR(grid, maxbins, alg)
+function RMG_penR(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default, alg::AbstractAlgorithm=SegNeig())
+    if typeof(alg) != SegNeig
+        throw(ArgumentError("Algorithm $(typeof(alg)) not supported for rule RMG_penR. Only the SegNeig algorithm is supported for this rule."))
+    end
+    return RMG_penR(grid, maxbins, alg)
+end
 
 function fit_autohist(x::AbstractVector{T}, rule::RMG_penR, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
     n = length(x)
@@ -281,7 +301,7 @@ Consists of finding the partition ``\\mathcal{I}`` that maximizes a penalized lo
 # Keyword arguments
 - `grid`: Symbol indicating how the finest possible mesh should be constructed. Options are `:data`, which uses each unique data point as a grid point, `:regular` (default) which constructs a fine regular grid, and `:quantile` which constructs the grid based on the sample quantiles.
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)` if `grid` is `regular` or `quantile`. Ignored if `grid=:data`.
-- `alg`: Algorithm used to fit the model. Currently, only `SegNeig()` is supported for this rule. See [`SegNeig`](@ref) for further details.
+- `alg`: Algorithm used to fit the model. Currently, only [`SegNeig`](@ref) is supported for this rule.
 
 # Examples
 ```jldoctest
@@ -304,7 +324,12 @@ a: NaN
 # References
 This a variant of this criterion first suggested by [Kontkanen and Myllymäki (2007)](https://proceedings.mlr.press/v2/kontkanen07a.html).
 """
-NML_I(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default, alg::AbstractAlgorithm=SegNeig()) = NML_I(grid, maxbins, alg)
+function NML_I(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default, alg::AbstractAlgorithm=SegNeig())
+    if typeof(alg) != SegNeig
+        throw(ArgumentError("Algorithm $(typeof(alg)) not supported for rule NML_I. Only the SegNeig algorithm is supported for this rule."))
+    end
+    return NML_I(grid, maxbins, alg)
+end
 
 function fit_autohist(x::AbstractVector{T}, rule::NML_I, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
     n = length(x)
@@ -342,7 +367,7 @@ Consists of finding the partition ``\\mathcal{I}`` that maximizes a L2 leave-one
 # Keyword arguments
 - `grid`: Symbol indicating how the finest possible mesh should be constructed. Options are `:data`, which uses each unique data point as a grid point, `:regular` (default) which constructs a fine regular grid, and `:quantile` which constructs the grid based on the sample quantiles.
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)` if `grid` is `regular` or `quantile`. Ignored if `grid=:data`.
-- `alg`: Algorithm used to fit the model. Currently, [`OptPart](@ref) and [`SegNeig`](@ref) are supported for this rule, with the former algorithm being the default.
+- `alg`: Algorithm used to fit the model. Currently, [`OptPart`](@ref) and [`SegNeig`](@ref) are supported for this rule, with the former algorithm being the default.
 - `use_min_length`: Boolean indicating whether or not to impose a restriction on the minimum bin length of the histogram. If set to true, the smallest allowed bin length is set to `(maximum(x)-minimum(x))/n*log(n)^(1.5)`.
 
 # Examples
@@ -366,7 +391,12 @@ a: NaN
 # References
 This approach dates back to [Rudemo (1982)](https://www.jstor.org/stable/4615859).
 """
-L2CV_I(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default, alg::AbstractAlgorithm=OptPart(), use_min_length::Bool=false) = L2CV_I(grid, maxbins, alg, use_min_length)
+function L2CV_I(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default, alg::AbstractAlgorithm=OptPart(), use_min_length::Bool=false)
+    if !(typeof(alg) in [SegNeig, OptPart])
+        throw(ArgumentError("Algorithm $(typeof(alg)) not supported for rule L2CV_I. Only the SegNeig and OptPart algorithms are supported for this rule."))
+    end
+    return L2CV_I(grid, maxbins, alg, use_min_length)
+end
 
 function fit_autohist(x::AbstractVector{T}, rule::L2CV_I, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
     n = length(x)
@@ -406,7 +436,7 @@ where the maximmization is over all partitions with ``N_j \\geq 2`` for all ``j`
 # Keyword arguments
 - `grid`: Symbol indicating how the finest possible mesh should be constructed. Options are `:data`, which uses each unique data point as a grid point, `:regular` (default) which constructs a fine regular grid, and `:quantile` which constructs the grid based on the sample quantiles.
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)` if `grid` is `regular` or `quantile`. Ignored if `grid=:data`.
-- `alg`: Algorithm used to fit the model. Currently, [`OptPart](@ref) and [`SegNeig`](@ref) are supported for this rule, with the former algorithm being the default.
+- `alg`: Algorithm used to fit the model. Currently, [`OptPart`](@ref) and [`SegNeig`](@ref) are supported for this rule, with the former algorithm being the default.
 - `use_min_length`: Boolean indicating whether or not to impose a restriction on the minimum bin length of the histogram. If set to true, the smallest allowed bin length is set to `(maximum(x)-minimum(x))/n*log(n)^(1.5)`.
 
 # Examples
@@ -430,7 +460,12 @@ a: NaN
 # References
 This approach to irregular histograms was, to the best of our knowledge, first considered in [Simensen et al. (2025)](https://doi.org/10.48550/ARXIV.2505.22034).
 """
-KLCV_I(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default, alg::AbstractAlgorithm=OptPart(), use_min_length::Bool=false) = KLCV_I(grid, maxbins, alg, use_min_length)
+function KLCV_I(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default, alg::AbstractAlgorithm=OptPart(), use_min_length::Bool=false)
+    if !(typeof(alg) in [SegNeig, OptPart])
+        throw(ArgumentError("Algorithm $(typeof(alg)) not supported for rule KLCV_I. Only the SegNeig and OptPart algorithms are supported for this rule."))
+    end
+    return KLCV_I(grid, maxbins, alg, use_min_length)
+end
 
 function fit_autohist(x::AbstractVector{T}, rule::KLCV_I, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
     n = length(x)
