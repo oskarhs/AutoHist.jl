@@ -12,9 +12,7 @@ A type for representing a histogram where the histogram partition has been chose
 - `a`: Value of the Dirichlet concentration parameter corresponding to the chosen partition. Only of relevance if a Bayesian method was used to fit the histogram, and is otherwise set to `NaN`.
 
 # Examples
-```jldoctest 
-julia> using AutoHist
-
+```jldoctest; setup = :(using AutoHist)
 julia> x = LinRange(eps(), 1.0-eps(), 5000) .^(1.0/4.0);
 
 julia> h = fit(AutomaticHistogram, x)
@@ -97,9 +95,7 @@ Fit a histogram to a one-dimensional vector `x` with an automatic and data-based
 - `h`: An object of type [`AutomaticHistogram`](@ref), corresponding to the fitted histogram.
 
 # Examples
-```jldoctest
-julia> using AutoHist
-
+```jldoctest; setup = :(using AutoHist)
 julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 5000)) .^(1/3)).^(1/3);
 
 julia> fit(AutomaticHistogram, x) == fit(AutomaticHistogram, x, RIH())

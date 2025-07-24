@@ -35,9 +35,7 @@ The default value is ``p_n(k) \\propto 1``. Here, ``a_j = a/k``, for a scalar ``
 - `alg`: Algorithm used to fit the model. Currently, only [`SegNeig`](@ref) is supported for this rule.
 
 # Examples
-```jldoctest
-julia> using AutoHist
-
+```jldoctest; setup = :(using AutoHist)
 julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
 
 julia> rule = RIH(a = 5.0, logprior = k-> -log(k), grid = :data);
@@ -104,9 +102,7 @@ Consists of finding the partition ``\\mathcal{I}`` that maximizes a penalized lo
 - `alg`: Algorithm used to fit the model. Currently, only [`SegNeig`](@ref) is supported for this rule.
 
 # Examples
-```jldoctest
-julia> using AutoHist
-
+```jldoctest; setup = :(using AutoHist)
 julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
 
 julia> rule = RMG_penA(grid = :data);
@@ -169,9 +165,7 @@ Consists of finding the partition ``\\mathcal{I}`` that maximizes a penalized lo
 - `alg`: Algorithm used to fit the model. Currently, only [`SegNeig`](@ref) is supported for this rule.
 
 # Examples
-```jldoctest
-julia> using AutoHist
-
+```jldoctest; setup = :(using AutoHist)
 julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
 
 julia> rule = RMG_penB(grid = :data);
@@ -234,9 +228,7 @@ Consists of finding the partition ``\\mathcal{I}`` that maximizes a penalized lo
 - `alg`: Algorithm used to fit the model. Currently, only [`SegNeig`](@ref) is supported for this rule.
 
 # Examples
-```jldoctest
-julia> using AutoHist
-
+```jldoctest; setup = :(using AutoHist)
 julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
 
 julia> rule = RMG_penR(grid = :data);
@@ -304,9 +296,7 @@ Consists of finding the partition ``\\mathcal{I}`` that maximizes a penalized lo
 - `alg`: Algorithm used to fit the model. Currently, only [`SegNeig`](@ref) is supported for this rule.
 
 # Examples
-```jldoctest
-julia> using AutoHist
-
+```jldoctest; setup = :(using AutoHist)
 julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
 
 julia> rule = NML_I(grid = :data);
@@ -371,9 +361,7 @@ Consists of finding the partition ``\\mathcal{I}`` that maximizes a L2 leave-one
 - `use_min_length`: Boolean indicating whether or not to impose a restriction on the minimum bin length of the histogram. If set to true, the smallest allowed bin length is set to `(maximum(x)-minimum(x))/n*log(n)^(1.5)`.
 
 # Examples
-```jldoctest
-julia> using AutoHist
-
+```jldoctest; setup = :(using AutoHist)
 julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
 
 julia> rule = L2CV_I(grid = :data, use_min_length=true);
@@ -440,9 +428,7 @@ where the maximmization is over all partitions with ``N_j \\geq 2`` for all ``j`
 - `use_min_length`: Boolean indicating whether or not to impose a restriction on the minimum bin length of the histogram. If set to true, the smallest allowed bin length is set to `(maximum(x)-minimum(x))/n*log(n)^(1.5)`.
 
 # Examples
-```jldoctest
-julia> using AutoHist
-
+```jldoctest; setup = :(using AutoHist)
 julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
 
 julia> rule = KLCV_I(grid = :data, use_min_length=true);

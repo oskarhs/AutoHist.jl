@@ -31,9 +31,7 @@ choices ``a_j = 0.5`` and ``p_n(k)\\propto 1``.
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)`.
 
 # Examples
-```jldoctest
-julia> using AutoHist
-
+```jldoctest; setup = :(using AutoHist)
 julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
 
 julia> rule = RRH(a = k->0.5*k, logprior = k->0.0);
@@ -121,9 +119,7 @@ where ``n`` is the sample size.
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)`.
 
 # Examples
-```jldoctest
-julia> using AutoHist
-
+```jldoctest; setup = :(using AutoHist)
 julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
 
 julia> fit(AutomaticHistogram, x, AIC())
@@ -179,9 +175,7 @@ where ``n`` is the sample size.
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)`.
 
 # Examples
-```jldoctest
-julia> using AutoHist
-
+```jldoctest; setup = :(using AutoHist)
 julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
 
 julia> fit(AutomaticHistogram, x, BIC())
@@ -233,9 +227,7 @@ where ``n`` is the sample size.
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)`.
 
 # Examples
-```jldoctest
-julia> using AutoHist
-
+```jldoctest; setup = :(using AutoHist)
 julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
 
 julia> fit(AutomaticHistogram, x, BR())
@@ -291,9 +283,7 @@ where ``n`` is the sample size and the maximmization is over all regular partiti
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)`.
 
 # Examples
-```jldoctest
-julia> using AutoHist
-
+```jldoctest; setup = :(using AutoHist)
 julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
 
 julia> fit(AutomaticHistogram, x, MDL())
@@ -352,9 +342,7 @@ where ``n`` is the sample size.
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)`.
 
 # Examples
-```jldoctest
-julia> using AutoHist
-
+```jldoctest; setup = :(using AutoHist)
 julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
 
 julia> fit(AutomaticHistogram, x, NML_R())
@@ -410,9 +398,7 @@ where ``n`` is the sample size.
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)`.
 
 # Examples
-```jldoctest
-julia> using AutoHist
-
+```jldoctest; setup = :(using AutoHist)
 julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
 
 julia> fit(AutomaticHistogram, x, L2CV_R())
@@ -467,9 +453,7 @@ where ``n`` is the sample size and the maximmization is over all regular partiti
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)`.
 
 # Examples
-```jldoctest
-julia> using AutoHist
-
+```jldoctest; setup = :(using AutoHist)
 julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
 
 julia> fit(AutomaticHistogram, x, KLCV_R())
@@ -520,9 +504,7 @@ where ``n`` is the sample size.
 This is the default procedure used by the `hist()` function in base R.
 
 # Examples
-```jldoctest
-julia> using AutoHist
-
+```jldoctest; setup = :(using AutoHist)
 julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
 
 julia> fit(AutomaticHistogram, x, Sturges())
@@ -564,9 +546,7 @@ The number ``k`` of bins is computed according to the formula
 where ``\\hat{\\sigma}`` is the sample standard deviation and ``n`` is the sample size.
 
 # Examples
-```jldoctest
-julia> using AutoHist
-
+```jldoctest; setup = :(using AutoHist)
 julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
 
 julia> fit(AutomaticHistogram, x, Scott())
@@ -611,9 +591,7 @@ where ``\\text{IQR}(\\boldsymbol{x})`` is the sample interquartile range and ``n
 This is the default procedure used by the `histogram()` function in `Plots.jl`.
 
 # Examples
-```jldoctest
-julia> using AutoHist
-
+```jldoctest; setup = :(using AutoHist)
 julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
 
 julia> fit(AutomaticHistogram, x, FD())
@@ -665,9 +643,7 @@ where ``\\hat{C}(f_0)`` is an estimate of the functional ``C(f_0) = \\int \\{f_0
 `scalest`: Estimate of scale parameter. Possible choices are `:minim` `:stdev` and `:iqr`. The latter two use sample standard deviation or the sample interquartile range, respectively, to estimate the scale. The default choice `:minim` uses the minimum of the above estimates.
 
 # Examples
-```jldoctest
-julia> using AutoHist
-
+```jldoctest; setup = :(using AutoHist)
 julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
 
 julia> rule = Wand(scalest=:stdev, level=5);

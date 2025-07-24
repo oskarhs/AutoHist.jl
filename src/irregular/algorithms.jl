@@ -18,9 +18,7 @@ The optimal partitioning algorithm for constructing an irregular histogram.
     This algorithm can be quite slow for large datasets when the `greedy` keyword is set to `false`.
 
 # Examples
-```jldoctest 
-julia> using AutoHist
-
+```jldoctest; setup = :(using AutoHist)
 julia> x = LinRange(eps(), 1.0-eps(), 1000) .^(1.0/4.0);
 
 julia> h = fit(AutomaticHistogram, x, L2CV_I(alg = OptPart(greedy=true, gr_maxbins=100)))
@@ -69,9 +67,7 @@ The segment neighbourhood algorithm for constructing an irregular histogram.
     This algorithm can be quite slow for large datasets when the `greedy` keyword is set to `false`.
 
 # Examples
-```jldoctest 
-julia> using AutoHist
-
+```jldoctest; setup = :(using AutoHist)
 julia> x = LinRange(eps(), 1.0-eps(), 5000) .^(1.0/4.0);
 
 julia> h = fit(AutomaticHistogram, x, RIH(alg = SegNeig(greedy=true, gr_maxbins=200)))
