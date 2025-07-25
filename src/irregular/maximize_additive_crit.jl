@@ -2,27 +2,16 @@
 function maximize_additive_crit(x::AbstractVector{T}, rule::A, xmin::T, xmax::T, closed::Symbol) where {T <: Real, A<:AbstractIrregularRule}
     y = @. (x - xmin) / (xmax - xmin)
     n = length(x)
-
-    if typeof(rule.grid) <: Symbol && rule.grid in (:data, :regular, :quantile)
-        grid = rule.grid
-    else
-        throw(ArgumentError("Invalid grid option: $(rule.grid)"))
-    end
+    grid = rule.grid
 
     if grid == :data
         sort!(y)
         z = unique(y)
         maxbins = length(z)-1
-    elseif typeof(rule.maxbins) <: Symbol && rule.maxbins == :default
+    elseif rule.use_default_maxbins
         maxbins = min(n, ceil(Int, 4.0*n/log(n)^2))
-    elseif isa(rule.maxbins, Int) && rule.maxbins > 0
-        maxbins = rule.maxbins
     else
-        if typeof(rule.maxbins) <: Symbol && rule.maxbins != :default
-            throw(ArgumentError("maxbins must either be a positive integer or :default."))
-        else
-            throw(DomainError("maxbins must be positive."))
-        end
+        maxbins = rule.maxbins
     end
 
     if hasfield(typeof(rule), :use_min_length)
@@ -50,7 +39,7 @@ function maximize_additive_crit(x::AbstractVector{T}, rule::A, xmin::T, xmax::T,
     end
 
     if rule.alg.greedy
-        if rule.alg.gr_maxbins == :default
+        if rule.alg.use_default_gr_maxbins
             gr_maxbins = ifelse(
                 typeof(rule.alg) == OptPart,
                 min(maxbins, max(ceil(Int, n^(1.0/2.0)), 3000)),

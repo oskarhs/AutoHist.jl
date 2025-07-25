@@ -189,12 +189,12 @@ function kl_divergence(h1::AutomaticHistogram, h2::AutomaticHistogram)
 end
 
 # Check that maxbins is positive and compute default if applicable
-function get_maxbins_regular(maxbins::Union{Symbol, Int}, n::Int)
+#= function get_maxbins_regular(maxbins::Union{Symbol, Int}, n::Int)
     if typeof(maxbins) <: Symbol && maxbins != :default
         throw(ArgumentError("maxbins must either be a positive integer or :default."))
     elseif typeof(maxbins) <: Int && maxbins < 1             # maximal number of bins must be positive
         throw(DomainError("maxbins bins must be positive."))
     end
-    k_max = min(ifelse(maxbins == :default, ceil(Int, 4.0*n / log(n)^2), maxbins), 1000)
+    k_max = ifelse(maxbins == :default, min(ceil(Int, 4.0*n / log(n)^2), 1000), maxbins)
     return k_max
-end
+end =#

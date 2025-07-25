@@ -68,7 +68,7 @@ BenchmarkTools.Trial: 5 samples with 1 evaluation per sample.
 The above code snippet has a median runtime of about ``1.2\ \text{s}`` on my machine.
 
 ## The quadratic-time dynamic programming algorithm
-For the [`L2CV_I`](@ref) and [`KLCV_I`](@ref) criteria, it becomes possible to compute the exact solution via the quadratic-time dynamic programming algorithm `OptPart` instead of the cubic-time `SegNeig` algorithm used for the other problems. In practice, this means that computing the exact solution is often feasible even as the number of candidate cutpoints becomes quite large. Both the `OptPart` and `SegNeig` algorithms can be used to fit `L2CV_I`, allowing us to get a direct comparison between the performance of the two algorithms.
+For the [`L2CV_I`](@ref) and [`KLCV_I`](@ref) criteria, it becomes possible to compute the exact solution via the quadratic-time dynamic programming algorithm [`OptPart`](@ref) instead of the cubic-time `SegNeig` algorithm used for the other problems. In practice, this means that computing the exact solution is often feasible even as the number of candidate cutpoints becomes quite large. Both the `OptPart` and `SegNeig` algorithms can be used to fit `L2CV_I`, allowing us to get a direct comparison between the performance of the two algorithms.
 ```julia
 n = 10^3
 @benchmark fit(

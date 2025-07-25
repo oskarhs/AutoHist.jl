@@ -48,26 +48,25 @@ fig
 Both the regular and the irregular procedure support a large number of criteria to select the histogram partition. The keyword argument `rule` controls the criterion used to choose the best partition, and includes the following options:
 
 - Regular Histograms:
-    - Knuth's rule
-    - Random regular histogram
-    - L2 cross-validation
-    - Kullback-Leibler cross-validation
-    - AIC
-    - BIC
-    - Birgé and Rozenholc's criterion
-    - Normalized Maximum Likelihood
-    - Minimum Description Length
-    - Sturges' rule
-    - Freedman and Diaconis' rule
-    - Scott's rule
-    - Wand's rule
+    - Knuth's rule, Random regular histogram, [`RRH`](@ref)
+    - L2 cross-validation, [`L2CV_R`](@ref)
+    - Kullback-Leibler cross-validation, [`KLCV_R`](@ref)
+    - Akaike's information criterion, [`AIC`](@ref)
+    - The Bayesian information criterion, [`BIC`](@ref)
+    - Birgé and Rozenholc's criterion, [`BR`](@ref)
+    - Normalized Maximum Likelihood, [`NML_R`](@ref)
+    - Minimum Description Length. [`MDL`](@ref)
+    - Sturges' rule, [`Sturges`](@ref)
+    - Freedman and Diaconis' rule, [`FD`](@ref)
+    - Scott's rule, [`Scott`](@ref)
+    - Wand's rule, [`Wand`](@ref)
 - Irregular Histograms:
-    - Random irregular histogram
-    - L2 cross-validation
-    - Kullback-Leibler cross-validation
-    - Rozenholc et al. penalty R
-    - Rozenholc et al. penalty B
-    - Rozenholc et al. penalty A
-    - Normalized Maximum Likelihood
+    - Random irregular histogram, [`RIH`](@ref)
+    - L2 cross-validation, [`L2CV_I`](@ref)
+    - Kullback-Leibler cross-validation, [`KLCV_I`](@ref)
+    - Rozenholc et al. penalty A, [`RMG_penA`](@ref)
+    - Rozenholc et al. penalty B, [`RMG_penB`](@ref)
+    - Rozenholc et al. penalty R, [`RMG_penR`](@ref)
+    - Normalized Maximum Likelihood, [`NML_I`](@ref)
 
-A more detailed description along with references for each method can be found on the [methods page](methods.md).
+A description of each method along with references for each method can be found on the [methods page](methods.md).

@@ -2,7 +2,8 @@ abstract type AbstractAlgorithm end
 
 struct OptPart <: AbstractAlgorithm
     greedy::Bool
-    gr_maxbins::Union{Int, Symbol}
+    gr_maxbins::Int
+    use_default_gr_maxbins::Bool
 end
 
 """
@@ -46,12 +47,17 @@ function OptPart(; greedy::Bool=true, gr_maxbins::Union{Int, Symbol}=:default)
     elseif typeof(gr_maxbins) == Int && gr_maxbins ≤ 0
         throw(DomainError("Keyword argument gr_maxbins must be positive."))
     end
-    return OptPart(greedy, gr_maxbins)
+    if gr_maxbins == :default
+        return OptPart(greedy, 0, true)
+    else
+        return OptPart(greedy, gr_maxbins, false)
+    end
 end
 
 struct SegNeig <: AbstractAlgorithm
     greedy::Bool
-    gr_maxbins::Union{Int, Symbol}
+    gr_maxbins::Int
+    use_default_gr_maxbins::Bool
 end
 
 """
@@ -95,5 +101,9 @@ function SegNeig(; greedy::Bool=true, gr_maxbins::Union{Int, Symbol}=:default)
     elseif typeof(gr_maxbins) == Int && gr_maxbins ≤ 0
         throw(DomainError("Keyword argument gr_maxbins must be positive."))
     end
-    return SegNeig(greedy, gr_maxbins)
+    if gr_maxbins == :default
+        return SegNeig(greedy, 0, true)
+    else
+        return SegNeig(greedy, gr_maxbins, false)
+    end
 end

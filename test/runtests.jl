@@ -136,14 +136,20 @@ end
     @test_throws DomainError fit(AutomaticHistogram, x, RRH(a=k->-2.0*k))
     @test_throws DomainError RIH(a=-1.0)
 
+    for rule in [RRH, Knuth, AIC, BIC, BR, MDL, NML_R, L2CV_R, KLCV_R]
+        @test_throws DomainError rule(maxbins=-100)
+        @test_throws ArgumentError rule(maxbins=:nonsense)
+    end
+    for rule in [RIH, RMG_penA, RMG_penB, RMG_penR, NML_I, L2CV_I, KLCV_I]
+        @test_throws DomainError rule(maxbins=-100)
+        @test_throws ArgumentError rule(maxbins=:nonsense)
+        @test_throws ArgumentError rule(grid=:nonsense)
+    end
+
     @test_throws ArgumentError Wand(level=100)
     @test_throws ArgumentError Wand(scalest=:nonsense)
     @test_throws ArgumentError fit(AutomaticHistogram, x; closed=:nonsense)
     @test_throws ArgumentError fit(AutomaticHistogram, x, Knuth(); closed=:nonsense)
-    @test_throws DomainError fit(AutomaticHistogram, x, Knuth(maxbins=-100))
-    @test_throws ArgumentError fit(AutomaticHistogram, x, Knuth(maxbins=:nonsense))
-    @test_throws DomainError fit(AutomaticHistogram, x, RIH(maxbins=-100))
-    @test_throws ArgumentError fit(AutomaticHistogram, x, RIH(maxbins=:nonsense))
 end
 
 @testset "a as function" begin

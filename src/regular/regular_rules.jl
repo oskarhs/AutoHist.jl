@@ -3,7 +3,8 @@
 struct RRH{T} <: AbstractRegularRule
     a::T
     logprior::Function
-    maxbins::Union{Int, Symbol}
+    maxbins::Int
+    use_default_maxbins::Bool
 end
 
 """
@@ -54,11 +55,22 @@ The `Knuth` criterion for histograms was proposed by [Knuth (2019)](https://doi.
 """
 RRH, Knuth
 
-RRH(; a::Union{Real, Function}=5.0, logprior::Function=k->0.0, maxbins::Union{Int, Symbol}=:default) = RRH(a, logprior, maxbins)
+function RRH(; a::Union{Real, Function}=5.0, logprior::Function=k->0.0, maxbins::Union{Int, Symbol}=:default)
+    if typeof(maxbins) <: Symbol && maxbins != :default
+        throw(ArgumentError("maxbins must either be a positive integer or :default."))
+    elseif typeof(maxbins) <: Int && maxbins < 1             # maximal number of bins must be positive
+        throw(DomainError("maxbins bins must be positive."))
+    end
+    if maxbins == :default
+        return RRH(a, logprior, 0, true)
+    else
+        return RRH(a, logprior, maxbins, false)
+    end
+end
 
 function fit_autohist(x::AbstractVector{T}, rule::RRH, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
     n = length(x)
-    k_max = get_maxbins_regular(rule.maxbins, n)
+    k_max = ifelse(rule.use_default_maxbins, min(ceil(Int, 4.0*n / log(n)^2), 1000), rule.maxbins)
     a_vec = Vector{Float64}(undef, k_max)
     if !isa(rule.a, Function) # create constant function if typeof(a) <: Real
         if rule.a ≤ 0.0
@@ -92,16 +104,14 @@ end
 
 # ------------------------------
 # Knuth's rule
-struct Knuth <: AbstractRegularRule
-    maxbins::Union{Int, Symbol}
-end
-Knuth(; maxbins::Union{Int, Symbol}=:default) = RRH(k->0.5*k, k->0.0, maxbins)
+Knuth(; maxbins::Union{Int, Symbol}=:default) = RRH(; a=k->0.5*k, logprior=k->0.0, maxbins=maxbins)
 
 
 # ------------------------------
 # AIC histogram
 struct AIC <: AbstractRegularRule
-    maxbins::Union{Int, Symbol}
+    maxbins::Int
+    use_default_maxbins::Bool
 end
 
 """
@@ -135,11 +145,22 @@ a: NaN
 # References
 The aic criterion was proposed by [Taylor (1987)](https://doi.org/10.1093/biomet/74.3.636) for histograms.
 """
-AIC(; maxbins::Union{Int, Symbol}=:default) = AIC(maxbins)
+function AIC(; maxbins::Union{Int, Symbol}=:default)
+    if typeof(maxbins) <: Symbol && maxbins != :default
+        throw(ArgumentError("maxbins must either be a positive integer or :default."))
+    elseif typeof(maxbins) <: Int && maxbins < 1             # maximal number of bins must be positive
+        throw(DomainError("maxbins bins must be positive."))
+    end
+    if maxbins == :default
+        return AIC(0, true)
+    else
+        return AIC(maxbins, false)
+    end
+end
 
 function fit_autohist(x::AbstractVector{T}, rule::AIC, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
     n = length(x)
-    k_max = get_maxbins_regular(rule.maxbins, n)
+    k_max = ifelse(rule.use_default_maxbins, min(ceil(Int, 4.0*n / log(n)^2), 1000), rule.maxbins)
     criterion = Vector{Float64}(undef, k_max) # Criterion to be maximized depending on the specified rule
     z = @. (x - xmin) / (xmax - xmin)         # Scale data to the interval [0,1]
     Threads.@threads for k = 1:k_max
@@ -157,7 +178,8 @@ end
 # ------------------------------
 # BIC histogram
 struct BIC <: AbstractRegularRule
-    maxbins::Union{Int, Symbol}
+    maxbins::Int
+    use_default_maxbins::Bool
 end
 
 """
@@ -188,11 +210,22 @@ closed: right
 a: NaN
 ```
 """
-BIC(; maxbins::Union{Int, Symbol}=:default) = BIC(maxbins)
+function BIC(; maxbins::Union{Int, Symbol}=:default)
+    if typeof(maxbins) <: Symbol && maxbins != :default
+        throw(ArgumentError("maxbins must either be a positive integer or :default."))
+    elseif typeof(maxbins) <: Int && maxbins < 1             # maximal number of bins must be positive
+        throw(DomainError("maxbins bins must be positive."))
+    end
+    if maxbins == :default
+        return BIC(0, true)
+    else
+        return BIC(maxbins, false)
+    end
+end
 
 function fit_autohist(x::AbstractVector{T}, rule::BIC, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
     n = length(x)
-    k_max = get_maxbins_regular(rule.maxbins, n)
+    k_max = ifelse(rule.use_default_maxbins, min(ceil(Int, 4.0*n / log(n)^2), 1000), rule.maxbins)
     criterion = Vector{Float64}(undef, k_max) # Criterion to be maximized depending on the specified rule
     z = @. (x - xmin) / (xmax - xmin)         # Scale data to the interval [0,1]
     Threads.@threads for k = 1:k_max
@@ -209,7 +242,8 @@ end
 # ------------------------------
 # Birgé-Rozenholc histogram
 struct BR <: AbstractRegularRule
-    maxbins::Union{Int, Symbol}
+    maxbins::Int
+    use_default_maxbins::Bool
 end
 
 """
@@ -243,11 +277,22 @@ a: NaN
 # References
 This criterion was proposed by [Birgé and Rozenholc (2006)](https://doi.org/10.1051/ps:2006001).
 """
-BR(; maxbins::Union{Int, Symbol}=:default) = BR(maxbins)
+function BR(; maxbins::Union{Int, Symbol}=:default)
+    if typeof(maxbins) <: Symbol && maxbins != :default
+        throw(ArgumentError("maxbins must either be a positive integer or :default."))
+    elseif typeof(maxbins) <: Int && maxbins < 1             # maximal number of bins must be positive
+        throw(DomainError("maxbins bins must be positive."))
+    end
+    if maxbins == :default
+        return BR(0, true)
+    else
+        return BR(maxbins, false)
+    end
+end
 
 function fit_autohist(x::AbstractVector{T}, rule::BR, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
     n = length(x)
-    k_max = get_maxbins_regular(rule.maxbins, n)
+    k_max = ifelse(rule.use_default_maxbins, min(ceil(Int, 4.0*n / log(n)^2), 1000), rule.maxbins)
     criterion = Vector{Float64}(undef, k_max) # Criterion to be maximized depending on the specified rule
     z = @. (x - xmin) / (xmax - xmin)         # Scale data to the interval [0,1]
     Threads.@threads for k = 1:k_max
@@ -265,7 +310,8 @@ end
 # ------------------------------
 # MDL regular histogram
 struct MDL <: AbstractRegularRule
-    maxbins::Union{Int, Symbol}
+    maxbins::Int
+    use_default_maxbins::Bool
 end
 
 """
@@ -299,11 +345,22 @@ a: NaN
 # References
 The minimum description length principle was first applied to histogram estimation by [Hall and Hannan (1988)](https://doi.org/10.1093/biomet/75.4.705).
 """
-MDL(; maxbins::Union{Int, Symbol}=:default) = MDL(maxbins)
+function MDL(; maxbins::Union{Int, Symbol}=:default)
+    if typeof(maxbins) <: Symbol && maxbins != :default
+        throw(ArgumentError("maxbins must either be a positive integer or :default."))
+    elseif typeof(maxbins) <: Int && maxbins < 1             # maximal number of bins must be positive
+        throw(DomainError("maxbins bins must be positive."))
+    end
+    if maxbins == :default
+        return MDL(0, true)
+    else
+        return MDL(maxbins, false)
+    end
+end
 
 function fit_autohist(x::AbstractVector{T}, rule::MDL, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
     n = length(x)
-    k_max = get_maxbins_regular(rule.maxbins, n)
+    k_max = ifelse(rule.use_default_maxbins, min(ceil(Int, 4.0*n / log(n)^2), 1000), rule.maxbins)
     criterion = Vector{Float64}(undef, k_max) # Criterion to be maximized depending on the specified rule
     z = @. (x - xmin) / (xmax - xmin)         # Scale data to the interval [0,1]
     Threads.@threads for k = 1:k_max
@@ -321,7 +378,8 @@ end
 # ------------------------------
 # NML regular histogram
 struct NML_R <: AbstractRegularRule
-    maxbins::Union{Int, Symbol}
+    maxbins::Int
+    use_default_maxbins::Bool
 end
 
 """
@@ -358,11 +416,22 @@ a: NaN
 # References
 This is a regular variant of the normalized maximum likelihood criterion considered by [Kontkanen and Myllymäki (2007)](https://proceedings.mlr.press/v2/kontkanen07a.html).
 """
-NML_R(; maxbins::Union{Int, Symbol}=:default) = NML_R(maxbins)
+function NML_R(; maxbins::Union{Int, Symbol}=:default)
+    if typeof(maxbins) <: Symbol && maxbins != :default
+        throw(ArgumentError("maxbins must either be a positive integer or :default."))
+    elseif typeof(maxbins) <: Int && maxbins < 1             # maximal number of bins must be positive
+        throw(DomainError("maxbins bins must be positive."))
+    end
+    if maxbins == :default
+        return NML_R(0, true)
+    else
+        return NML_R(maxbins, false)
+    end
+end
 
 function fit_autohist(x::AbstractVector{T}, rule::NML_R, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
     n = length(x)
-    k_max = get_maxbins_regular(rule.maxbins, n)
+    k_max = ifelse(rule.use_default_maxbins, min(ceil(Int, 4.0*n / log(n)^2), 1000), rule.maxbins)
     criterion = Vector{Float64}(undef, k_max) # Criterion to be maximized depending on the specified rule
     z = @. (x - xmin) / (xmax - xmin)         # Scale data to the interval [0,1]
     Threads.@threads for k = 1:k_max
@@ -380,7 +449,8 @@ end
 # ------------------------------
 # L2CV for regular histograms
 struct L2CV_R <: AbstractRegularRule
-    maxbins::Union{Int, Symbol}
+    maxbins::Int
+    use_default_maxbins::Bool
 end
 
 """
@@ -414,11 +484,22 @@ a: NaN
 # References
 This approach to histogram density estimation was first considered by [Rudemo (1982)](https://www.jstor.org/stable/4615859).
 """
-L2CV_R(; maxbins::Union{Int, Symbol}=:default) = L2CV_R(maxbins)
+function L2CV_R(; maxbins::Union{Int, Symbol}=:default)
+    if typeof(maxbins) <: Symbol && maxbins != :default
+        throw(ArgumentError("maxbins must either be a positive integer or :default."))
+    elseif typeof(maxbins) <: Int && maxbins < 1             # maximal number of bins must be positive
+        throw(DomainError("maxbins bins must be positive."))
+    end
+    if maxbins == :default
+        return L2CV_R(0, true)
+    else
+        return L2CV_R(maxbins, false)
+    end
+end
 
 function fit_autohist(x::AbstractVector{T}, rule::L2CV_R, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
     n = length(x)
-    k_max = get_maxbins_regular(rule.maxbins, n)
+    k_max = ifelse(rule.use_default_maxbins, min(ceil(Int, 4.0*n / log(n)^2), 1000), rule.maxbins)
     criterion = Vector{Float64}(undef, k_max) # Criterion to be maximized depending on the specified rule
     z = @. (x - xmin) / (xmax - xmin)         # Scale data to the interval [0,1]
     Threads.@threads for k = 1:k_max
@@ -435,7 +516,8 @@ end
 # ------------------------------
 # KLCV for regular histograms
 struct KLCV_R <: AbstractRegularRule
-    maxbins::Union{Int, Symbol}
+    maxbins::Int
+    use_default_maxbins::Bool
 end
 
 """
@@ -469,11 +551,22 @@ a: NaN
 # References
 This approach was first studied by [Hall (1990)](https://doi.org/10.1007/BF01203164).
 """
-KLCV_R(; maxbins::Union{Int, Symbol}=:default) = KLCV_R(maxbins)
+function KLCV_R(; maxbins::Union{Int, Symbol}=:default)
+    if typeof(maxbins) <: Symbol && maxbins != :default
+        throw(ArgumentError("maxbins must either be a positive integer or :default."))
+    elseif typeof(maxbins) <: Int && maxbins < 1             # maximal number of bins must be positive
+        throw(DomainError("maxbins bins must be positive."))
+    end
+    if maxbins == :default
+        return KLCV_R(0, true)
+    else
+        return KLCV_R(maxbins, false)
+    end
+end
 
 function fit_autohist(x::AbstractVector{T}, rule::KLCV_R, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
     n = length(x)
-    k_max = get_maxbins_regular(rule.maxbins, n)
+    k_max = ifelse(rule.use_default_maxbins, min(ceil(Int, 4.0*n / log(n)^2), 1000), rule.maxbins)
     criterion = Vector{Float64}(undef, k_max) # Criterion to be maximized depending on the specified rule
     z = @. (x - xmin) / (xmax - xmin)         # Scale data to the interval [0,1]
     Threads.@threads for k = 1:k_max

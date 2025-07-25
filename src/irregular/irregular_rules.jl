@@ -4,7 +4,8 @@ struct RIH{T<:Real, A<:AbstractAlgorithm} <: AbstractIrregularRule
     a::T
     logprior::Function
     grid::Symbol
-    maxbins::Union{Int, Symbol}
+    maxbins::Int
+    use_default_maxbins::Bool
     alg::A
 end
 
@@ -60,7 +61,19 @@ function RIH(; a::Real=5.0, logprior::Function=k->0.0, grid::Symbol=:regular, ma
     if a ≤ 0.0
         throw(DomainError("Supplied value of a must be positive."))
     end
-    return RIH(a, logprior, grid, maxbins, alg)
+    if typeof(maxbins) <: Symbol && maxbins != :default
+        throw(ArgumentError("maxbins must either be a positive integer or :default."))
+    elseif typeof(maxbins) <: Int && maxbins < 1
+        throw(DomainError("maxbins bins must be positive."))
+    end
+    if !(grid in (:data, :regular, :quantile))
+        throw(ArgumentError("Invalid grid option: $(grid). Please select one of :data, :regular or :quantile."))
+    end
+    if maxbins == :default
+        return RIH(a, logprior, grid, 0, true, alg)
+    else
+        return RIH(a, logprior, grid, maxbins, false, alg)
+    end
 end
 
 function fit_autohist(x::AbstractVector{T}, rule::RIH, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
@@ -80,7 +93,8 @@ end
 # RMG penA
 struct RMG_penA{A<:AbstractAlgorithm} <: AbstractIrregularRule
     grid::Symbol
-    maxbins::Union{Int, Symbol}
+    maxbins::Int
+    use_default_maxbins::Bool
     alg::A
 end
 
@@ -124,7 +138,19 @@ function RMG_penA(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default,
     if typeof(alg) != SegNeig
         throw(ArgumentError("Algorithm $(typeof(alg)) not supported for rule RMG_penA. Only the SegNeig algorithm is supported for this rule."))
     end
-    return RMG_penA(grid, maxbins, alg)
+    if typeof(maxbins) <: Symbol && maxbins != :default
+        throw(ArgumentError("maxbins must either be a positive integer or :default."))
+    elseif typeof(maxbins) <: Int && maxbins < 1
+        throw(DomainError("maxbins bins must be positive."))
+    end
+    if !(grid in (:data, :regular, :quantile))
+        throw(ArgumentError("Invalid grid option :$(grid). Please select one of :data, :regular or :quantile."))
+    end
+    if maxbins == :default
+        return RMG_penA(grid, 0, true, alg)
+    else
+        return RMG_penA(grid, maxbins, false, alg)
+    end
 end
 
 function fit_autohist(x::AbstractVector{T}, rule::RMG_penA, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
@@ -143,7 +169,8 @@ end
 # RMG penB
 struct RMG_penB{A<:AbstractAlgorithm} <: AbstractIrregularRule
     grid::Symbol
-    maxbins::Union{Int, Symbol}
+    maxbins::Int
+    use_default_maxbins::Bool
     alg::A
 end
 
@@ -187,7 +214,19 @@ function RMG_penB(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default,
     if typeof(alg) != SegNeig
         throw(ArgumentError("Algorithm $(typeof(alg)) not supported for rule RMG_penB. Only the SegNeig algorithm is supported for this rule."))
     end
-    return RMG_penB(grid, maxbins, alg)
+    if !(grid in (:data, :regular, :quantile))
+        throw(ArgumentError("Invalid grid option :$(grid). Please select one of :data, :regular or :quantile."))
+    end
+    if typeof(maxbins) <: Symbol && maxbins != :default
+        throw(ArgumentError("maxbins must either be a positive integer or :default."))
+    elseif typeof(maxbins) <: Int && maxbins < 1
+        throw(DomainError("maxbins bins must be positive."))
+    end
+    if maxbins == :default
+        return RMG_penB(grid, 0, true, alg)
+    else
+        return RMG_penB(grid, maxbins, false, alg)
+    end
 end
 
 function fit_autohist(x::AbstractVector{T}, rule::RMG_penB, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
@@ -203,10 +242,11 @@ end
 
 
 # ------------------------------
-# RMG penB
+# RMG penR
 struct RMG_penR{A<:AbstractAlgorithm} <: AbstractIrregularRule
     grid::Symbol
-    maxbins::Union{Int, Symbol}
+    maxbins::Int
+    use_default_maxbins::Bool
     alg::A
 end
 
@@ -250,7 +290,19 @@ function RMG_penR(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default,
     if typeof(alg) != SegNeig
         throw(ArgumentError("Algorithm $(typeof(alg)) not supported for rule RMG_penR. Only the SegNeig algorithm is supported for this rule."))
     end
-    return RMG_penR(grid, maxbins, alg)
+    if !(grid in (:data, :regular, :quantile))
+        throw(ArgumentError("Invalid grid option :$(grid). Please select one of :data, :regular or :quantile."))
+    end
+    if typeof(maxbins) <: Symbol && maxbins != :default
+        throw(ArgumentError("maxbins must either be a positive integer or :default."))
+    elseif typeof(maxbins) <: Int && maxbins < 1
+        throw(DomainError("maxbins bins must be positive."))
+    end
+    if maxbins == :default
+        return RMG_penR(grid, 0, true, alg)
+    else
+        return RMG_penR(grid, maxbins, false, alg)
+    end
 end
 
 function fit_autohist(x::AbstractVector{T}, rule::RMG_penR, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
@@ -269,7 +321,8 @@ end
 # NML_I
 struct NML_I{A<:AbstractAlgorithm} <: AbstractIrregularRule
     grid::Symbol
-    maxbins::Union{Int, Symbol}
+    maxbins::Int
+    use_default_maxbins::Bool
     alg::A
 end
 
@@ -318,7 +371,19 @@ function NML_I(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default, al
     if typeof(alg) != SegNeig
         throw(ArgumentError("Algorithm $(typeof(alg)) not supported for rule NML_I. Only the SegNeig algorithm is supported for this rule."))
     end
-    return NML_I(grid, maxbins, alg)
+    if !(grid in (:data, :regular, :quantile))
+        throw(ArgumentError("Invalid grid option :$(grid). Please select one of :data, :regular or :quantile."))
+    end
+    if typeof(maxbins) <: Symbol && maxbins != :default
+        throw(ArgumentError("maxbins must either be a positive integer or :default."))
+    elseif typeof(maxbins) <: Int && maxbins < 1
+        throw(DomainError("maxbins bins must be positive."))
+    end
+    if maxbins == :default
+        return NML_I(grid, 0, true, alg)
+    else
+        return NML_I(grid, maxbins, false, alg)
+    end
 end
 
 function fit_autohist(x::AbstractVector{T}, rule::NML_I, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
@@ -336,7 +401,8 @@ end
 # L2CV_I
 struct L2CV_I{A<:AbstractAlgorithm} <: AbstractIrregularRule
     grid::Symbol
-    maxbins::Union{Int, Symbol}
+    maxbins::Int
+    use_default_maxbins::Bool
     alg::A
     use_min_length::Bool
 end
@@ -383,7 +449,19 @@ function L2CV_I(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default, a
     if !(typeof(alg) in [SegNeig, OptPart])
         throw(ArgumentError("Algorithm $(typeof(alg)) not supported for rule L2CV_I. Only the SegNeig and OptPart algorithms are supported for this rule."))
     end
-    return L2CV_I(grid, maxbins, alg, use_min_length)
+    if !(grid in (:data, :regular, :quantile))
+        throw(ArgumentError("Invalid grid option :$(grid). Please select one of :data, :regular or :quantile."))
+    end
+    if typeof(maxbins) <: Symbol && maxbins != :default
+        throw(ArgumentError("maxbins must either be a positive integer or :default."))
+    elseif typeof(maxbins) <: Int && maxbins < 1
+        throw(DomainError("maxbins bins must be positive."))
+    end
+    if maxbins == :default
+        return L2CV_I(grid, 0, true, alg, use_min_length)
+    else
+        return L2CV_I(grid, maxbins, false, alg, use_min_length)
+    end
 end
 
 function fit_autohist(x::AbstractVector{T}, rule::L2CV_I, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
@@ -402,7 +480,8 @@ end
 # KLCV_I
 struct KLCV_I{A<:AbstractAlgorithm} <: AbstractIrregularRule
     grid::Symbol
-    maxbins::Union{Int, Symbol}
+    maxbins::Int
+    use_default_maxbins::Bool
     alg::A
     use_min_length::Bool
 end
@@ -450,7 +529,19 @@ function KLCV_I(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default, a
     if !(typeof(alg) in [SegNeig, OptPart])
         throw(ArgumentError("Algorithm $(typeof(alg)) not supported for rule KLCV_I. Only the SegNeig and OptPart algorithms are supported for this rule."))
     end
-    return KLCV_I(grid, maxbins, alg, use_min_length)
+    if !(grid in (:data, :regular, :quantile))
+        throw(ArgumentError("Invalid grid option :$(grid). Please select one of :data, :regular or :quantile."))
+    end
+    if typeof(maxbins) <: Symbol && maxbins != :default
+        throw(ArgumentError("maxbins must either be a positive integer or :default."))
+    elseif typeof(maxbins) <: Int && maxbins < 1
+        throw(DomainError("maxbins bins must be positive."))
+    end
+    if maxbins == :default
+        return KLCV_I(grid, 0, true, alg, use_min_length)
+    else
+        return KLCV_I(grid, maxbins, false, alg, use_min_length)
+    end
 end
 
 function fit_autohist(x::AbstractVector{T}, rule::KLCV_I, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
