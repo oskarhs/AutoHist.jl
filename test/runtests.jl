@@ -39,6 +39,15 @@ end
     end
 end
 
+@testset "given maxbins" begin
+    x = collect(LinRange(0, 1, 11))
+    for rule in [RRH, Knuth, AIC, BIC, BR, MDL, NML_R, L2CV_R, KLCV_R,
+                 RIH, RMG_penA, RMG_penB, RMG_penR, NML_I, L2CV_I, KLCV_I]
+        h = fit(AutomaticHistogram, x, rule(maxbins=5))
+        @test typeof(h) <: AutomaticHistogram
+    end
+end
+
 @testset "left open and right open intervals" begin
     x = collect(LinRange(0,1,11))
     h1 = fit(AutomaticHistogram, x, Knuth(); closed=:right)
@@ -71,6 +80,11 @@ end
     h = fit(AutomaticHistogram,
             LinRange(0.0, 1.0, 10^4),
             RIH(grid=:data, alg=SegNeig(greedy=true, gr_maxbins=600))
+    )
+    @test typeof(h) <: AutomaticHistogram
+    h = fit(AutomaticHistogram,
+            LinRange(0.0, 1.0, 10^2),
+            RIH(grid=:data, alg=SegNeig(greedy=false))
     )
     @test typeof(h) <: AutomaticHistogram
 
