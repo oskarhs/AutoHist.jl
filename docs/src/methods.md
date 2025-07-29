@@ -43,12 +43,12 @@ RMG_penB
 RMG_penR
 ```
 
-#### Irregular ``L_2`` leave-one-out cross-validation (L2CV_R)
+#### Irregular ``L_2`` leave-one-out cross-validation (L2CV_I)
 ```@docs
 L2CV_I
 ```
 
-#### Irregular Kullback-Leibler leave-one-out cross-validation (L2CV_R)
+#### Irregular Kullback-Leibler leave-one-out cross-validation (KLCV_I)
 ```@docs
 KLCV_I
 ```

@@ -4,7 +4,7 @@ The following document illustrates the use of AutoHist.jl through examples from 
 
 ## Estimating the LogNormal probability density
 
-We start by considering an example with some simulated data from the [LogNormal-distribution](https://en.wikipedia.org/wiki/Log-normal_distribution). To start, we fit a regular histogram to the data, using the approach of [Birgé and Rozenholc (2006)](https://doi.org/10.1016/j.csda.2010.04.021), which corresponds to `rule=:br`.
+We start by considering an example with some simulated data from the [LogNormal-distribution](https://en.wikipedia.org/wiki/Log-normal_distribution). To start, we fit a regular histogram to the data, using the approach of [Birgé and Rozenholc (2006)](https://doi.org/10.1016/j.csda.2010.04.021), which corresponds to `rule=BR()`.
 ```@example LogNormal; continued=true
 using AutoHist, Random, Distributions
 x = rand(Xoshiro(1812), LogNormal(), 10^4)
