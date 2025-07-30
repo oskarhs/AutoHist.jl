@@ -164,7 +164,7 @@ end
     logmarginallikelihood(h::AutomaticHistogram, a::Real)
     logmarginallikelihood(h::AutomaticHistogram)
 
-Compute the log-marginal likelihood (up to proportionality) of `h` when the value of the Dirichlet concentration parameter equals `a`. This can be automatically inferred if the histogram was fitted with the `rule` argument set to [`RIH`](@ref), [`RRH`](@ref) or [`Knuth`](@ref), and does not have to be explicitly passed as an argument in this case.
+Compute the log-marginal likelihood (up to proportionality) of `h` when the value of the Dirichlet concentration parameter equals `a`. This can be automatically inferred if the histogram was fitted with the `rule` argument set to [`RIH`](@ref) or [`RRH`](@ref), and does not have to be explicitly passed as an argument in this case.
 
 Assumes that the Dirichlet prior is centered on the uniform distribution, so that ``a_j = a/k`` for a scalar ``a>0`` and all ``j``.
 The value of the log-marginal likelihood is
