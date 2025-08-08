@@ -79,7 +79,7 @@ end
 
 
 """
-    fit(AutomaticHistogram, x::AbstractVector{x<:Real}, rule::AbstractRule=RIH(); support::Tuple{Real,Real}=(-Inf,Inf), closed::Symbol=:right)
+    fit(AutomaticHistogram, x::AbstractVector{<:Real}, rule::AbstractRule=RIH(); support::Tuple{Real,Real}=(-Inf,Inf), closed::Symbol=:right)
 
 Fit a histogram to a one-dimensional vector `x` with an automatic and data-based selection of the histogram partition.
 

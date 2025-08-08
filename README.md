@@ -25,12 +25,12 @@ x = randn(10^6)
 h1 = fit(AutomaticHistogram, x)
 ```
 
-Several rules are available to select the histogram partition, and can be controlled through the use of the `rule` keyword argument. For instance, a regular histogram based on maximizing the AIC can be fit as follows:
+Several rules are available to select the histogram partition, and can be controlled through the use of the `rule` positional argument. For instance, a regular histogram based on maximizing the AIC can be fit as follows:
 ```julia
 h2 = fit(AutomaticHistogram, x, AIC())
 ```
 
-A detailed exposition of the keyword arguments passed to each of these functions can be found by typing `?fit` in the repl or in the [API documentation](https://oskarhs.github.io/AutoHist.jl/stable/api/).
+A detailed exposition of the keyword arguments passed to `fit` can be found by typing `?fit` in the repl or in the [API documentation](https://oskarhs.github.io/AutoHist.jl/stable/api/). A detailed description of all methods currently implemented in AutoHist.jl can be found in the [methods documentation](https://oskarhs.github.io/AutoHist.jl/stable/methods/).
 
 The fitted histograms can be displayed through the [Plots.jl](https://github.com/JuliaPlots/Plots.jl) or [Makie.jl](https://github.com/MakieOrg/Makie.jl) packages as follows:
 

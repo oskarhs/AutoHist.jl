@@ -1,10 +1,10 @@
 # Choice of algorithm
-In this section, we empirically assess the efficiency of the dynamic programming algorithm provided for irregular histograms, and show how heuristics can be used to speed up the computations.[^1]
+In this section, we empirically assess the efficiency of the dynamic programming algorithm provided for irregular histograms, and show how heuristics can be used to speed up the computations with a few benchmarks.[^1]
 
 [^1]: **Note:** The benchmarks presented here were performed on a Windows machine with a Intel® Core™ Ultra 5 125U CPU. Results may vary on systems with different hardware configurations.
 
 ## The cubic-time dynamic programming algorithm
-As a toy problem, we consider standard normal random samples of using a data-based grid. In this case, the number of candidate cutpoints are ``k_n = n+1``, where ``n`` is the sample size. For smaller samples, we can just compute the exact solution using the default dynamic programming algorithm, available as [`SegNeig`](@ref). The code snippet below illustrates how this algorithm can be explicitly specified when calling `fit`:
+As a toy problem, we consider standard normal random samples of using a data-based grid. In this case, the number of candidate cutpoints are ``k_n+1 = n+1`` (including the edges), where ``n`` is the sample size. For smaller samples, we can just compute the exact solution using the default dynamic programming algorithm, available as [`SegNeig`](@ref). The code snippet below illustrates how this algorithm can be explicitly specified when calling `fit`:
 ```julia
 using AutoHist, Distributions, BenchmarkTools
 n = 500
