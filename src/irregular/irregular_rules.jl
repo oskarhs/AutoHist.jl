@@ -11,11 +11,11 @@ end
 
 """
     RIH(;
-        a::Real,
-        logprior::Function:=k-> 0.0,
-        grid::Symbol=:regular,
-        maxbins::Union{Int, Symbol}=:default,
-        alg::AbstractAlgorithm=SegNeig()
+        a::Real                     = 5.0,
+        logprior::Function          = k -> 0.0,
+        grid::Symbol                = :regular,
+        maxbins::Union{Int, Symbol} = :default,
+        alg::AbstractAlgorithm      = SegNeig()
     )
 
 The random irregular histogram criterion.
@@ -100,9 +100,9 @@ end
 
 """
     RMG_penA(;
-        grid::Symbol=:regular,
-        maxbins::Union{Int, Symbol}=:default,
-        alg::AbstractAlgorithm=SegNeig()
+        grid::Symbol                = :regular,
+        maxbins::Union{Int, Symbol} = :default,
+        alg::AbstractAlgorithm      = SegNeig()
     )
 
 Consists of finding the partition ``\\mathcal{I}`` that maximizes a penalized log-likelihood,
@@ -176,9 +176,9 @@ end
 
 """
     RMG_penB(;
-        grid::Symbol=:regular,
-        maxbins::Union{Int, Symbol}=:default,
-        alg::AbstractAlgorithm=SegNeig()
+        grid::Symbol                = :regular,
+        maxbins::Union{Int, Symbol} = :default,
+        alg::AbstractAlgorithm      = SegNeig()
     )
 
 Consists of finding the partition ``\\mathcal{I}`` that maximizes a penalized log-likelihood,
@@ -252,9 +252,9 @@ end
 
 """
     RMG_penR(;
-        grid::Symbol=:regular,
-        maxbins::Union{Int, Symbol}=:default,
-        alg::AbstractAlgorithm=SegNeig()
+        grid::Symbol                = :regular,
+        maxbins::Union{Int, Symbol} = :default,
+        alg::AbstractAlgorithm      = SegNeig()
     )
 
 Consists of finding the partition ``\\mathcal{I}`` that maximizes a penalized log-likelihood,
@@ -328,9 +328,9 @@ end
 
 """
     NML_I(;
-        grid::Symbol=:regular,
-        maxbins::Union{Int, Symbol}=:default,
-        alg::AbstractAlgorithm=DP()
+        grid::Symbol                = :regular,
+        maxbins::Union{Int, Symbol} = :default,
+        alg::AbstractAlgorithm      = DP()
     )
 
 A quick-to-evalutate version of the normalized maximum likelihood criterion.
@@ -409,10 +409,10 @@ end
 
 """
     L2CV_I(;
-        grid::Symbol=:regular,
-        maxbins::Union{Int, Symbol}=:default,
-        alg::AbstractAlgorithm=OptPart(),
-        use_min_length::Bool=false
+        grid::Symbol                = :regular,
+        maxbins::Union{Int, Symbol} = :default,
+        alg::AbstractAlgorithm      = OptPart(),
+        use_min_length::Bool        = false
     )
 
 Consists of finding the partition ``\\mathcal{I}`` that maximizes a L2 leave-one-out cross-validation criterion,
@@ -488,10 +488,10 @@ end
 
 """
     KLCV_I(;
-        grid::Symbol=:regular,
-        maxbins::Union{Int, Symbol}=:default,
-        alg::AbstractAlgorithm=OptPart(),
-        use_min_length::Bool=false
+        grid::Symbol                = :regular,
+        maxbins::Union{Int, Symbol} = :default,
+        alg::AbstractAlgorithm      = OptPart(),
+        use_min_length::Bool        = false
     )
 
 Consists of finding the partition ``\\mathcal{I}`` that maximizes a Kullback-Leibler leave-one-out cross-validation criterion,

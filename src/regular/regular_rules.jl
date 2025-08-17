@@ -8,8 +8,12 @@ struct RRH{T} <: AbstractRegularRule
 end
 
 """
-    RRH(; a::Union{Real, Function}, logprior::Function, maxbins::Union{Int, Symbol}=:default)
-    Knuth(; maxbins::Union{Int, Symbol}=:default)
+    RRH(;
+        a::Union{Real, Function}    = 5.0,
+        logprior::Function          = k->0.0,
+        maxbins::Union{Int, Symbol} = :default
+    )
+    Knuth(; maxbins::Union{Int, Symbol} = :default)
 
 The random regular histogram criterion.
 
@@ -115,7 +119,7 @@ struct AIC <: AbstractRegularRule
 end
 
 """
-    AIC(; maxbins::Union{Int, Symbol}=:default)
+    AIC(; maxbins::Union{Int, Symbol} = :default)
 
 AIC criterion for regular histograms.
 
@@ -183,7 +187,7 @@ struct BIC <: AbstractRegularRule
 end
 
 """
-    BIC(; maxbins::Union{Int, Symbol}=:default)
+    BIC(; maxbins::Union{Int, Symbol} = :default)
 
 BIC criterion for regular histograms.
 
@@ -247,7 +251,7 @@ struct BR <: AbstractRegularRule
 end
 
 """
-    BR(; maxbins::Union{Int, Symbol}=:default)
+    BR(; maxbins::Union{Int, Symbol} = :default)
 
 Birgé-Rozenholc criterion for regular histograms.
 
@@ -315,7 +319,7 @@ struct MDL <: AbstractRegularRule
 end
 
 """
-    MDL(; maxbins::Union{Int, Symbol}=:default)
+    MDL(; maxbins::Union{Int, Symbol} = :default)
 
 MDL criterion for regular histograms.
 
@@ -383,7 +387,7 @@ struct NML_R <: AbstractRegularRule
 end
 
 """
-    NML_R(; maxbins::Union{Int, Symbol}=:default)
+    NML_R(; maxbins::Union{Int, Symbol} = :default)
 
 NML_R criterion for regular histograms.
 
@@ -454,7 +458,7 @@ struct L2CV_R <: AbstractRegularRule
 end
 
 """
-    L2CV_R(; maxbins::Union{Int, Symbol}=:default)
+    L2CV_R(; maxbins::Union{Int, Symbol} = :default)
 
 L2 cross-validation criterion for regular histograms.
 
@@ -521,7 +525,7 @@ struct KLCV_R <: AbstractRegularRule
 end
 
 """
-    KLCV_R(; maxbins::Union{Int, Symbol}=:default)
+    KLCV_R(; maxbins::Union{Int, Symbol} = :default)
 
 Kullback-Leibler cross-validation criterion for regular histograms.
 
@@ -721,7 +725,10 @@ struct Wand <: AbstractRegularRule
 end
 
 """
-    Wand(; level::Int=2, scalest::Symbol=:minim)
+    Wand(;
+        level::Int      = 2,
+        scalest::Symbol = :minim
+    )
 
 Wand's rule for regular histograms.
 
