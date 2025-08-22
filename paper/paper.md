@@ -22,7 +22,7 @@ date: 16 July 2025
 # Summary
 
 `AutoHist.jl` is a Julia [@bezanson2017julia] package for fitting histograms to univariate data, with an automatic and data-based selection of the histogram partition.
-It currently supports 7 irregular and 12 regular automatic histogram procedures from the statistical literature. Additionally, `AutoHist.jl` provides extensions for `Plots.jl` [@christ2023plots] and `Makie.jl` [@danisch2021makie],
+It currently supports 7 irregular and 12 regular automatic histogram procedures from the statistics literature. Additionally, `AutoHist.jl` provides extensions for `Plots.jl` [@christ2023plots] and `Makie.jl` [@danisch2021makie],
 allowing for simple visualization of the resulting histogram fits.
 
 # Statement of need
@@ -69,7 +69,7 @@ using Pkg
 Pkg.add("AutoHist")
 ```
 
-To illustrate the basic use of the software, we fit a histogram based on the irregular Bayesian criterion and a regular histogram based on AIC to a standard normal random sample of size $n = 10^6$.
+To illustrate the basic use of the software, we fit a histogram based on the irregular RIH criterion and a regular histogram based on AIC to a standard normal random sample of size $n = 10^6$.
 
 ```julia
 using AutoHist, Random, Distributions
