@@ -135,6 +135,13 @@ function fit(::Type{AutomaticHistogram}, x::AbstractVector{<:Real}, rule::Abstra
 end
 
 """
+    autohist(x::AbstractVector{<:Real}, rule::AbstractRule=RIH(); support::Tuple{Real,Real}=(-Inf,Inf), closed::Symbol=:right)
+
+Fit an automatic histogram to data based on the supplied rule. This is an alias for `fit(AutomaticHistogram, x, rule; support, closed)`. See [`fit`](@ref) for further details.
+"""
+autohist(x::AbstractVector{<:Real}, rule::AbstractRule=RIH(); support::Tuple{Real,Real}=(-Inf,Inf), closed::Symbol=:right) = fit(AutomaticHistogram, x, rule; support, closed)
+
+"""
     convert(Histogram, h::AutomaticHistogram)
 
 Convert an `h` to a StatsBase.Histogram, normalized to be a probability density.
@@ -230,20 +237,20 @@ function pdf(h::AutomaticHistogram, x::Real)
         if h.type == :irregular
             if h.closed == :right
                 idx = max(1, searchsortedfirst(h.breaks, x) - 1)
-                @inbounds val = h.density[idx]
+                val = h.density[idx]
             else 
                 idx = min(k, searchsortedlast(h.breaks, x))
-                @inbounds val = h.density[idx]
+                val = h.density[idx]
             end
         else
             xmin, xmax = extrema(h)
             edges_inc = k/(xmax-xmin)
             if h.closed == :right
                 idx = max(0, floor(Int, (x-xmin)*edges_inc-10.0*edges_inc*eps())) + 1
-                @inbounds val = h.density[idx]
+                val = h.density[idx]
             else 
                 idx = min(k-1, floor(Int, (x-xmin)*edges_inc+10.0*edges_inc*eps())) + 1
-                @inbounds val = h.density[idx]
+                val = h.density[idx]
             end
         end
     end
@@ -272,19 +279,19 @@ function cdf(h::AutomaticHistogram, x::Real)
         if h.type == :irregular
             if h.closed == :right
                 idx = max(1, searchsortedfirst(h.breaks, x) - 1)
-                @inbounds val = h.density[idx] * (x - h.breaks[idx]) + sum(diff(h.breaks[1:idx]) .* h.density[1:idx-1])
+                val = h.density[idx] * (x - h.breaks[idx]) + sum(diff(h.breaks[1:idx]) .* h.density[1:idx-1])
             else 
                 idx = min(k, searchsortedlast(h.breaks, x))
-                @inbounds val = h.density[idx] * (x - h.breaks[idx]) + sum(diff(h.breaks[1:idx]) .* h.density[1:idx-1])
+                val = h.density[idx] * (x - h.breaks[idx]) + sum(diff(h.breaks[1:idx]) .* h.density[1:idx-1])
             end
         else
             edges_inc = k/(xmax-xmin)
             if h.closed == :right
                 idx = max(0, floor(Int, (x-xmin)*edges_inc-10.0*edges_inc*eps())) + 1
-                @inbounds val = h.density[idx] * (x - h.breaks[idx]) + sum(diff(h.breaks[1:idx]) .* h.density[1:idx-1])
+                val = h.density[idx] * (x - h.breaks[idx]) + sum(diff(h.breaks[1:idx]) .* h.density[1:idx-1])
             else 
                 idx = min(k-1, floor(Int, (x-xmin)*edges_inc+10.0*edges_inc*eps())) + 1
-                @inbounds val = h.density[idx] * (x - h.breaks[idx]) + sum(diff(h.breaks[1:idx]) .* h.density[1:idx-1])
+                val = h.density[idx] * (x - h.breaks[idx]) + sum(diff(h.breaks[1:idx]) .* h.density[1:idx-1])
             end
         end
     elseif x ≥ xmax
@@ -300,6 +307,43 @@ function Base.Broadcast.broadcasted(::typeof(cdf), h::AutomaticHistogram, x::Abs
         vals[i] = cdf(h, x[i])
     end
     return vals
+end
+
+"""
+    quantile(h::AutomaticHistogram, x::Real)
+
+Evaluate the quantile function of `h` at ``q \\in [0, 1]``.
+"""
+function quantile(h::AutomaticHistogram, q::Real)
+    if !(0.0 ≤ q ≤ 1.0)
+        throw(DomainError(q, "Quantile function is only defined for inputs in the closed interval [0, 1]."))
+    end
+    # First compute the cdf at breakpoints, then find the index 
+    h_cdf = vcat(0.0, cumsum(diff(h.breaks) .* h.density))
+    val = get_quantile_from_cdf(q, h_cdf, h.breaks, h.density, h.closed, length(h))
+    return val
+end
+
+# Allows for quantile.(h, q) where q is a vector.
+function Base.Broadcast.broadcasted(::typeof(quantile), h::AutomaticHistogram, q::AbstractVector)
+    vals = Vector{Float64}(undef, length(q))
+    h_cdf = vcat(0.0, cumsum(diff(h.breaks) .* h.density))
+    k = length(h)
+    @inbounds for i in eachindex(q)
+        vals[i] = get_quantile_from_cdf(q[i], h_cdf, h.breaks, h.density, h.closed, k)
+    end
+    return vals
+end
+
+function get_quantile_from_cdf(q::Real, h_cdf::AbstractVector{<:Real}, h_breaks::AbstractVector{<:Real}, h_density::AbstractVector{<:Real}, h_closed::Symbol, k::Int)
+    val = if h_closed == :right
+        idx = max(1, searchsortedfirst(h_cdf, q) - 1)
+        h_breaks[idx] + (q - h_cdf[idx])/(h_cdf[idx+1] - h_cdf[idx])*(h_breaks[idx+1] - h_breaks[idx])
+    else 
+        idx = min(k, searchsortedlast(h_cdf, q))
+        h_breaks[idx] + (q - h_cdf[idx])/(h_cdf[idx+1] - h_cdf[idx])*(h_breaks[idx+1] - h_breaks[idx])   
+    end
+    return val
 end
 
 """
