@@ -40,8 +40,8 @@ The fitted histograms can be displayed through the [Plots.jl](https://github.com
 
 ```julia
 import Plots, CairoMakie, Makie
-Plots.plot(h)
-Makie.plot(h)
+Plots.plot(h1)
+Makie.plot(h1)
 ```
 
 ## Supported criteria
