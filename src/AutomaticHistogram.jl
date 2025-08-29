@@ -16,7 +16,7 @@ A type for representing a histogram where the histogram partition has been chose
 julia> x = LinRange(eps(), 1.0-eps(), 5000) .^(1.0/4.0);
 
 julia> h = fit(AutomaticHistogram, x)
-AutomaticHistogram
+AutomaticHistogram{Vector{Float64}, Vector{Float64}, Vector{Int64}}
 breaks: [0.0001220703125, 0.17763663029325183, 0.29718725232110504, 0.4022468898607337, 0.4928155429121377, 0.5797614498414855, 0.6667073567708333, 0.7572760098222373, 0.8405991706295289, 0.9202995853147645, 1.0]
 density: [0.006626835974128547, 0.057821970706400425, 0.17596277991076312, 0.36279353706969375, 0.6214544825215076, 0.9730458529384184, 1.4481767793920146, 2.0440057561776532, 2.733509595364622, 3.545742066060377]
 counts: [5, 34, 92, 164, 270, 423, 656, 852, 1090, 1414]
@@ -25,10 +25,10 @@ closed: right
 a: 5.0
 ```
 """
-struct AutomaticHistogram 
-    breaks::AbstractVector{Float64}
-    density::AbstractVector{Float64}
-    counts::AbstractVector{Int}
+struct AutomaticHistogram{T<:AbstractVector{<:Real}, S<:AbstractVector{<:Real}, R<:AbstractVector{Int}}
+    breaks::T
+    density::S
+    counts::R
     type::Symbol
     closed::Symbol
     a::Float64
@@ -108,7 +108,7 @@ julia> fit(AutomaticHistogram, x) == fit(AutomaticHistogram, x, RIH())
 true
 
 julia> h = fit(AutomaticHistogram, x, Wand(scalest=:stdev, level=4))
-AutomaticHistogram
+AutomaticHistogram{LinRange{Float64, Int64}, Vector{Float64}, Vector{Int64}}
 breaks: LinRange{Float64}(0.0, 1.0, 27)
 density: [0.0052, 0.0312, 0.0884, 0.1612, 0.2652, 0.4004, 0.5408, 0.7176, 0.8944, 1.0868  …  2.0072, 1.9656, 1.8616, 1.69, 1.4508, 1.1596, 0.8372, 0.5044, 0.2184, 0.0364]
 counts: [1, 6, 17, 31, 51, 77, 104, 138, 172, 209  …  386, 378, 358, 325, 279, 223, 161, 97, 42, 7]
@@ -141,9 +141,21 @@ function fit(::Type{AutomaticHistogram}, x::AbstractVector{<:Real}, rule::Abstra
 end
 
 """
-    autohist(x::AbstractVector{<:Real}, rule::AbstractRule=RIH(); support::Tuple{Real,Real}=(-Inf,Inf), closed::Symbol=:right)
+    autohist(
+        x::AbstractVector{<:Real},
+        rule::AbstractRule=RIH();
+        kwargs...
+    )
 
-Fit an automatic histogram to data based on the supplied rule. This is an alias for `fit(AutomaticHistogram, x, rule; support, closed)`. See [`fit`](@ref) for further details.
+Fit an automatic histogram to data based on the supplied rule. This is an alias for `fit(AutomaticHistogram, x, rule; kwargs...)`. See [`fit`](@ref) for further details.
+
+# Examples
+```jldoctest; setup = :(using AutoHist)
+julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 5000)) .^(1/3)).^(1/3);
+
+julia> autohist(x, Sturges()) == fit(AutomaticHistogram, x, Sturges())
+true
+```
 """
 autohist(x::AbstractVector{<:Real}, rule::AbstractRule=RIH(); support::Tuple{Real,Real}=(-Inf,Inf), closed::Symbol=:right) = fit(AutomaticHistogram, x, rule; support, closed)
 

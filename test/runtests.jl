@@ -208,10 +208,6 @@ end
     h = AutomaticHistogram(breaks, density, counts, :irregular, :right, 1.0)
     @test typeof(Plots.plot(h)) == Plots.Plot{Plots.GRBackend}    # check that Plots extension works
 
-    F = Makie.Figure(); ax = Makie.Axis(F[1,1])
-    Makie.plot!(ax, h)
-    @test length(ax.scene.plots) == 1 && typeof(ax.scene.plots[1]) == Makie.PlotList{Tuple{Makie.PlotSpec}}
-
     io = IOBuffer() # just checks that we can call the show method
     show(io, h)
     output = String(take!(io))

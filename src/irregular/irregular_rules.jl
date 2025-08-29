@@ -42,7 +42,7 @@ julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
 julia> rule = RIH(a = 5.0, logprior = k-> -log(k), grid = :data);
 
 julia> fit(AutomaticHistogram, x, rule)
-AutomaticHistogram
+AutomaticHistogram{Vector{Float64}, Vector{Float64}, Vector{Int64}}
 breaks: [0.0, 0.18220071105959446, 0.3587941358096334, 0.8722292888743843, 1.0]
 density: [0.11858322346056327, 0.6490600487586273, 1.6066011289666577, 0.30436411114439915]
 counts: [10, 57, 414, 19]
@@ -122,7 +122,7 @@ julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
 julia> rule = RMG_penA(grid = :data);
 
 julia> fit(AutomaticHistogram, x, rule)
-AutomaticHistogram
+AutomaticHistogram{Vector{Float64}, Vector{Float64}, Vector{Int64}}
 breaks: [0.0, 0.18875598171056715, 0.3644223879547405, 0.8696799410193466, 1.0]
 density: [0.116552597701164, 0.6717277510418354, 1.6229346697072502, 0.30693663211078037]
 counts: [11, 59, 410, 20]
@@ -198,7 +198,7 @@ julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
 julia> rule = RMG_penB(grid = :data);
 
 julia> fit(AutomaticHistogram, x, rule)
-AutomaticHistogram
+AutomaticHistogram{Vector{Float64}, Vector{Float64}, Vector{Int64}}
 breaks: [0.0, 0.1948931612779725, 0.375258352661302, 0.8268306249022703, 0.9222490305512866, 1.0]
 density: [0.12314439276691318, 0.7096713008662634, 1.6962954704872724, 0.7545714006671028, 0.12861575966067232]
 counts: [12, 64, 383, 36, 5]
@@ -274,7 +274,7 @@ julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
 julia> rule = RMG_penR(grid = :data);
 
 julia> fit(AutomaticHistogram, x, rule)
-AutomaticHistogram
+AutomaticHistogram{Vector{Float64}, Vector{Float64}, Vector{Int64}}
 breaks: [0.0, 0.18875598171056715, 0.3699070396003733, 0.8285645195146814, 0.9222490305512866, 1.0]
 density: [0.116552597701164, 0.6845115973621804, 1.6875338000474953, 0.7471886144834441, 0.12861575966067232]
 counts: [11, 62, 387, 35, 5]
@@ -355,7 +355,7 @@ julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
 julia> rule = NML_I(grid = :data);
 
 julia> fit(AutomaticHistogram, x, rule)
-AutomaticHistogram
+AutomaticHistogram{Vector{Float64}, Vector{Float64}, Vector{Int64}}
 breaks: [0.0, 0.18875598171056715, 0.3644223879547405, 0.8696799410193466, 1.0]
 density: [0.116552597701164, 0.6717277510418354, 1.6229346697072502, 0.30693663211078037]
 counts: [11, 59, 410, 20]
@@ -433,7 +433,7 @@ julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
 julia> rule = L2CV_I(grid = :data, use_min_length=true);
 
 julia> fit(AutomaticHistogram, x, rule)
-AutomaticHistogram
+AutomaticHistogram{Vector{Float64}, Vector{Float64}, Vector{Int64}}
 breaks: [0.0, 0.149647045210915, 0.2499005080461325, 0.3490626376697454, 0.4600140220788484, 0.7765683248449301, 0.8535131937737716, 0.9121099383916996, 0.9560732934980348, 1.0]
 density: [0.08018868653963065, 0.3590898407087615, 0.7664216197097746, 1.2798398213438569, 1.8448651460332468, 1.2476465466304287, 0.6826317786220794, 0.2729545998246794, 0.045530388214070294]
 counts: [6, 18, 38, 71, 292, 48, 20, 6, 1]
@@ -513,7 +513,7 @@ julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
 julia> rule = KLCV_I(grid = :data, use_min_length=true);
 
 julia> fit(AutomaticHistogram, x, rule)
-AutomaticHistogram
+AutomaticHistogram{Vector{Float64}, Vector{Float64}, Vector{Int64}}
 breaks: [0.0, 0.13888886265725095, 0.23836051747480758, 0.33883651300547, 0.45084951551151237, 0.7900230337213711, 0.8722292888743843, 0.9352920770792058, 1.0]
 density: [0.07200001359848368, 0.321699684786505, 0.7165890680628054, 1.2319998295961743, 1.8220762141507212, 1.1191362485586687, 0.5074307830485909, 0.09272434856770642]
 counts: [5, 16, 36, 69, 309, 46, 16, 3]
@@ -595,7 +595,7 @@ julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
 julia> rule = BayesBlocks(grid = :data, use_min_length=true);
 
 julia> fit(AutomaticHistogram, x, rule)
-AutomaticHistogram
+AutomaticHistogram{Vector{Float64}, Vector{Float64}, Vector{Int64}}
 breaks: [0.0, 0.1948931612779725, 0.375258352661302, 0.8268306249022703, 0.9222490305512866, 1.0]
 density: [0.12314439276691318, 0.7096713008662634, 1.6962954704872724, 0.7545714006671028, 0.12861575966067232]
 counts: [12, 64, 383, 36, 5]
