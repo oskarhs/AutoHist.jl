@@ -16,7 +16,7 @@ output:
   github_document:
     html_preview: true
 bibliography: paper.bib
-date: 16 July 2025
+date: 29 August 2025
 ---
 
 # Summary
@@ -36,23 +36,23 @@ and typically do not provide any support for automatic irregular histogram const
 `AutoHist.jl` fills this gap by providing a fast implementation of state-of-the-art regular and irregular bin selection algorithms from the statistics literature. A complete overview of the bin selection procedures that have been implemented so far is given in **Table 1**.
 
 | Rule | Type (regular/irregular) | Reference |
-|--------------------|:-------------------------|:-------------------------|
-| Sturges           | regular   | @sturges1926choice |
-| Scott             | regular   | @scott1979optimal   |
-| Freedman-Diaconis | regular   | @freedman1981histogram |
-| AIC               | regular   | @hall1990akaike    |
-| BIC               | regular   | @davies2009automatic  |
-| Birgé-Rozenholc   | regular   | @birge2006bins |
-| MDL               | regular   | @hall1988stochastic |
-| Wand              | regular   | @wand1997data |
-| RRH, Knuth        | regular   | @knuth2019optimal |
-| RMG penA          | irregular | @rozenholc2010irregular |
-| RMG penB          | irregular | @rozenholc2010irregular |
-| RMG penR          | irregular | @rozenholc2010irregular |
-| RIH               | irregular | @simensen2025random |
-| NML               | both      | @kontkanen2007mdl |
-| L2CV              | both      | @rudemo1982empirical |
-| KLCV              | both      | @hall1990akaike, @simensen2025random |
+|-----------------------------------------|:-----------------|:-------------------------|
+| Sturges rule                             | regular   | @sturges1926choice |
+| Scott's rule                             | regular   | @scott1979optimal   |
+| Freedman-Diaconis' rule                  | regular   | @freedman1981histogram |
+| Akaike's Information Criterion (AIC)     | regular   | @hall1990akaike    |
+| Bayesian Information Criterion (BIC)     | regular   | @davies2009automatic  |
+| Birgé-Rozenholc                          | regular   | @birge2006bins |
+| Minimum Description Length (MDL)         | regular   | @hall1988stochastic |
+| Wand's rule                              | regular   | @wand1997data |
+| Random Regular Histogram (RRH), Knuth    | regular   | @knuth2019optimal |
+| Rozenholc et al. penalty A               | irregular | @rozenholc2010irregular |
+| Rozenholc et al. penalty B               | irregular | @rozenholc2010irregular |
+| Rozenholc et al. penalty R               | irregular | @rozenholc2010irregular |
+| Random Irregular Histogram (RIH)         | irregular | @simensen2025random |
+| Normalized Maximum Likelihood (NML)      | both      | @kontkanen2007mdl |
+| L2 cross-validation (L2CV)               | both      | @rudemo1982empirical |
+| Kullback-Leibler cross-validation (KLCV) | both      | @hall1990akaike, @simensen2025random |
  
 
 Table: Implemented bin selection procedures so far. For methods with type=both, a regular and an irregular variant of the criterion is supported.
@@ -69,7 +69,7 @@ using Pkg
 Pkg.add("AutoHist")
 ```
 
-To illustrate the basic use of the software, we fit a histogram based on the irregular RIH criterion and a regular histogram based on AIC to a standard normal random sample of size $n = 10^6$.
+To illustrate the basic use of the software, we fit a histogram based on the Random Irregular Histogram criterion and a regular histogram based on Akaike's Information Criterion to a standard normal random sample of size $n = 10^6$.
 
 ```julia
 using AutoHist, Random, Distributions
