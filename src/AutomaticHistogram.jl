@@ -310,7 +310,7 @@ function Base.Broadcast.broadcasted(::typeof(cdf), h::AutomaticHistogram, x::Abs
 end
 
 """
-    quantile(h::AutomaticHistogram, x::Real)
+    quantile(h::AutomaticHistogram, q::Real)
 
 Evaluate the quantile function of `h` at ``q \\in [0, 1]``.
 """
