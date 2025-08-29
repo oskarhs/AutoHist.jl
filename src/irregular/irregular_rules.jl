@@ -11,11 +11,11 @@ end
 
 """
     RIH(;
-        a::Real                     = 5.0,
-        logprior::Function          = k -> 0.0,
-        grid::Symbol                = :regular,
-        maxbins::Union{Int, Symbol} = :default,
-        alg::AbstractAlgorithm      = SegNeig()
+        a::Real                    = 5.0,
+        logprior::Function         = k -> 0.0,
+        grid::Symbol               = :regular,
+        maxbins::Union{Int,Symbol} = :default,
+        alg::AbstractAlgorithm     = SegNeig()
     )
 
 The random irregular histogram criterion.
@@ -54,7 +54,7 @@ a: 5.0
 # References
 This approach to irregular histograms first appeared in [Simensen et al. (2025)](https://doi.org/10.48550/ARXIV.2505.22034).
 """
-function RIH(; a::Real=5.0, logprior::Function=k->0.0, grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default, alg::AbstractAlgorithm=SegNeig())
+function RIH(; a::Real=5.0, logprior::Function=k->0.0, grid::Symbol=:regular, maxbins::Union{Int,Symbol}=:default, alg::AbstractAlgorithm=SegNeig())
     if typeof(alg) != SegNeig
         throw(ArgumentError("Algorithm $(typeof(alg)) not supported for rule RIH. Only the SegNeig algorithm is supported for this rule."))
     end
@@ -64,7 +64,7 @@ function RIH(; a::Real=5.0, logprior::Function=k->0.0, grid::Symbol=:regular, ma
     if typeof(maxbins) <: Symbol && maxbins != :default
         throw(ArgumentError("maxbins must either be a positive integer or :default."))
     elseif typeof(maxbins) <: Int && maxbins < 1
-        throw(DomainError("maxbins bins must be positive."))
+        throw(DomainError(maxbins, "maxbins bins must be positive."))
     end
     if !(grid in (:data, :regular, :quantile))
         throw(ArgumentError("Invalid grid option: $(grid). Please select one of :data, :regular or :quantile."))
@@ -100,9 +100,9 @@ end
 
 """
     RMG_penA(;
-        grid::Symbol                = :regular,
-        maxbins::Union{Int, Symbol} = :default,
-        alg::AbstractAlgorithm      = SegNeig()
+        grid::Symbol               = :regular,
+        maxbins::Union{Int,Symbol} = :default,
+        alg::AbstractAlgorithm     = SegNeig()
     )
 
 Consists of finding the partition ``\\mathcal{I}`` that maximizes a penalized log-likelihood,
@@ -134,14 +134,14 @@ a: NaN
 # References
 This approach was suggested by [Rozenholc et al. (2010)](https://doi.org/10.1016/j.csda.2010.04.021).
 """
-function RMG_penA(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default, alg::AbstractAlgorithm=SegNeig())
+function RMG_penA(; grid::Symbol=:regular, maxbins::Union{Int,Symbol}=:default, alg::AbstractAlgorithm=SegNeig())
     if typeof(alg) != SegNeig
         throw(ArgumentError("Algorithm $(typeof(alg)) not supported for rule RMG_penA. Only the SegNeig algorithm is supported for this rule."))
     end
     if typeof(maxbins) <: Symbol && maxbins != :default
         throw(ArgumentError("maxbins must either be a positive integer or :default."))
     elseif typeof(maxbins) <: Int && maxbins < 1
-        throw(DomainError("maxbins bins must be positive."))
+        throw(DomainError(maxbins, "maxbins bins must be positive."))
     end
     if !(grid in (:data, :regular, :quantile))
         throw(ArgumentError("Invalid grid option :$(grid). Please select one of :data, :regular or :quantile."))
@@ -176,9 +176,9 @@ end
 
 """
     RMG_penB(;
-        grid::Symbol                = :regular,
-        maxbins::Union{Int, Symbol} = :default,
-        alg::AbstractAlgorithm      = SegNeig()
+        grid::Symbol               = :regular,
+        maxbins::Union{Int,Symbol} = :default,
+        alg::AbstractAlgorithm     = SegNeig()
     )
 
 Consists of finding the partition ``\\mathcal{I}`` that maximizes a penalized log-likelihood,
@@ -210,7 +210,7 @@ a: NaN
 # References
 This approach was suggested by [Rozenholc et al. (2010)](https://doi.org/10.1016/j.csda.2010.04.021).
 """
-function RMG_penB(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default, alg::AbstractAlgorithm=SegNeig())
+function RMG_penB(; grid::Symbol=:regular, maxbins::Union{Int,Symbol}=:default, alg::AbstractAlgorithm=SegNeig())
     if typeof(alg) != SegNeig
         throw(ArgumentError("Algorithm $(typeof(alg)) not supported for rule RMG_penB. Only the SegNeig algorithm is supported for this rule."))
     end
@@ -220,7 +220,7 @@ function RMG_penB(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default,
     if typeof(maxbins) <: Symbol && maxbins != :default
         throw(ArgumentError("maxbins must either be a positive integer or :default."))
     elseif typeof(maxbins) <: Int && maxbins < 1
-        throw(DomainError("maxbins bins must be positive."))
+        throw(DomainError(maxbins, "maxbins bins must be positive."))
     end
     if maxbins == :default
         return RMG_penB(grid, 0, true, alg)
@@ -252,9 +252,9 @@ end
 
 """
     RMG_penR(;
-        grid::Symbol                = :regular,
-        maxbins::Union{Int, Symbol} = :default,
-        alg::AbstractAlgorithm      = SegNeig()
+        grid::Symbol               = :regular,
+        maxbins::Union{Int,Symbol} = :default,
+        alg::AbstractAlgorithm     = SegNeig()
     )
 
 Consists of finding the partition ``\\mathcal{I}`` that maximizes a penalized log-likelihood,
@@ -286,7 +286,7 @@ a: NaN
 # References
 This approach was suggested by [Rozenholc et al. (2010)](https://doi.org/10.1016/j.csda.2010.04.021).
 """
-function RMG_penR(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default, alg::AbstractAlgorithm=SegNeig())
+function RMG_penR(; grid::Symbol=:regular, maxbins::Union{Int,Symbol}=:default, alg::AbstractAlgorithm=SegNeig())
     if typeof(alg) != SegNeig
         throw(ArgumentError("Algorithm $(typeof(alg)) not supported for rule RMG_penR. Only the SegNeig algorithm is supported for this rule."))
     end
@@ -296,7 +296,7 @@ function RMG_penR(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default,
     if typeof(maxbins) <: Symbol && maxbins != :default
         throw(ArgumentError("maxbins must either be a positive integer or :default."))
     elseif typeof(maxbins) <: Int && maxbins < 1
-        throw(DomainError("maxbins bins must be positive."))
+        throw(DomainError(maxbins, "maxbins bins must be positive."))
     end
     if maxbins == :default
         return RMG_penR(grid, 0, true, alg)
@@ -328,9 +328,9 @@ end
 
 """
     NML_I(;
-        grid::Symbol                = :regular,
-        maxbins::Union{Int, Symbol} = :default,
-        alg::AbstractAlgorithm      = DP()
+        grid::Symbol               = :regular,
+        maxbins::Union{Int,Symbol} = :default,
+        alg::AbstractAlgorithm     = DP()
     )
 
 A quick-to-evalutate version of the normalized maximum likelihood criterion.
@@ -367,7 +367,7 @@ a: NaN
 # References
 This a variant of this criterion first suggested by [Kontkanen and Myllymäki (2007)](https://proceedings.mlr.press/v2/kontkanen07a.html).
 """
-function NML_I(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default, alg::AbstractAlgorithm=SegNeig())
+function NML_I(; grid::Symbol=:regular, maxbins::Union{Int,Symbol}=:default, alg::AbstractAlgorithm=SegNeig())
     if typeof(alg) != SegNeig
         throw(ArgumentError("Algorithm $(typeof(alg)) not supported for rule NML_I. Only the SegNeig algorithm is supported for this rule."))
     end
@@ -377,7 +377,7 @@ function NML_I(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default, al
     if typeof(maxbins) <: Symbol && maxbins != :default
         throw(ArgumentError("maxbins must either be a positive integer or :default."))
     elseif typeof(maxbins) <: Int && maxbins < 1
-        throw(DomainError("maxbins bins must be positive."))
+        throw(DomainError(maxbins, "maxbins bins must be positive."))
     end
     if maxbins == :default
         return NML_I(grid, 0, true, alg)
@@ -409,10 +409,10 @@ end
 
 """
     L2CV_I(;
-        grid::Symbol                = :regular,
-        maxbins::Union{Int, Symbol} = :default,
-        alg::AbstractAlgorithm      = OptPart(),
-        use_min_length::Bool        = false
+        grid::Symbol               = :regular,
+        maxbins::Union{Int,Symbol} = :default,
+        alg::AbstractAlgorithm     = OptPart(),
+        use_min_length::Bool       = false
     )
 
 Consists of finding the partition ``\\mathcal{I}`` that maximizes a L2 leave-one-out cross-validation criterion,
@@ -445,7 +445,7 @@ a: NaN
 # References
 This approach dates back to [Rudemo (1982)](https://www.jstor.org/stable/4615859).
 """
-function L2CV_I(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default, alg::AbstractAlgorithm=OptPart(), use_min_length::Bool=false)
+function L2CV_I(; grid::Symbol=:regular, maxbins::Union{Int,Symbol}=:default, alg::AbstractAlgorithm=OptPart(), use_min_length::Bool=false)
     if !(typeof(alg) in [SegNeig, OptPart])
         throw(ArgumentError("Algorithm $(typeof(alg)) not supported for rule L2CV_I. Only the SegNeig and OptPart algorithms are supported for this rule."))
     end
@@ -455,7 +455,7 @@ function L2CV_I(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default, a
     if typeof(maxbins) <: Symbol && maxbins != :default
         throw(ArgumentError("maxbins must either be a positive integer or :default."))
     elseif typeof(maxbins) <: Int && maxbins < 1
-        throw(DomainError("maxbins bins must be positive."))
+        throw(DomainError(maxbins, "maxbins bins must be positive."))
     end
     if maxbins == :default
         return L2CV_I(grid, 0, true, alg, use_min_length)
@@ -488,10 +488,10 @@ end
 
 """
     KLCV_I(;
-        grid::Symbol                = :regular,
-        maxbins::Union{Int, Symbol} = :default,
-        alg::AbstractAlgorithm      = OptPart(),
-        use_min_length::Bool        = false
+        grid::Symbol               = :regular,
+        maxbins::Union{Int,Symbol} = :default,
+        alg::AbstractAlgorithm     = OptPart(),
+        use_min_length::Bool       = false
     )
 
 Consists of finding the partition ``\\mathcal{I}`` that maximizes a Kullback-Leibler leave-one-out cross-validation criterion,
@@ -525,7 +525,7 @@ a: NaN
 # References
 This approach to irregular histograms was, to the best of our knowledge, first considered in [Simensen et al. (2025)](https://doi.org/10.48550/ARXIV.2505.22034).
 """
-function KLCV_I(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default, alg::AbstractAlgorithm=OptPart(), use_min_length::Bool=false)
+function KLCV_I(; grid::Symbol=:regular, maxbins::Union{Int,Symbol}=:default, alg::AbstractAlgorithm=OptPart(), use_min_length::Bool=false)
     if !(typeof(alg) in [SegNeig, OptPart])
         throw(ArgumentError("Algorithm $(typeof(alg)) not supported for rule KLCV_I. Only the SegNeig and OptPart algorithms are supported for this rule."))
     end
@@ -535,7 +535,7 @@ function KLCV_I(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default, a
     if typeof(maxbins) <: Symbol && maxbins != :default
         throw(ArgumentError("maxbins must either be a positive integer or :default."))
     elseif typeof(maxbins) <: Int && maxbins < 1
-        throw(DomainError("maxbins bins must be positive."))
+        throw(DomainError(maxbins, "maxbins bins must be positive."))
     end
     if maxbins == :default
         return KLCV_I(grid, 0, true, alg, use_min_length)
@@ -545,6 +545,91 @@ function KLCV_I(; grid::Symbol=:regular, maxbins::Union{Int, Symbol}=:default, a
 end
 
 function fit_autohist(x::AbstractVector{T}, rule::KLCV_I, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
+    n = length(x)
+    bin_edges_norm = maximize_additive_crit(x, rule, xmin, xmax, closed)
+    
+    bin_edges = @. xmin + (xmax - xmin) * bin_edges_norm
+    N = bin_irregular_int(x, bin_edges, closed == :right)
+    dens = N ./ (n*(bin_edges[2:end] - bin_edges[1:end-1]))
+    h = AutomaticHistogram(bin_edges, dens, N, :irregular, closed, NaN)
+    return h
+end
+
+
+# ------------------------------
+# Bayesian Blocks
+struct BayesBlocks{T<:Real, A<:AbstractAlgorithm} <: AbstractIrregularRule
+    p0::T
+    grid::Symbol
+    maxbins::Int
+    use_default_maxbins::Bool
+    alg::A
+    use_min_length::Bool
+end
+
+"""
+    BayesBlocks(;
+        p0::Real                   = 0.05,
+        grid::Symbol               = :regular,
+        maxbins::Union{Int,Symbol} = :default,
+        alg::AbstractAlgorithm     = OptPart(),
+        use_min_length::Bool       = false
+    )
+
+Consists of finding the partition ``\\mathcal{I}`` that maximizes a penalized Poisson likelihood criterion,
+```math
+    \\sum_{j=1}^k N_j\\log\\big(N_j/|\\mathcal{I}_j|\\big) + k\\big(4 - \\log(73.53 p_0 n^{-0.478})\\big).
+```
+
+# Keyword arguments
+- `p0`: Hyperparameter controlling the penalty for the number of changepoints. Must be a number in the open interval ``(0,1)``, with `p0 = 0.05` serving as the default.
+- `grid`: Symbol indicating how the finest possible mesh should be constructed. Options are `:data`, which uses each unique data point as a grid point, `:regular` (default) which constructs a fine regular grid, and `:quantile` which constructs the grid based on the sample quantiles.
+- `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)` if `grid` is `regular` or `quantile`. Ignored if `grid=:data`.
+- `alg`: Algorithm used to fit the model. Currently, [`OptPart`](@ref) and [`SegNeig`](@ref) are supported for this rule, with the former algorithm being the default.
+- `use_min_length`: Boolean indicating whether or not to impose a restriction on the minimum bin length of the histogram. If set to true, the smallest allowed bin length is set to `(maximum(x)-minimum(x))/n*log(n)^(1.5)`.
+
+# Examples
+```jldoctest; setup = :(using AutoHist)
+julia> x = (1.0 .- (1.0 .- LinRange(0.0, 1.0, 500)) .^(1/3)).^(1/3);
+
+julia> rule = BayesBlocks(grid = :data, use_min_length=true);
+
+julia> fit(AutomaticHistogram, x, rule)
+AutomaticHistogram
+breaks: [0.0, 0.1948931612779725, 0.375258352661302, 0.8268306249022703, 0.9222490305512866, 1.0]
+density: [0.12314439276691318, 0.7096713008662634, 1.6962954704872724, 0.7545714006671028, 0.12861575966067232]
+counts: [12, 64, 383, 36, 5]
+type: irregular
+closed: right
+a: NaN
+```
+
+# References
+The Bayesian Blocks method was first introduced in [Scargle et al. (2013)](https://doi.org/10.1088/0004-637X/764/2/167).
+"""
+function BayesBlocks(; p0::Real=0.05, grid::Symbol=:regular, maxbins::Union{Int,Symbol}=:default, alg::AbstractAlgorithm=OptPart(), use_min_length::Bool=false)
+    if !(0.0 < p0 < 1.0)
+        throw(DomainError(p0, ""))
+    end
+    if !(typeof(alg) in [SegNeig, OptPart])
+        throw(ArgumentError("Algorithm $(typeof(alg)) not supported for rule BayesBlocks. Only the SegNeig and OptPart algorithms are supported for this rule."))
+    end
+    if !(grid in (:data, :regular, :quantile))
+        throw(ArgumentError("Invalid grid option :$(grid). Please select one of :data, :regular or :quantile."))
+    end
+    if typeof(maxbins) <: Symbol && maxbins != :default
+        throw(ArgumentError("maxbins must either be a positive integer or :default."))
+    elseif typeof(maxbins) <: Int && maxbins < 1
+        throw(DomainError(maxbins, "maxbins bins must be positive."))
+    end
+    if maxbins == :default
+        return BayesBlocks(p0, grid, 0, true, alg, use_min_length)
+    else
+        return BayesBlocks(p0, grid, maxbins, false, alg, use_min_length)
+    end
+end
+
+function fit_autohist(x::AbstractVector{T}, rule::BayesBlocks, xmin::T, xmax::T, closed::Symbol) where {T <: Real}
     n = length(x)
     bin_edges_norm = maximize_additive_crit(x, rule, xmin, xmax, closed)
     

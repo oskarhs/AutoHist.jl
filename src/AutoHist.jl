@@ -1,9 +1,9 @@
 module AutoHist
 
 export AutomaticHistogram
-export fit, convert, loglikelihood, logmarginallikelihood, minimum, maximum, extrema, peaks, pdf, cdf, insupport, length, distance
+export fit, autohist, convert, loglikelihood, logmarginallikelihood, minimum, maximum, extrema, peaks, pdf, cdf, insupport, length, distance, quantile
 export RRH, Knuth, AIC, BIC, BR, MDL, NML_R, L2CV_R, KLCV_R, Sturges, FD, Scott, Wand
-export RIH, RMG_penA, RMG_penB, RMG_penR, NML_I, L2CV_I, KLCV_I
+export RIH, RMG_penA, RMG_penB, RMG_penR, NML_I, L2CV_I, KLCV_I, BayesBlocks
 export OptPart, SegNeig
 
 using StatsBase, Base.Threads, Distributions
@@ -12,7 +12,7 @@ import Statistics: quantile
 import SpecialFunctions: loggamma, logabsbinomial, gamma
 import FFTW: fft, ifft
 import StatsAPI: fit, loglikelihood
-import Distributions: pdf, insupport
+import Distributions: pdf, insupport, cdf, quantile
 
 abstract type AbstractRule end
 

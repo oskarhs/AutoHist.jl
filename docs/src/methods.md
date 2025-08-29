@@ -58,6 +58,11 @@ KLCV_I
 NML_I
 ```
 
+#### Bayesian Blocks (BayesBlocks)
+```@docs
+BayesBlocks
+```
+
 ## Regular histograms
 The following section details how each value of the `rule` argument selects the number ``k`` of bins to draw a regular histogram automatically based on a random sample. In the following, ``\mathcal{I} = (\mathcal{I}_1, \mathcal{I}_2, \ldots, \mathcal{I}_k)`` is the corresponding partition of ``[0,1]`` consisting of ``k`` equal-length bins. In cases where the value of the number of bins is computed by maximizing an expression, we look for the best regular partition among all regular partitions consisting of no more than ``k_n`` bins. For rules falling under this umbrella, ``k_n`` can be controlled through the `maxbins` keyword, as detailed below.
 

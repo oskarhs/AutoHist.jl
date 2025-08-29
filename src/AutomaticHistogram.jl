@@ -79,15 +79,21 @@ end
 
 
 """
-    fit(AutomaticHistogram, x::AbstractVector{<:Real}, rule::AbstractRule=RIH(); support::Tuple{Real,Real}=(-Inf,Inf), closed::Symbol=:right)
+    fit(
+        AutomaticHistogram,
+        x::AbstractVector{<:Real},
+        rule::AbstractRule=RIH();
+        support::Tuple{Real,Real} = (-Inf,Inf),
+        closed::Symbol            = :right
+    )
 
 Fit a histogram to a one-dimensional vector `x` with an automatic and data-based selection of the histogram partition.
 
 # Arguments
 - `x`: 1D vector of data for which a histogram is to be constructed.
+- `rule`: The criterion used to determine the optimal number of bins. Default value is `rule=RIH()`, the random irregular histogram.
 
 # Keyword arguments
-- `rule`: The criterion used to determine the optimal number of bins. Default value is `rule=RIH()`, the random irregular histogram.
 - `closed`: Symbol indicating whether the drawn intervals should be right-inclusive or not. Possible values are `:right` (default) and `:left`.
 - `support`: Tuple specifying the the support of the histogram estimate. If the first element is `-Inf`, then `minimum(x)` is taken as the leftmost cutpoint. Likewise, if the second element is `Inf`, then the rightmost cutpoint is `maximum(x)`. Default value is `(-Inf, Inf)`, which estimates the support of the data.
 

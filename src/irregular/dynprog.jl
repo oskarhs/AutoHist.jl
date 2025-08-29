@@ -18,8 +18,8 @@ function optimal_partitioning(phi::Function, k_max::Int)
 
     # Compute weights for each possible interval
     for i in 1:k_max
-        @simd for j in (i+1):(k_max+1)
-            @inbounds weight[i, j] = phi(i, j)
+        @inbounds for j in (i+1):(k_max+1)
+            weight[i, j] = phi(i, j)
         end
     end
 
@@ -66,9 +66,9 @@ function segment_neighborhood(phi::Function, k_max::Int)
     end
 
     # Compute weights for each possible interval
-    for i in 1:k_max
-        @simd for j in (i+1):(k_max+1)
-            @inbounds weight[i, j] = phi(i, j)
+    @inbounds for i in 1:k_max
+        for j in (i+1):(k_max+1)
+            weight[i, j] = phi(i, j)
         end
     end
 
@@ -106,8 +106,8 @@ function dynprog(alg::SegNeig, rule::AbstractIrregularRule, phi::Function, mesh:
     optimal, ancestor = segment_neighborhood(phi, k_max)
     psi = get_psi(rule, maxbins, n)
     dep_k = Vector{Float64}(undef, k_max)
-    @simd for k in 1:k_max
-        @inbounds dep_k[k] = psi(k)
+    @inbounds for k in 1:k_max
+        dep_k[k] = psi(k)
     end
     k_opt = argmax(optimal + dep_k)
     bin_edges_norm = compute_bounds_sn(ancestor, mesh, k_opt)

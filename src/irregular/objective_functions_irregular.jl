@@ -39,6 +39,13 @@ end
     return contrib
 end
 
+@inline function phi_BayesBlocks(i::Int, j::Int, N_cum::AbstractVector{<:Real}, grid::AbstractVector{<:Real}, ncp_prior::Real; minlength::Real=0.0)
+    @inbounds N_bin = N_cum[j] - N_cum[i]
+    @inbounds len_bin = grid[j] - grid[i]
+    contrib = ifelse(N_bin > 0.0, N_bin * log(N_bin / len_bin), 0.0) - ncp_prior
+    return contrib
+end
+
 function get_phi(rule::RIH, N_cum::AbstractVector{<:Real}, mesh::AbstractVector{<:Real}, n::Real)
     phi = let N_cum = N_cum, mesh = mesh
         f(i,j) = phi_bayes(i, j, N_cum, mesh, rule.a)
@@ -90,6 +97,15 @@ function get_phi(rule::KLCV_I, N_cum::AbstractVector{<:Real}, mesh::AbstractVect
     return phi
 end
 
+function get_phi(rule::BayesBlocks, N_cum::AbstractVector{<:Real}, mesh::AbstractVector{<:Real}, n::Real)
+    minlength = ifelse(rule.use_min_length, log(n)^(1.5)/n, 0.0)
+    ncp_prior = 4-0 - log(73.53 * rule.p0 * n^(-0.478))
+    phi = let N_cum = N_cum, mesh = mesh, minlength=minlength, ncp_prior = ncp_prior
+        f(i,j) = phi_BayesBlocks(i, j, N_cum, mesh, ncp_prior; minlength=minlength)
+    end
+    return phi
+end
+
 get_psi(rule::RIH, maxbins::Int, n::Int) = k-> rule.logprior(k) - logabsbinomial(maxbins-1, k-1)[1] + loggamma(rule.a) - loggamma(rule.a + n)
 get_psi(rule::RMG_penB, maxbins::Int, n::Int) = k-> -logabsbinomial(maxbins-1, k-1)[1] - k - log(k)^(2.5)
 get_psi(rule::RMG_penA, maxbins::Int, n::Int) = k-> -logabsbinomial(maxbins-1, k-1)[1] - k - 2.0*log(k) -
@@ -101,3 +117,4 @@ get_psi(rule::NML_I, maxbins::Int, n::Int) = k-> -( 0.5*k*log(0.5*n) - loggamma(
                 ) - logabsbinomial(maxbins-1, k-1)[1]
 get_psi(rule::L2CV_I, maxbins::Int, n::Int) = k-> 0.0
 get_psi(rule::KLCV_I, maxbins::Int, n::Int) = k-> 0.0
+get_psi(rule::BayesBlocks, maxbins::Int, n::Int) = k-> 0.0

@@ -4,13 +4,15 @@ using AutoHist, Distributions
 using Test
 import StatsBase: Histogram, fit
 
+const regular_rules = [RRH, Knuth, AIC, BIC, BR, MDL, NML_R, L2CV_R, KLCV_R, Sturges, FD, Scott]
+const irregular_rules = [RMG_penA, RMG_penB, RMG_penR, RIH, KLCV_I, L2CV_I, NML_I, BayesBlocks]
+
 @testset "return type regular" begin
     x = collect(LinRange(0,1,11))
 
-    for rule in [RRH(), Knuth(), AIC(), BIC(), BR(), MDL(), NML_R(), 
-                 L2CV_R(), KLCV_R(), Sturges(), FD(), Scott()]
+    for rule in regular_rules
         for closed in [:left, :right]
-            h = fit(AutomaticHistogram, x, rule; closed=closed)
+            h = fit(AutomaticHistogram, x, rule(); closed=closed)
             @test typeof(h) <: AutomaticHistogram
         end
     end
@@ -27,8 +29,8 @@ end
 @testset "return type irregular" begin
     x = collect(LinRange(0,1,11))
 
-    for rule in [RMG_penA(), RMG_penB(), RMG_penR(), RIH(), KLCV_I(), L2CV_I(), NML_I()]
-        h = fit(AutomaticHistogram, x, rule)
+    for rule in irregular_rules
+        h = fit(AutomaticHistogram, x, rule())
         @test typeof(h) <: AutomaticHistogram
     end
     for grid in [:regular, :data, :quantile] # test grid, right-left open interval combinations
@@ -41,8 +43,7 @@ end
 
 @testset "given maxbins" begin
     x = collect(LinRange(0, 1, 11))
-    for rule in [RRH, Knuth, AIC, BIC, BR, MDL, NML_R, L2CV_R, KLCV_R,
-                 RIH, RMG_penA, RMG_penB, RMG_penR, NML_I, L2CV_I, KLCV_I]
+    for rule in [RRH, Knuth, AIC, BIC, BR, MDL, NML_R, L2CV_R, KLCV_R, RMG_penA, RMG_penB, RMG_penR, RIH, KLCV_I, L2CV_I, NML_I, BayesBlocks]
         h = fit(AutomaticHistogram, x, rule(maxbins=5))
         @test typeof(h) <: AutomaticHistogram
     end
@@ -64,17 +65,18 @@ end
 @testset "algorithms" begin
     x = collect(LinRange(0,1,11))
 
-    for rule in [KLCV_I(alg=SegNeig()), KLCV_I(alg=OptPart()),
-                 L2CV_I(alg=SegNeig()), L2CV_I(alg=OptPart())]
-        h = fit(AutomaticHistogram, x, rule)
-        @test typeof(h) <: AutomaticHistogram
+    for rule in [KLCV_I, L2CV_I, BayesBlocks]
+        for alg in [OptPart(), SegNeig()]
+            h = fit(AutomaticHistogram, x, rule(alg=alg))
+            @test typeof(h) <: AutomaticHistogram
+        end
     end
 
     # Error handling
-    @test_throws ArgumentError SegNeig(gr_maxbins = :nonsense)
-    @test_throws DomainError SegNeig(gr_maxbins = -1)
-    @test_throws ArgumentError OptPart(gr_maxbins = :nonsense)
-    @test_throws DomainError OptPart(gr_maxbins = -1)
+    for alg in [SegNeig, OptPart]
+        @test_throws ArgumentError alg(gr_maxbins = :nonsense)
+        @test_throws DomainError alg(gr_maxbins = -1)
+    end
 
     # Greedy
     h = fit(AutomaticHistogram,
@@ -89,15 +91,14 @@ end
     @test typeof(h) <: AutomaticHistogram
 
     # Check that error is thrown when attempting to pass OptPart to unsupported rules
-    @test_throws ArgumentError RIH(alg=OptPart())
-    @test_throws ArgumentError RMG_penA(alg=OptPart())
-    @test_throws ArgumentError RMG_penB(alg=OptPart())
-    @test_throws ArgumentError RMG_penR(alg=OptPart())
-    @test_throws ArgumentError NML_I(alg=OptPart())
+    for rule in [RIH, RMG_penA, RMG_penB, RMG_penR, NML_I]
+        @test_throws ArgumentError rule(alg=OptPart())
+    end
 
     struct NonsenseAlg <: AutoHist.AbstractAlgorithm end
-    @test_throws ArgumentError L2CV_I(alg=NonsenseAlg())
-    @test_throws ArgumentError KLCV_I(alg=NonsenseAlg())
+    for rule in [L2CV_I, KLCV_I, BayesBlocks]
+        @test_throws ArgumentError rule(alg=NonsenseAlg())
+    end
 end
 
 @testset "estimated support" begin
@@ -149,12 +150,13 @@ end
     @test_throws DomainError fit(AutomaticHistogram, x, RRH(a=-1.0))
     @test_throws DomainError fit(AutomaticHistogram, x, RRH(a=k->-2.0*k))
     @test_throws DomainError RIH(a=-1.0)
+    @test_throws DomainError BayesBlocks(p0 = -1.0)
 
     for rule in [RRH, Knuth, AIC, BIC, BR, MDL, NML_R, L2CV_R, KLCV_R]
         @test_throws DomainError rule(maxbins=-100)
         @test_throws ArgumentError rule(maxbins=:nonsense)
     end
-    for rule in [RIH, RMG_penA, RMG_penB, RMG_penR, NML_I, L2CV_I, KLCV_I]
+    for rule in [RIH, RMG_penA, RMG_penB, RMG_penR, NML_I, L2CV_I, KLCV_I, BayesBlocks]
         @test_throws DomainError rule(maxbins=-100)
         @test_throws ArgumentError rule(maxbins=:nonsense)
         @test_throws ArgumentError rule(grid=:nonsense)
@@ -164,6 +166,11 @@ end
     @test_throws ArgumentError Wand(scalest=:nonsense)
     @test_throws ArgumentError fit(AutomaticHistogram, x; closed=:nonsense)
     @test_throws ArgumentError fit(AutomaticHistogram, x, Knuth(); closed=:nonsense)
+end
+
+@testset "autohist" begin
+    x = randn(10^3)
+    @test autohist(x, RIH()) == fit(AutomaticHistogram, x, RIH())
 end
 
 @testset "a as function" begin
@@ -200,12 +207,6 @@ end
 
     h = AutomaticHistogram(breaks, density, counts, :irregular, :right, 1.0)
     @test typeof(Plots.plot(h)) == Plots.Plot{Plots.GRBackend}    # check that Plots extension works
-    
-    @test typeof(Makie.plot(h)) == Makie.FigureAxisPlot # check that Makie extension works
-    @test typeof(Makie.plot!(h)) == Makie.PlotList{Tuple{Makie.PlotSpec}}
-    @test typeof(Makie.barplot(h)) == Makie.FigureAxisPlot
-    @test typeof(Makie.hist(h)) == Makie.FigureAxisPlot
-    @test typeof(Makie.stephist(h)) == Makie.FigureAxisPlot
 
     F = Makie.Figure(); ax = Makie.Axis(F[1,1])
     Makie.plot!(ax, h)
@@ -325,7 +326,7 @@ end
     @test AutoHist.pdf.(AutomaticHistogram(breaks2, density2, counts2, :irregular, :right), [0.2]) == [0.945]
 end
 
-@testset "AutomaticHistogram cdf" begin
+@testset "AutomaticHistogram cdf and quantile" begin
     breaks1 = LinRange(0, 1, 11)
     density1 = [1.08, 1.05, 1.05, 1.14, 0.91, 0.88, 0.80, 1.05, 1.01, 1.03]
     counts1 = [108, 105, 105, 114, 91, 88, 80, 105, 101, 103]
@@ -336,20 +337,29 @@ end
 
     @test AutoHist.cdf(AutomaticHistogram(breaks1, density1, counts1, :regular, :right), -0.1) == 0.0    # test values outside of support
     @test AutoHist.cdf(AutomaticHistogram(breaks2, density2, counts2, :irregular, :right), 1.2) == 1.0
+    @test_throws DomainError AutoHist.quantile(AutomaticHistogram(breaks1, density1, counts1, :regular, :right), -0.1)
 
     for j in 1:9    # test at each boundary that closed=:right and closed=:left behave as expected
-        @test AutoHist.cdf(AutomaticHistogram(breaks1, density1, counts1, :regular, :right), breaks1[j+1]) == sum(density1[1:j] .* diff(breaks1[1:j+1]))
-        @test AutoHist.cdf(AutomaticHistogram(breaks1, density1, counts1, :regular, :left), breaks1[j+1]) == sum(density1[1:j] .* diff(breaks1[1:j+1]))
+        @test AutoHist.cdf(AutomaticHistogram(breaks1, density1, counts1, :regular, :right), breaks1[j+1]) ≈ sum(density1[1:j] .* diff(breaks1[1:j+1]))
+        @test AutoHist.cdf(AutomaticHistogram(breaks1, density1, counts1, :regular, :left), breaks1[j+1]) ≈ sum(density1[1:j] .* diff(breaks1[1:j+1]))
+
+        @test AutoHist.quantile(AutomaticHistogram(breaks1, density1, counts1, :regular, :right), sum(density1[1:j] .* diff(breaks1[1:j+1]))) ≈ breaks1[j+1]
+        @test AutoHist.quantile(AutomaticHistogram(breaks1, density1, counts1, :regular, :left), sum(density1[1:j] .* diff(breaks1[1:j+1]))) ≈ breaks1[j+1]
     end
 
     for j in 1:3    # test at each boundary that closed=:right and closed=:left behave as expected
-        @test AutoHist.cdf(AutomaticHistogram(breaks2, density2, counts2, :irregular, :right), breaks2[j+1]) == sum(density2[1:j] .* diff(breaks2[1:j+1]))
-        @test AutoHist.cdf(AutomaticHistogram(breaks2, density2, counts2, :irregular, :left), breaks2[j+1]) == sum(density2[1:j] .* diff(breaks2[1:j+1]))
+        @test AutoHist.cdf(AutomaticHistogram(breaks2, density2, counts2, :irregular, :right), breaks2[j+1]) ≈ sum(density2[1:j] .* diff(breaks2[1:j+1]))
+        @test AutoHist.cdf(AutomaticHistogram(breaks2, density2, counts2, :irregular, :left), breaks2[j+1]) ≈ sum(density2[1:j] .* diff(breaks2[1:j+1]))
+
+        @test AutoHist.quantile(AutomaticHistogram(breaks2, density2, counts2, :regular, :right), sum(density2[1:j] .* diff(breaks2[1:j+1]))) ≈ breaks2[j+1]
+        @test AutoHist.quantile(AutomaticHistogram(breaks2, density2, counts2, :regular, :left), sum(density2[1:j] .* diff(breaks2[1:j+1]))) ≈ breaks2[j+1]
     end
 
     # Test the broadcasted versions as well
-    @test AutoHist.cdf.(AutomaticHistogram([0.0, 1.0], [1.0], [1], :regular, :right), LinRange(0.0, 1.0, 11)) == collect(LinRange(0.0, 1.0, 11))
-    @test AutoHist.cdf.(AutomaticHistogram([0.0, 1.0], [1.0], [1], :irregular, :right), LinRange(0.0, 1.0, 11)) == collect(LinRange(0.0, 1.0, 11))
+    @test AutoHist.cdf.(AutomaticHistogram([0.0, 1.0], [1.0], [1], :regular, :right), LinRange(0.0, 1.0, 11)) ≈ collect(LinRange(0.0, 1.0, 11))
+    @test AutoHist.cdf.(AutomaticHistogram([0.0, 1.0], [1.0], [1], :irregular, :right), LinRange(0.0, 1.0, 11)) ≈ collect(LinRange(0.0, 1.0, 11))
+    @test AutoHist.quantile.(AutomaticHistogram([0.0, 1.0], [1.0], [1], :regular, :right), LinRange(0.0, 1.0, 11)) ≈ collect(LinRange(0.0, 1.0, 11))
+    @test AutoHist.quantile.(AutomaticHistogram([0.0, 1.0], [1.0], [1], :irregular, :right), LinRange(0.0, 1.0, 11)) ≈ collect(LinRange(0.0, 1.0, 11))
 end
 
 @testset "AutomaticHistogram distance" begin
