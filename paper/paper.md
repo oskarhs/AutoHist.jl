@@ -16,7 +16,7 @@ output:
   github_document:
     html_preview: true
 bibliography: paper.bib
-date: 29 August 2025
+date: 01 September 2025
 ---
 
 # Summary
@@ -37,12 +37,12 @@ and typically do not provide any support for automatic irregular histogram const
 
 | Rule | Type (regular/irregular) | Reference |
 |-----------------------------------------|:-----------------|:-------------------------|
-| Sturges rule                             | regular   | @sturges1926choice |
+| Sturges' rule                            | regular   | @sturges1926choice |
 | Scott's rule                             | regular   | @scott1979optimal   |
-| Freedman-Diaconis' rule                  | regular   | @freedman1981histogram |
+| Freedman & Diaconis' rule                | regular   | @freedman1981histogram |
 | Akaike's Information Criterion (AIC)     | regular   | @hall1990akaike    |
 | Bayesian Information Criterion (BIC)     | regular   | @davies2009automatic  |
-| Birgé-Rozenholc                          | regular   | @birge2006bins |
+| Birgé & Rozenholc's rule                 | regular   | @birge2006bins |
 | Minimum Description Length (MDL)         | regular   | @hall1988stochastic |
 | Wand's rule                              | regular   | @wand1997data |
 | Random Regular Histogram (RRH), Knuth    | regular   | @knuth2019optimal |
@@ -58,9 +58,9 @@ and typically do not provide any support for automatic irregular histogram const
 
 Table: Implemented bin selection procedures so far. For methods with type=both, a regular and an irregular variant of the criterion is supported.
 
-We note that some automatic histogram selection rules have been implemented in Julia, typically as part of plotting libraries.
-The `Plots.jl` package includes support for certain plug-in rules used in standard histograms, whereas the `StatsPlots.jl` library [@christ2023plots] provides functionality for plotting equal-area histograms.
-The `R` package `histogram` [@mildenberger2019histogram] supports some regular and irregular histogram methods, but their implementation covers fewer criteria than ours.
+We note that some automatic histogram selection rules have been implemented in Julia and in other programming languages, typically as part of plotting libraries.
+The `Plots.jl` package and the `hist` function from base R [@Rlanguage2025] includes support for some plug-in rules used to construct regular histograms, including Sturges'-, Scott's- and Freedman & Diaconis' rules. Pythons's `matplotlib` [@hunter2007matplotlib] implements regular L2 cross-validation in addition to the three aforementioned rules. In Julia, the `StatsPlots.jl` library [@christ2023plots] also includes an implementation of equal-area histograms.
+The `R` package `histogram` [@mildenberger2019histogram] supports a wider range of more sophisticated regular and irregular histogram methods, but their implementation covers fewer criteria than ours.
 
 # Installation and usage
 
@@ -82,7 +82,7 @@ h_irr = fit(AutomaticHistogram, x, RIH())    # fit an irregular histogram
 h_reg = fit(AutomaticHistogram, x, AIC())    # fit a regular histogram
 ```
 
-The call to the `fit` method returns an object of type `AutomaticHistogram`, with fields recording the chosen histogram partition, estimated density and bin counts. `AutoHist.jl` provides plotting recipes for `Plots.jl` and `Makie.jl`, which allows the user to easily visualize the fit. Here, we show how to plot the irregular and the regular histogram fitted in the aabove code snippet using `Makie`.
+The call to the `fit` method returns an object of type `AutomaticHistogram`, with fields recording the chosen histogram partition, estimated density and bin counts. `AutoHist.jl` provides plotting recipes for `Plots.jl` and `Makie.jl`, which allows the user to easily visualize the fit via `Plots.plot(h_irr)` or `Makie.plot(h_reg)`. Below, we show in more detail how to plot the irregular and the regular histogram fitted in the aabove code snippet using `Makie`.
 
 ```julia
 import CairoMakie, Makie # using the CairoMakie backend
