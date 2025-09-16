@@ -1,7 +1,7 @@
 # Choice of algorithm
 In this section, we empirically assess the efficiency of the dynamic programming algorithm provided for irregular histograms, and show how heuristics can be used to speed up the computations with a few benchmarks.[^1]
 
-[^1]: **Note:** The benchmarks presented here were performed on a Windows machine with a Intel® Core™ Ultra 5 125U CPU. Results may vary on systems with different hardware configurations.
+[^1]: **Note:** The benchmarks presented here were performed on a Windows machine with an Intel® Core™ Ultra 5 125U CPU. Results may vary on systems with different hardware configurations.
 
 ## The cubic-time dynamic programming algorithm
 As a toy problem, we consider standard normal random samples of using a data-based grid. In this case, the number of candidate cutpoints are ``k_n+1 = n+1`` (including the edges), where ``n`` is the sample size. For smaller samples, we can just compute the exact solution using the default dynamic programming algorithm, available as [`SegNeig`](@ref). The code snippet below illustrates how this algorithm can be explicitly specified when calling `fit`:
@@ -27,7 +27,7 @@ Benchmarking the above code snippet yields a median runtime of around ``57\ \tex
 
 #### Speeding up computations via heuristics
 
-The ``\mathcal{O}(k_n^3)`` runtime of dynamic programming means that computing the optimal solution quickly becomes computationally prohibitive, even for moderate samples. As an example, when doubling the number of samples in the above code snippet to ``n = 1000``, the median runtime increases to ``442\ \text{ms}``, a rougly ``8``-fold increase. To ensure that the code retains good performance even for larger samples, we have implemented a greedy search heuristic which selects a subset of the candidate cutpoints, and the dynamic programming algorithm is subsequently run on this smaller set. Adopting the heuristic approach can improve performance considerably, but comes at the cost of no longer being guaranteed to find the optimal solution. To showcase the computational advantages of the heuristic approach, we run a benchmark on a normal sample of size ``n = 10^6``.
+The ``\mathcal{O}(k_n^3)`` runtime of dynamic programming means that computing the optimal solution quickly becomes computationally prohibitive, even for moderate samples. As an example, when doubling the number of samples in the above code snippet to ``n = 1000``, the median runtime increases to ``442\ \text{ms}``, a roughly ``8``-fold increase. To ensure that the code retains good performance even for larger samples, we have implemented a greedy search heuristic which selects a subset of the candidate cutpoints, and the dynamic programming algorithm is subsequently run on this smaller set. Adopting the heuristic approach can improve performance considerably, but comes at the cost of no longer being guaranteed to find the optimal solution. To showcase the computational advantages of the heuristic approach, we run a benchmark on a normal sample of size ``n = 10^6``.
 ```julia
 n = 10^6
 @benchmark fit(
@@ -47,7 +47,7 @@ BenchmarkTools.Trial: 7 samples with 1 evaluation per sample.
 ```
 As we can see, the median runtime is less than 2 times slower than the mean time it took to compute the exact solution for random samples of size ``n = 10^3``.
 
-The number candidate cutpoints constructed by the greedy search heuristic can be controlled through the `gr_maxbins` keyword argument, which equals the number of selected gridpoints plus one. By default, the greedy algorithm will produce a subset consisting of ``\max\{500, n^{1/3}\}+1`` cutpoints by default (including the edges). For `gr_maxbins1 < gr_maxbins2`, the cutpoint subset formed by the greedy algorithm for `gr_maxbins1` is a subset of that selected with `gr_maxbins2` bins. Thus, increasing the number of candidate cutpoints added this grid will never lead to a worse solution of the original optimization problem. If additional precision is desired in the above example, we can increase `gr_maxbins` to ``1000``:
+The number of candidate cutpoints constructed by the greedy search heuristic can be controlled through the `gr_maxbins` keyword argument, which equals the number of selected gridpoints plus one. By default, the greedy algorithm will produce a subset consisting of ``\max\{500, n^{1/3}\}+1`` cutpoints (including the edges). For `gr_maxbins1 < gr_maxbins2`, the cutpoint subset formed by the greedy algorithm for `gr_maxbins1` is a subset of that selected with `gr_maxbins2` bins. Thus, increasing the number of candidate cutpoints added to this grid will never lead to a worse solution of the original optimization problem. If additional precision is desired in the above example, we can increase `gr_maxbins` to ``1000``:
 ```julia
 n = 10^6
 @benchmark fit(

@@ -30,7 +30,7 @@ allowing for simple visualization of the resulting histogram fits.
 To this day, histograms remain one of the most widely used nonparametric density estimators. Their popularity is in no doubt due to their simplicity and interpretability,
 and they are routinely used by practitioners with limited mathematical backgrounds as a means of visualizing the distribution of data sets. 
 Although the construction of a histogram for a given interval partition is a simple task, the quality of the resulting density estimate is very sensitive to the choice of bins.
-As a result, the task of designing automatic histogram procedures, where the number of bins and their location are chosen in a data-driven fashion, has recieved considerable interest in the statistics community.
+As a result, the task of designing automatic histogram procedures, where the number of bins and their location are chosen in a data-driven fashion, has received considerable interest in the statistics community.
 Despite advances in our understanding of different bin selection rules, many popular software libraries only include a limited number of simple rules for selecting a regular histogram partition,
 and typically do not provide any support for automatic irregular histogram construction.
 `AutoHist.jl` fills this gap by providing a fast implementation of state-of-the-art regular and irregular bin selection algorithms from the statistics literature. A complete overview of the bin selection procedures that have been implemented so far is given in **Table 1**.
@@ -59,7 +59,7 @@ and typically do not provide any support for automatic irregular histogram const
 Table: Implemented bin selection procedures so far. For methods with type=both, a regular and an irregular variant of the criterion is supported.
 
 We note that some automatic histogram selection rules have been implemented in Julia and in other programming languages, typically as part of plotting libraries.
-The `Plots.jl` package and the `hist` function from base R [@Rlanguage2025] includes support for some plug-in rules used to construct regular histograms, including Sturges'-, Scott's- and Freedman & Diaconis' rules. Pythons's `matplotlib` [@hunter2007matplotlib] implements regular L2 cross-validation in addition to the three aforementioned rules. In Julia, the `StatsPlots.jl` library [@christ2023plots] also includes an implementation of equal-area histograms.
+The `Plots.jl` package and the `hist` function from base R [@Rlanguage2025] includes support for some plug-in rules used to construct regular histograms, including Sturges'-, Scott's- and Freedman & Diaconis' rules. Python's `matplotlib` [@hunter2007matplotlib] implements regular L2 cross-validation in addition to the three aforementioned rules. In Julia, the `StatsPlots.jl` library [@christ2023plots] also includes an implementation of equal-area histograms.
 The `R` package `histogram` [@mildenberger2019histogram] supports a wider range of more sophisticated regular and irregular histogram methods, but their implementation covers fewer criteria than ours.
 
 # Installation and usage
@@ -82,7 +82,7 @@ h_irr = fit(AutomaticHistogram, x, RIH())    # fit an irregular histogram
 h_reg = fit(AutomaticHistogram, x, AIC())    # fit a regular histogram
 ```
 
-The call to the `fit` method returns an object of type `AutomaticHistogram`, with fields recording the chosen histogram partition, estimated density and bin counts. `AutoHist.jl` provides plotting recipes for `Plots.jl` and `Makie.jl`, which allows the user to easily visualize the fit via `Plots.plot(h_irr)` or `Makie.plot(h_reg)`. Below, we show in more detail how to plot the irregular and the regular histogram fitted in the aabove code snippet using `Makie`.
+The call to the `fit` method returns an object of type `AutomaticHistogram`, with fields recording the chosen histogram partition, estimated density and bin counts. `AutoHist.jl` provides plotting recipes for `Plots.jl` and `Makie.jl`, which allows the user to easily visualize the fit via `Plots.plot(h_irr)` or `Makie.plot(h_reg)`. Below, we show in more detail how to plot the irregular and the regular histogram fitted in the above code snippet using `Makie`.
 
 ```julia
 import CairoMakie, Makie # using the CairoMakie backend
@@ -97,5 +97,8 @@ fig
 ```
 ![Plot of the irregular and regular histogram fit to the standard normal sample.](figures/makie_plotting.png)
 
+
+# Acknowledgements
+The author thanks the two reviewers for their valuable suggestions that improved the software and this paper.
 
 # References

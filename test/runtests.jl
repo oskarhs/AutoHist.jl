@@ -45,7 +45,7 @@ end
     x = collect(LinRange(0, 1, 11))
     for rule in [RRH, Knuth, AIC, BIC, BR, MDL, NML_R, L2CV_R, KLCV_R, RMG_penA, RMG_penB, RMG_penR, RIH, KLCV_I, L2CV_I, NML_I, BayesBlocks]
         h = fit(AutomaticHistogram, x, rule(maxbins=5))
-        @test typeof(h) <: AutomaticHistogram
+        @test length(h) ≤ 5
     end
 end
 
@@ -204,9 +204,12 @@ end
     breaks = [0.0, 0.4, 0.6, 1.0]
     counts = [2, 5, 10]
     density = counts ./ ((breaks[2:end] - breaks[1:end-1])*sum(counts))
+    x = LinRange(0, 1, 101)
 
     h = AutomaticHistogram(breaks, density, counts, :irregular, :right, 1.0)
     @test typeof(Plots.plot(h)) == Plots.Plot{Plots.GRBackend}    # check that Plots extension works
+    @test typeof(Plots.histogram(x, AIC())) == Plots.Plot{Plots.GRBackend}
+    @test_throws ArgumentError Plots.pie(x, AIC())
 
     io = IOBuffer() # just checks that we can call the show method
     show(io, h)
@@ -218,13 +221,18 @@ end
     breaks = [0.0, 0.4, 0.6, 1.0]
     counts = [2, 5, 10]
     density = counts ./ ((breaks[2:end] - breaks[1:end-1])*sum(counts))
-    h = AutomaticHistogram(breaks, density, counts, :irregular, :right, 1.0)        
+    h = AutomaticHistogram(breaks, density, counts, :irregular, :right, 1.0)
+    x = LinRange(0, 1, 101)
 
     @test typeof(Makie.plot(h)) == Makie.FigureAxisPlot # check that Makie extension works
     @test typeof(Makie.plot!(h)) == Makie.PlotList{Tuple{Makie.PlotSpec}}
     @test typeof(Makie.barplot(h)) == Makie.FigureAxisPlot
     @test typeof(Makie.hist(h)) == Makie.FigureAxisPlot
     @test typeof(Makie.stephist(h)) == Makie.FigureAxisPlot
+
+    @test typeof(Makie.barplot(x, AIC())) == Makie.FigureAxisPlot
+    @test typeof(Makie.hist(x, AIC())) == Makie.FigureAxisPlot
+    @test typeof(Makie.stephist(x, AIC())) == Makie.FigureAxisPlot
 
     F = Makie.Figure(); ax = Makie.Axis(F[1,1])
     Makie.plot!(ax, h)

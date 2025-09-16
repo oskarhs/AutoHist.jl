@@ -46,6 +46,13 @@ Plots.plot(h1)
 Makie.plot(h1)
 ```
 
+It is also possible to draw an automatic histogram by calling a supported plotting function directly:
+```julia
+Plots.histogram(x, AIC())
+Makie.hist(x, AIC())
+```
+For more details on the plotting capabilities offered by AutoHist.jl, see the [plotting tutorial](https://oskarhs.github.io/AutoHist.jl/stable/examples/plotting/).
+
 ## Supported criteria
 
 The argument `rule` determines the method used to construct the histogram for both of the histogram functions. The rule used to construct the histogram can be changed by setting `rule` equal to a symbol indicating the method to be used, e.g. `BIC()` which yields an automatic regular histogram based on the BIC criterion.
@@ -53,16 +60,12 @@ The argument `rule` determines the method used to construct the histogram for bo
 The default method is the Bayesian approach of [Simensen et al. (2025)](#simensen2025random), corresponding to keyword `rule=RIH()`.
 A detailed description of the supported methods can be found in the [methods documentation](https://oskarhs.github.io/AutoHist.jl/stable/methods/).
 
-# Contributing
+## Contributing
 If you encounter a bug when using this software or have a feature request, then feel free to open a github issue.
 
-Coding contributions are also very much welcome, especially if you are looking to add a new automatic histogram rule or a new algorithm. To make sure that your proposed new feature is a good fit for the AutoHist package, please open a new issue to discuss how your contribution could elevate AutoHist.jl.
+Coding contributions are also very much welcome, especially if you are looking to add a new automatic histogram method or a new algorithm for fitting an already-implemented bin selection rule. To make sure that your proposed new feature is a good fit for the AutoHist package, please open a new issue to discuss how your contribution could elevate AutoHist.jl.
 
 ## References
 <a name="simensen2025random"></a> Simensen, O. H., Christensen, D. & Hjort, N. L. (2025). Random Irregular Histograms. _arXiv preprint_. doi: [10.48550/ARXIV.2505.22034](https://doi.org/10.48550/ARXIV.2505.22034)
-
-<a name="rozenholc2010combining"></a> Rozenholc, Y., Mildenberger, T., & Gather, U. (2010). Combining regular and irregular histograms by penalized likelihood. _Computational Statistics & Data Analysis_, **54**, 3313–3323. doi: [10.1016/j.csda.2010.04.021](https://doi.org/10.1016/j.csda.2010.04.021)
-
-<a name="kanazawa1988optimal"></a> Kanazawa, Y. (1988). An optimal variable cell histogram. _Communications in Statistics-Theory and Methods_, **17**, 1401–1422. doi: [10.1080/03610928808829688](https://doi.org/10.1080/03610928808829688)
 
 <a name="birge2006bins"></a> Birgé, L., & Rozenholc, Y. (2006). How many bins should be put in a regular histogram. _ESAIM: Probability and Statistics_, **10**, 24–45. doi: [10.1051/ps:2006001](https://doi.org/10.1051/ps:2006001)
