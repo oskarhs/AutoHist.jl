@@ -20,7 +20,7 @@ Makie.convert_arguments(P::Type{<:Stairs}, h::AutomaticHistogram) = convert_argu
 
 function Makie.plot!(plot::StepHist{<:Tuple{<:AutomaticHistogram}}) # enables stephist(h)
     attributes = Makie.shared_attributes(plot, BarPlot)
-    stairs!(plot, attributes, plot[1])
+    stairs!(plot, attributes, plot[1][])
 end
 
 function Makie.convert_arguments(P::Type{<:BarPlot}, x::AbstractVector{<:Real}, rule::AbstractRule) # enables e.g. `plot(x, AIC())`
@@ -30,19 +30,25 @@ end
 
 Makie.plottype(::AbstractVector{<:Real}, ::AbstractRule) = BarPlot
 
-function Makie.plot!(plot::Hist{<:Tuple{<:AbstractVector{<:Real}, <:AbstractRule}}) # enables e.g. `hist(x, AIC())`
-    attributes = Makie.shared_attributes(plot, BarPlot)
-    barplot!(plot, attributes, plot[1][], plot[2][])
+function Makie.convert_arguments(P::Type{<:Hist}, x::AbstractVector{<:Real}, rule::AbstractRule) # enables e.g. `hist(x, AIC())`
+    h = fit(AutomaticHistogram, x, rule)
+    return Makie.convert_arguments(P, h)
 end
 
-function Makie.convert_arguments(P::Type{<:Stairs}, x::AbstractVector{<:Real}, rule::AbstractRule)
-    h = fit(AutomaticHistogram, x, rule)
-    convert_arguments(P, vcat(h.breaks, h.breaks[end]), vcat(0.0, h.density, 0.0))
+function Makie.plot!(plot::Hist{<:Tuple{<:AbstractVector{<:Real}, <:AbstractRule}}) # enables e.g. `hist(x, AIC())`
+    attributes = Makie.shared_attributes(plot, BarPlot)
+    barplot!(plot, attributes, plot[1][])
 end
+
+function Makie.convert_arguments(P::Type{<:StepHist}, x::AbstractVector{<:Real}, rule::AbstractRule)
+    h = fit(AutomaticHistogram, x, rule)
+    Makie.convert_arguments(P, h)
+end
+
 
 function Makie.plot!(plot::StepHist{<:Tuple{<:AbstractVector{<:Real}, <:AbstractRule}}) # enables e.g. `stephist(x, AIC())`
     attributes = Makie.shared_attributes(plot, BarPlot)
-    stairs!(plot, attributes, plot[1], plot[2])
+    stairs!(plot, attributes, plot[1][])
 end
 
 end # module

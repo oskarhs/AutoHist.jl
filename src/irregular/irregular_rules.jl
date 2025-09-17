@@ -609,7 +609,7 @@ The Bayesian Blocks method was first introduced in [Scargle et al. (2013)](https
 """
 function BayesBlocks(; p0::Real=0.05, grid::Symbol=:regular, maxbins::Union{Int,Symbol}=:default, alg::AbstractAlgorithm=OptPart(), use_min_length::Bool=false)
     if !(0.0 < p0 < 1.0)
-        throw(DomainError(p0, ""))
+        throw(DomainError(p0, "p0 must be in the interval (0, 1)."))
     end
     if !(typeof(alg) in [SegNeig, OptPart])
         throw(ArgumentError("Algorithm $(typeof(alg)) not supported for rule BayesBlocks. Only the SegNeig and OptPart algorithms are supported for this rule."))

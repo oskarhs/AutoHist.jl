@@ -16,11 +16,15 @@ x = Random.randexp(Random.Xoshiro(1812), 10^5)
 h1 = autohist(x, AIC())
 h2 = autohist(x, BIC())
 
+# Set axis limits
+xlims = [-0.5, 6.0]
+ylims = [-0.05, 1.0]
+
 # Plot a filled histogram
-p1 = Plots.plot(h1, color=:red, alpha=0.4, label="", title="AIC", xlims=[-0.5, 6.0])
+p1 = Plots.plot(h1, color=:red, alpha=0.4, label="", title="AIC", xlims=xlims, ylims=ylims)
 
 # Plot a stephist
-p2 = Plots.stephist(h2, color=:green, label="", title="BIC", xlims=[-0.5, 6.0])
+p2 = Plots.stephist(h2, color=:green, label="", title="BIC", xlims=xlims, ylims=ylims)
 
 # Display the two plots side-by-side
 Plots.plot(p1, p2, layout=(1, 2), size=(670, 320))
@@ -34,10 +38,12 @@ Automatic histograms can also be plotted by accessing Plots.jl functions directl
 When using Plots.jl functions directly, one can pass additional keyword arguments directly to the plotting function. In the code snippet below, we show how to directly plot a right-closed histogram with support constrained to be positive.
 ```@example Plots
 # Plot a filled histogram
-p3 = Plots.plot(x, BayesBlocks(), color=:black, alpha=0.4, label="", title="Bayesian Blocks", xlims=[-0.5, 6.0])
+p3 = Plots.plot(x, BayesBlocks(), color=:black, alpha=0.4, label="",
+                title="BayesBlocks", xlims=xlims, ylims=ylims)
 
 # Plot a stephist, supported on [0, maximum(x)] with left-closed intervals
-p4 = Plots.stephist(x, RRH(), support=(0.0, Inf), closed=:left, color=:blue, label="", title="RRH", xlims=[-0.5, 6.0])
+p4 = Plots.stephist(x, RRH(), support=(0.0, Inf), closed=:left, color=:blue,
+                    label="", title="RRH", xlims=xlims, ylims=ylims)
 
 # Display the two plots
 Plots.plot(p3, p4, layout=(1, 2), size=(670, 320))
@@ -59,14 +65,15 @@ x = Random.randexp(Random.Xoshiro(1812), 10^5)
 h1 = autohist(x, AIC())
 h2 = autohist(x, BIC())
 
-# Set axis lims
-limits = ((-0.5, 6.0), nothing)
+# Specify axis lims, ticks
+limits = ((-0.5, 6.0), (-0.05, 1.0))
+yticks = 0.0:0.25:1.0
 
 # Make a figure with a 2x1 Layout
 fig = Makie.Figure(size=(670, 320))
 ax1 = Makie.Axis(fig[1, 1], title="AIC", xlabel="x",
-                 ylabel="Density", limits=limits)
-ax2 = Makie.Axis(fig[1, 2], title="BIC", xlabel="x", limits=limits)
+                 ylabel="Density", limits=limits, yticks = yticks)
+ax2 = Makie.Axis(fig[1, 2], title="BIC", xlabel="x", limits=limits, yticks=yticks)
 
 # Draw a filled AIC histogram in the left panel
 Makie.plot!(ax1, h1, alpha=0.4, color="red")
@@ -83,13 +90,11 @@ As shown in the above example, we can pass additional plot attributes to the Mak
 
 We can also plot automatically selected histograms directly without needing to construct an `AutomaticHistogram` object directly first. This is achieved by calling e.g. `Makie.plot(x, rule)`, where `rule` is any of the bin selection rules provided as part of AutoHist.jl, see the [methods page](../methods.md). Alternatively, we can use another histogram-like series type like `stephist` instead. In the following code snippet, we illustrate the use of these methods on the simulated exponential dataset considered previously:
 ```@example Makie
-limits = ((-0.5, 6.0), nothing)
-
 # Make a figure with a 2x1 Layout
 fig = Makie.Figure(size=(670, 320))
-ax1 = Makie.Axis(fig[1, 1], title="Bayesian Blocks", xlabel="x",
-                 ylabel="Density", limits=limits)
-ax2 = Makie.Axis(fig[1, 2], title="RRH", xlabel="x", limits=limits)
+ax1 = Makie.Axis(fig[1, 1], title="BayesBlocks", xlabel="x",
+                 ylabel="Density", limits=limits, yticks=yticks)
+ax2 = Makie.Axis(fig[1, 2], title="RRH", xlabel="x", limits=limits, yticks=yticks)
 
 # Draw a filled BayesBlocks histogram in the left panel
 Makie.plot!(ax1, x, BayesBlocks(), alpha=0.4, color="black")
