@@ -13,8 +13,6 @@ import StatsBase: Histogram
         :barhist => :barbins,
         :bar => :barbins,
         :stephist => :stepbins,
-        :step => :stepbins,
-        :steppost => :stepbins
     )
     seriestype := get(st_map, plotattributes[:seriestype], plotattributes[:seriestype])
     if !(plotattributes[:seriestype] in [:barbins, :stepbins])

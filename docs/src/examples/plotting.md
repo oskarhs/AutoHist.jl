@@ -29,7 +29,10 @@ p2 = Plots.stephist(h2, color=:green, label="", title="BIC", xlims=xlims, ylims=
 # Display the two plots side-by-side
 Plots.plot(p1, p2, layout=(1, 2), size=(670, 320))
 ```
-As illustrated here, the call to `Plots.plot` also accepts additional keyword arguments which allow us to customize the look of the histogram. `AutomaticHistogram` objects are compatible with most histogram-like seriestypes, so the above call to `Plots.plot` is equivalent to calling `Plots.histogram` with the same input. By default, the plotted histogram is a filled bar chart. If one desires, a non-filled histogram can be drawn by using the `stephist` seriestype, as we did above.
+As illustrated here, the call to `Plots.plot` also accepts additional keyword arguments which allow us to customize the look of the histogram. `AutomaticHistogram` objects are compatible with most histogram-like seriestypes[^1], so the above call to `Plots.plot` is equivalent to calling `Plots.histogram` with the same input. By default, the plotted histogram is a filled bar chart. If one desires, a non-filled histogram can be drawn by using the `stephist` seriestype, as we did above.
+
+[^1]:
+    In particular, the seriestypes `histogram`, `barbins`, `barhist` and `bar` will draw the histogram as a filled bar chart, while `stephist` draws a non-filled histogram. An attempt to plot an `AutomaticHistogram` with another [seriestype](https://docs.juliaplots.org/latest/generated/attributes_series/) throws an error.
 
 !!! note
     Some of the arguments normally supported by the `histogram` and `stephist` seriestypes are deprecated when used together with `AutomaticHistogram`. In particular, the `weights` keyword is not supported, as `autohist` currently only handles equally weighted samples. The `bins` keyword is ignored, as the histogram partition has already been chosen by `autohist`. Additionally, the `normalize` kwarg is deprecated, so that e.g. `Plots.histogram(h, normalize=norm)` will always draw a histogram on the density scale no matter the value of `norm`.
@@ -56,7 +59,7 @@ using AutoHist; import Makie, CairoMakie;
 ```
 
 Quickly plotting a pre-fitted `AutomaticHistogram` object can be done easily via `Makie.plot(h)`.
-`AutomaticHistogram` objects also supports other histogram-like recipes such as [`hist`](https://docs.makie.org/stable/reference/plots/hist), `barplot` and [`stephist`](https://docs.makie.org/stable/reference/plots/stephist), so e.g. `Makie.hist(h)` can also be used to draw a fitted histogram.
+`AutomaticHistogram` objects also supports other histogram-like recipes such as [`hist`](https://docs.makie.org/stable/reference/plots/hist), [`barplot`](https://docs.makie.org/stable/reference/plots/barplot) and [`stephist`](https://docs.makie.org/stable/reference/plots/stephist), so e.g. `Makie.hist(h)` can also be used to draw a fitted histogram.
 Below, we show a slightly more involved example where we plot two histograms fitted using different rules side-by-side, using a `stephist` for the last panel.
 ```@example Makie
 import Random
