@@ -1,10 +1,13 @@
-<h1 align="center">
-  <picture style="vertical-align: middle;">
-    <source srcset="docs/src/assets/logo-dark.svg" media="(prefers-color-scheme: dark)">
-    <img src="docs/src/assets/logo.svg" width="90" alt="AutoHist logo" style="vertical-align: middle;">
-  </picture>
-  <span style="vertical-align: middle; margin-left: 10px;">AutoHist.jl</span>
-</h1>
+<div style="text-align: left;">
+  <div style="display: flex; align-items: center;">
+    <picture>
+      <source srcset="docs/src/assets/logo-dark.svg" media="(prefers-color-scheme: dark)">
+      <img src="docs/src/assets/logo.svg" alt="AutoHist logo" width="90">
+    </picture>
+    <h1 style="margin: 0 0 0 10px;">AutoHist.jl</h1>
+  </div>
+</div>
+
 
 
 
