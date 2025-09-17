@@ -1,14 +1,16 @@
-<div style="text-align: left;">
-  <div style="display: flex; align-items: center;">
-    <picture>
-      <source srcset="docs/src/assets/logo-dark.svg" media="(prefers-color-scheme: dark)">
-      <img src="docs/src/assets/logo.svg" alt="AutoHist logo" width="90">
-    </picture>
-    <h1 style="margin: 0 0 0 10px;">AutoHist.jl</h1>
-  </div>
-</div>
-
-
+<table style="border-collapse: collapse; border: none;">
+  <tr>
+    <td valign="middle" style="border: none; padding: 0;">
+      <picture>
+        <source srcset="docs/src/assets/logo-dark.svg" media="(prefers-color-scheme: dark)">
+        <img src="docs/src/assets/logo.svg" width="90" alt="AutoHist logo">
+      </picture>
+    </td>
+    <td valign="middle" style="border: none; padding-left: 10px;">
+      <h1 style="margin: 0;">AutoHist.jl</h1>
+    </td>
+  </tr>
+</table>
 
 
 [![Build Status](https://github.com/oskarhs/AutoHist.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/oskarhs/AutoHist.jl/actions/workflows/CI.yml?query=branch%3Amain)
