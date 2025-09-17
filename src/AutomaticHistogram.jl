@@ -127,14 +127,14 @@ function fit(::Type{AutomaticHistogram}, x::AbstractVector{<:Real}, rule::Abstra
         if xmin > support[1]
             xmin = support[1]  # use known lower bound
         else 
-            throw(DomainError("The supplied lower bound is greater than the smallest value of the sample."))
+            throw(DomainError(support, "The supplied lower bound is greater than the smallest value of the sample."))
         end
     end
     if support[2] < Inf
         if xmax < support[2]
             xmax = support[2]  # use known upper bound
         else 
-            throw(DomainError("The supplied upper bound is smaller than the smallest value of the sample."))
+            throw(DomainError(support, "The supplied upper bound is smaller than the smallest value of the sample."))
         end
     end
     return fit_autohist(x, rule, xmin, xmax, closed)

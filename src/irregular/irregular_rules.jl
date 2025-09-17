@@ -582,7 +582,7 @@ Consists of finding the partition ``\\mathcal{I}`` that maximizes a penalized Po
 ```
 
 # Keyword arguments
-- `p0`: Hyperparameter controlling the penalty for the number of changepoints. Must be a number in the open interval ``(0,1)``, with `p0 = 0.05` serving as the default.
+- `p0`: Hyperparameter controlling the penalty for the number of bins. Must be a number in the open interval ``(0,1)``, with `p0 = 0.05` serving as the default.
 - `grid`: Symbol indicating how the finest possible mesh should be constructed. Options are `:data`, which uses each unique data point as a grid point, `:regular` (default) which constructs a fine regular grid, and `:quantile` which constructs the grid based on the sample quantiles.
 - `maxbins`: Maximal number of bins for which the above criterion is evaluated. Defaults to `maxbins=:default`, which sets maxbins to the ceil of `min(1000, 4n/log(n)^2)` if `grid` is `regular` or `quantile`. Ignored if `grid=:data`.
 - `alg`: Algorithm used to fit the model. Currently, [`OptPart`](@ref) and [`SegNeig`](@ref) are supported for this rule, with the former algorithm being the default.
@@ -609,7 +609,7 @@ The Bayesian Blocks method was first introduced in [Scargle et al. (2013)](https
 """
 function BayesBlocks(; p0::Real=0.05, grid::Symbol=:regular, maxbins::Union{Int,Symbol}=:default, alg::AbstractAlgorithm=OptPart(), use_min_length::Bool=false)
     if !(0.0 < p0 < 1.0)
-        throw(DomainError(p0, ""))
+        throw(DomainError(p0, "p0 must be in the interval (0, 1)."))
     end
     if !(typeof(alg) in [SegNeig, OptPart])
         throw(ArgumentError("Algorithm $(typeof(alg)) not supported for rule BayesBlocks. Only the SegNeig and OptPart algorithms are supported for this rule."))

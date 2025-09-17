@@ -5,9 +5,10 @@ makedocs(
     modules = [AutoHist],
     format=Documenter.HTML(),
     pages = [
-        "Introdution" => "index.md",
+        "Introduction" => "index.md",
         "Supported Methods" => "methods.md",
         "Examples" => [
+            "examples/plotting.md",
             "examples/density_estimation.md",
             "examples/algorithm_choice.md"
         ],

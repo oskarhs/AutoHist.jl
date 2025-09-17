@@ -16,10 +16,11 @@ Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 Makie = "ee78f7c6-11fb-53f2-987a-cfe4a2b5a57a"
 
 [extensions]
-MakieExt = "Makie"
-PlotsExt = "Plots"
+AutoHistMakieExt = "Makie"
+AutoHistPlotsExt = "Plots"
 
 [compat]
+CairoMakie = "v0.15.0"
 Distributions = "v0.25.0"
 FFTW = "v1.0.0"
 Makie = "v0.24.0"
