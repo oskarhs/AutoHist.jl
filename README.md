@@ -1,6 +1,12 @@
-![AutoHist Logo](https://raw.githubusercontent.com/oskarhs/AutoHist.jl/main/docs/src/assets/AutoHistlogo.svg)
+<h1 align="center">
+  <picture style="vertical-align: middle;">
+    <source srcset="docs/src/assets/logo-dark.svg" media="(prefers-color-scheme: dark)">
+    <img src="docs/src/assets/logo.svg" width="90" alt="AutoHist logo" style="vertical-align: middle;">
+  </picture>
+  <span style="vertical-align: middle; margin-left: 10px;">AutoHist.jl</span>
+</h1>
 
-# AutoHist.jl
+
 
 [![Build Status](https://github.com/oskarhs/AutoHist.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/oskarhs/AutoHist.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![codecov](https://codecov.io/gh/oskarhs/AutoHist.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/oskarhs/AutoHist.jl)
