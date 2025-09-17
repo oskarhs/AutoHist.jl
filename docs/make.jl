@@ -3,7 +3,7 @@ using Documenter, AutoHist, StatsBase
 makedocs(
     sitename="AutoHist.jl",
     modules = [AutoHist],
-    format=Documenter.HTML(),
+    format=Documenter.HTML(; assets=["assets/AutoHistlogo.ico"]),
     pages = [
         "Introduction" => "index.md",
         "Supported Methods" => "methods.md",

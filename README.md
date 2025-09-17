@@ -1,3 +1,5 @@
+![AutoHist Logo](https://github.com/oskarhs/AutoHist.jl/tree/main/docs/src/assets/AutoHistlogo.svg)
+
 # AutoHist.jl
 
 [![Build Status](https://github.com/oskarhs/AutoHist.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/oskarhs/AutoHist.jl/actions/workflows/CI.yml?query=branch%3Amain)
