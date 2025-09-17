@@ -1,4 +1,4 @@
-![AutoHist Logo](https://github.com/oskarhs/AutoHist.jl/tree/main/docs/src/assets/AutoHistlogo.svg)
+![AutoHist Logo](https://raw.githubusercontent.com/oskarhs/AutoHist.jl/main/docs/src/assets/AutoHistlogo.svg)
 
 # AutoHist.jl
 
