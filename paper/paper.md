@@ -59,8 +59,8 @@ and typically do not provide any support for automatic irregular histogram const
 Table: Implemented bin selection procedures so far. For methods with type=both, a regular and an irregular variant of the criterion is supported.
 
 We note that some automatic histogram selection rules have been implemented in Julia and in other programming languages, typically as part of plotting libraries.
-The `Plots.jl` package and the `hist` function from base R [@Rlanguage2025] includes support for some plug-in rules used to construct regular histograms, including Sturges'-, Scott's- and Freedman & Diaconis' rules. Python's `matplotlib` [@hunter2007matplotlib] implements regular L2 cross-validation in addition to the three aforementioned rules. In Julia, the `StatsPlots.jl` library [@christ2023plots] also includes an implementation of equal-area histograms.
-The `R` package `histogram` [@mildenberger2019histogram] supports a wider range of more sophisticated regular and irregular histogram methods, but their implementation covers fewer criteria than ours.
+The `Plots.jl` package and the `hist` function from base R [@Rlanguage2025] include support for some plug-in rules used to construct regular histograms, including Sturges' rule, Scott's rule, and Freedman & Diaconis' rule. Python's `matplotlib` [@hunter2007matplotlib] implements regular L2 cross-validation in addition to the three aforementioned rules. In Julia, the `StatsPlots.jl` library [@christ2023plots] also includes an implementation of equal-area histograms.
+The `R` package `histogram` [@mildenberger2019histogram] supports a wider range of more sophisticated regular and irregular histogram methods, but their implementation covers fewer criteria than `AutoHist.jl`.
 
 # Installation and usage
 
@@ -70,7 +70,7 @@ using Pkg
 Pkg.add("AutoHist")
 ```
 
-To illustrate the basic use of the software, we fit a histogram based on the Random Irregular Histogram criterion and a regular histogram based on Akaike's Information Criterion to a standard normal random sample of size $n = 10^6$.
+To illustrate the basic use of the software, we fit a histogram based on the Random Irregular Histogram criterion and a regular histogram based on Akaike's Information Criterion to a standard Normal random sample of size $n = 10^6$.
 
 ```julia
 using AutoHist, Random, Distributions
@@ -95,7 +95,7 @@ p_irr = Makie.plot!(ax1, h_irr, alpha=0.4, color="black")
 p_reg = Makie.plot!(ax2, h_reg, alpha=0.4, color="red")
 fig
 ```
-![Plot of the irregular and regular histogram fit to the standard normal sample.](figures/makie_plotting.png)
+![Plot of the irregular and regular histogram fit to the standard Normal sample.](figures/makie_plotting.png)
 
 
 # Acknowledgements
