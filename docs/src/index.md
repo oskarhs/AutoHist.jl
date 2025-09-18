@@ -28,25 +28,25 @@ Alternatively, an automatic histogram can be fitted to data through the `autohis
 h_reg = autohist(x, Knuth())     # equivalent to fit(AutomaticHistogram, x, Knuth())
 ```
 
-AutomaticHistogram objects are compatible with [Plots.jl](https://github.com/JuliaPlots/Plots.jl), which lets us easily plot the two histograms resulting from the above code snippet via e.g. `Plots.plot(h_irr)`. To show both histograms side by side, we can create a plot as follows:
+### Plotting
+AutomaticHistogram objects are compatible with [Plots.jl](https://github.com/JuliaPlots/Plots.jl) and [Makie.jl](https://github.com/MakieOrg/Makie.jl), which lets us easily plot the two histograms resulting from the above code snippet via e.g. `Plots.plot(h_irr)`. As an example, the irregular histogram fitted above can be displayed via Plots.jl as follows:
 
 ```@example index
 import Plots; Plots.gr()
-p_irr = Plots.plot(h_irr, xlabel="x", ylabel="Density", title="Irregular", alpha=0.4, color="black", label="")
-p_reg = Plots.plot(h_reg, xlabel="x", title="Regular", alpha=0.4, color="red", label="")
-Plots.plot(p_irr, p_reg, layout=(1, 2), size=(670, 320))
+Plots.plot(h_irr, label="") # Plot the irregular histogram.
+Plots.plot(h_irr, label="", size=(400, 266)) # hide
 ```
 
-Alternatively, [Makie.jl](https://github.com/MakieOrg/Makie.jl) can also be used to make graphical displays of the fitted histograms via e.g. `Makie.plot(h_irr)`. To produce a plot similar to the above display, we may for instance do the following:
+Alternatively, Makie.jl can also be used to make graphical displays of the fitted histograms via e.g. `Makie.plot(h_irr)`. To produce a plot similar to the above display, we may for instance do the following:
 ```@example index
 import CairoMakie, Makie # using the CairoMakie backend
-fig = Makie.Figure(size=(670, 320))
-ax1 = Makie.Axis(fig[1, 1], title="Irregular", xlabel="x", ylabel="Density")
-ax2 = Makie.Axis(fig[1, 2], title="Regular", xlabel="x")
-p_irr = Makie.plot!(ax1, h_irr, alpha=0.4, color="black")
-p_reg = Makie.plot!(ax2, h_reg, alpha=0.4, color="red")
-fig
+Makie.plot(h_reg) # Plot the regular histogram
+fig = Makie.Figure(resolution = (220, 180))  # hide
+ax = Makie.Axis(fig[1, 1], width = 180, height = 140, xticksize=3.0, yticksize=3.0, xticklabelsize=8, yticklabelsize=8) # hide
+Makie.plot!(ax, h_reg) # hide
+fig # hide
 ```
+AutoHist.jl also makes it possible to draw automatic histograms directly using Makie and Plots functions, for instance via `Makie.hist(x, RIH())` or `Plots.histogram(x, Knuth())`.
 For a more detailed account of the plotting capabilities offered by AutoHist, please consult the [plotting tutorial](examples/plotting.md).
 
 ## Supported methods
