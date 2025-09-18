@@ -6,7 +6,7 @@
 [![Doc](https://img.shields.io/badge/docs-stable-blue.svg)](https://oskarhs.github.io/AutoHist.jl/stable/)
 [![Doc](https://img.shields.io/badge/docs-dev-blue.svg)](https://oskarhs.github.io/AutoHist.jl/dev/)
 
-A pure Julia implementation of automatic regular and irregular histogram methods based on maximizing a goodness-of-fit criterion.
+A pure Julia implementation of state-of-the-art automatic regular and irregular histogram methods.
 
 ## Introduction
 Most default histogram plotting software only support a few regular automatic histogram procedures and use very simple plug-in rules by default to compute the the number of bins, frequently leading to poor density estimates for non-normal data \[cf. [Birgé and Rozenholc (2006)](#birge2006bins), [Simensen et al. (2025)](#simensen2025random)\]. The purpose of this software package is to offer the user a fast and simple-to-use implementation of more sophisticated regular and irregular histogram procedures. Our package supports a variety of methods including those based on asymptotic risk minimization, leave-one-out cross-validiation, penalized maximum likelihood and fully Bayesian approaches.
