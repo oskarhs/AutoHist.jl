@@ -21,7 +21,9 @@ The goal of an automatic histogram procedure is to find a partition ``\mathcal{I
 In order to fit a histogram using a specific `rule`, we call `fit(AutomaticHistogram, x, rule)`, where `x` is the data vector. For many of the rules discussed below, the user can specify additional rule-specific keywords to `rule`, providing additional control over the supplied method when desired. We also provide a set of default values for these parameters, so that the user may for instance call `fit(AutomaticHistogram, x, AIC())` to fit a regular histogram using the AIC criterion without having to worry about explicitly passing any keyword arguments.
 
 ## Irregular histograms
-The following section provides a description of all the irregular histogram rules that have been implemented in AutoHist.jl. In each case, the best partition is selected among the subset of interval partitions of the unit interval that have cut points belonging to a discrete set of cardinality ``k_n-1``. In all the irregular procedures covered here, we attempt to find best partition according to a goodness-of-fit criterion among all partitions with endpoints belonging to a given discrete mesh ``\{\tau_{j}\colon 0\leq j \leq k_n\}``.
+The following section provides a description of all the irregular histogram rules that have been implemented in AutoHist.jl. In each case, the best partition is selected among the subset of interval partitions of the unit interval that have cut points belonging to a discrete set of cardinality ``k_n+1``[^1]. In all the irregular procedures covered here, we attempt to find best partition according to a goodness-of-fit criterion among all partitions with endpoints belonging to a given discrete mesh ``\{\tau_{j}\colon 0\leq j \leq k_n\}``.
+
+[^1]: Note that the endpoints ``0`` and ``1`` are included in every candidate partition.
 
 #### Random irregular histogram
 ```@docs

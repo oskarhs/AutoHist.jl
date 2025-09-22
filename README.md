@@ -32,13 +32,14 @@ Several rules are available to select the histogram partition, and can be contro
 ```julia
 h2 = fit(AutomaticHistogram, x, AIC())
 ```
-Alternatively, we can use the `autohist` method, which serves as an alias for `fit(AutomaticHistogram, ...)`
+Alternatively, we can use the `autohist(x, rule; kwargs...)` syntax, which serves as an alias for `fit(AutomaticHistogram, x, rule; kwargs...)`. The code snippet below shows how to fit the AIC-based histogram using this method.
 ```julia
 h2 = autohist(x, AIC())
 ```
 
-A detailed exposition of the keyword arguments passed to `fit` can be found by typing `?fit` in the repl or in the [API documentation](https://oskarhs.github.io/AutoHist.jl/stable/api/). A detailed description of all methods currently implemented in AutoHist.jl can be found in the [methods documentation](https://oskarhs.github.io/AutoHist.jl/stable/methods/).
+A detailed exposition of the keyword arguments passed to `fit` and `autohist` can be found by typing `?fit` in the repl or in the [API documentation](https://oskarhs.github.io/AutoHist.jl/stable/api/). A detailed description of all methods currently implemented in AutoHist.jl can be found in the [methods documentation](https://oskarhs.github.io/AutoHist.jl/stable/methods/).
 
+#### Plotting
 The fitted histograms can be displayed through the [Plots.jl](https://github.com/JuliaPlots/Plots.jl) or [Makie.jl](https://github.com/MakieOrg/Makie.jl) packages as follows:
 
 ```julia

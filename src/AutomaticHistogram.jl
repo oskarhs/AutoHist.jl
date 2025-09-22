@@ -1,7 +1,7 @@
 """
     AutomaticHistogram
 
-A type for representing a histogram where the histogram partition has been chosen automatically based on the sample. Can be fitted to data using the [`fit`](@ref) method.
+A type for representing a histogram where the histogram partition has been chosen automatically based on the sample. Can be fitted to data using the [`fit`](@ref) or [`autohist`](@ref) methods.
 
 # Fields
 - `breaks`: AbstractVector consisting of the cut points in the chosen partition.
@@ -82,7 +82,7 @@ end
     fit(
         AutomaticHistogram,
         x::AbstractVector{<:Real},
-        rule::AbstractRule=RIH();
+        rule::AbstractRule        = RIH();
         support::Tuple{Real,Real} = (-Inf,Inf),
         closed::Symbol            = :right
     )
@@ -143,7 +143,7 @@ end
 """
     autohist(
         x::AbstractVector{<:Real},
-        rule::AbstractRule=RIH();
+        rule::AbstractRule        = RIH();
         kwargs...
     )
 
@@ -189,7 +189,8 @@ end
     logmarginallikelihood(h::AutomaticHistogram, a::Real)
     logmarginallikelihood(h::AutomaticHistogram)
 
-Compute the log-marginal likelihood (up to proportionality) of `h` when the value of the Dirichlet concentration parameter equals `a`. This can be automatically inferred if the histogram was fitted with the `rule` argument set to [`RIH`](@ref) or [`RRH`](@ref), and does not have to be explicitly passed as an argument in this case.
+Compute the log-marginal likelihood (up to proportionality) of `h` from a Bayesian model where then bin probabilities have been endowed with a symmetric Dirichlet prior with concentration parameter equal to `a`.
+The value of `a` can be automatically inferred if the histogram was fitted with the `rule` argument set to [`RIH`](@ref) or [`RRH`](@ref), and does not have to be explicitly passed as an argument in this case.
 
 Assumes that the Dirichlet prior is centered on the uniform distribution, so that ``a_j = a/k`` for a scalar ``a>0`` and all ``j``.
 The value of the log-marginal likelihood is
