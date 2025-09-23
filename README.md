@@ -68,6 +68,22 @@ If you encounter a bug when using this software or have a feature request, then 
 
 Coding contributions are also very much welcome, especially if you are looking to add a new automatic histogram method or a new algorithm for fitting an already-implemented bin selection rule. To make sure that your proposed new feature is a good fit for the AutoHist package, please open a new issue to discuss how your contribution could elevate AutoHist.jl.
 
+## Citing
+If you find AutoHist.jl useful in your academic work, then please cite our JOSS paper using the following BibTeX entry:
+```
+@article{simensen2025autohist,
+  title={{AutoHist.jl: A Julia package for fast and automatic histogram
+    construction}},
+  author={Simensen, Oskar Høgberg},
+  journal={Journal of Open Source Software},
+  volume={10},
+  number={113},
+  pages={8850},
+  year={2025},
+  doi={10.21105/joss.08850}
+}
+```
+
 ## References
 <a name="simensen2025random"></a> Simensen, O. H., Christensen, D. & Hjort, N. L. (2025). Random Irregular Histograms. _arXiv preprint_. doi: [10.48550/ARXIV.2505.22034](https://doi.org/10.48550/ARXIV.2505.22034)
 

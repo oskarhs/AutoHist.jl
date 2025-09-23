@@ -1,11 +1,28 @@
-cff-version: 1.2.0
-message: "Cite this paper whenever AutoHist.jl played an important role in your research"
+cff-version: "1.2.0"
 authors:
-- family-names: "Simensen"
-  given-names: "Oskar Høgberg"
+- family-names: Simensen
+  given-names: Oskar Høgberg
   orcid: "https://orcid.org/0009-0009-5056-7324"
-title: "AutoHist.jl: A pure Julia library for fast automatic histogram construction"
-version: "v0.2.2"
-license: "MIT"
-date-released: 2025-06-01
-url: "https://github.com/oskarhs/AutoHist.jl.git"
+doi: 10.5281/zenodo.17148023
+message: If you use this software, please cite our article in the
+  Journal of Open Source Software.
+preferred-citation:
+  authors:
+  - family-names: Simensen
+    given-names: Oskar Høgberg
+    orcid: "https://orcid.org/0009-0009-5056-7324"
+  date-published: 2025-09-23
+  doi: 10.21105/joss.08850
+  issn: 2475-9066
+  issue: 113
+  journal: Journal of Open Source Software
+  publisher:
+    name: Open Journals
+  start: 8850
+  title: "AutoHist.jl: A Julia package for fast and automatic histogram
+    construction"
+  type: article
+  url: "https://joss.theoj.org/papers/10.21105/joss.08850"
+  volume: 10
+title: "AutoHist.jl: A Julia package for fast and automatic histogram
+  construction"
