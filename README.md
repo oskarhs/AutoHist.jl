@@ -5,6 +5,7 @@
 [![codecov](https://codecov.io/gh/oskarhs/AutoHist.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/oskarhs/AutoHist.jl)
 [![Doc](https://img.shields.io/badge/docs-stable-blue.svg)](https://oskarhs.github.io/AutoHist.jl/stable/)
 [![Doc](https://img.shields.io/badge/docs-dev-blue.svg)](https://oskarhs.github.io/AutoHist.jl/dev/)
+[![status](https://joss.theoj.org/papers/d354cd6d6ecfa7a3c4e87d9fa83f1e16/status.svg)](https://joss.theoj.org/papers/d354cd6d6ecfa7a3c4e87d9fa83f1e16)
 
 A pure Julia implementation of state-of-the-art automatic regular and irregular histogram methods.
 
