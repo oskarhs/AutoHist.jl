@@ -417,7 +417,7 @@ Compute a statistical distance between two histogram probability densities.
 
 # Arguments
 - `h1`, `h2`: The two histograms for which the distance should be computed
-- `dist`: The name of the distance to compute. Valid options are `:iae` (default), `:ise`, `:hellinger`, `:sup`, `:kl`, `:lp`. For the ``L_p``-metric, a given power `p` can be specified as a keyword argument. 
+- `dist`: The name of the distance to compute. Valid options are `:iae` (default), `:ise`, `:hell`, `:sup`, `:kl`, `:lp`. For the ``L_p``-metric, a given power `p` can be specified as a keyword argument. 
 
 # Keyword arguments
 - `p`: Power of the ``L_p``-metric, which should be a number in the interval ``[1, \\infty]``. Ignored if `dist != :lp`. Defaults to `p=1.0`.
