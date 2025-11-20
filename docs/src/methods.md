@@ -55,7 +55,7 @@ L2CV_I
 KLCV_I
 ```
 
-#### Normalized maximum likelihood, regular (NML_R)
+#### Normalized maximum likelihood, irregular (NML_I)
 ```@docs
 NML_I
 ```
