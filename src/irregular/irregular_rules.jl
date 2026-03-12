@@ -52,7 +52,7 @@ a: 5.0
 ```
 
 # References
-This approach to irregular histograms first appeared in [Simensen et al. (2025)](https://doi.org/10.48550/ARXIV.2505.22034).
+This approach to irregular histograms first appeared in [Simensen et al. (2026)](https://doi.org/10.1016/j.csda.2026.108367).
 """
 function RIH(; a::Real=5.0, logprior::Function=k->0.0, grid::Symbol=:regular, maxbins::Union{Int,Symbol}=:default, alg::AbstractAlgorithm=SegNeig())
     if typeof(alg) != SegNeig
@@ -523,7 +523,7 @@ a: NaN
 ```
 
 # References
-This approach to irregular histograms was, to the best of our knowledge, first considered in [Simensen et al. (2025)](https://doi.org/10.48550/ARXIV.2505.22034).
+This approach to irregular histograms was, to the best of our knowledge, first considered in [Simensen et al. (2026)](https://doi.org/10.1016/j.csda.2026.108367).
 """
 function KLCV_I(; grid::Symbol=:regular, maxbins::Union{Int,Symbol}=:default, alg::AbstractAlgorithm=OptPart(), use_min_length::Bool=false)
     if !(typeof(alg) in [SegNeig, OptPart])

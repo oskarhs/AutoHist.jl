@@ -10,7 +10,7 @@
 A pure Julia implementation of state-of-the-art automatic regular and irregular histogram methods.
 
 ## Introduction
-Most default histogram plotting software only support a few regular automatic histogram procedures and use very simple plug-in rules by default to compute the the number of bins, frequently leading to poor density estimates for non-normal data \[cf. [Birgé and Rozenholc (2006)](#birge2006bins), [Simensen et al. (2025)](#simensen2025random)\]. The purpose of this software package is to offer the user a fast and simple-to-use implementation of more sophisticated regular and irregular histogram procedures. Our package supports a variety of methods including those based on asymptotic risk minimization, leave-one-out cross-validiation, penalized maximum likelihood and fully Bayesian approaches.
+Most default histogram plotting software only support a few regular automatic histogram procedures and use very simple plug-in rules by default to compute the the number of bins, frequently leading to poor density estimates for non-normal data \(cf. [Birgé and Rozenholc, 2006](#birge2006bins); [Simensen et al., 2026](#simensen2026random)\). The purpose of this software package is to offer the user a fast and simple-to-use implementation of more sophisticated regular and irregular histogram procedures. Our package supports a variety of methods including those based on asymptotic risk minimization, leave-one-out cross-validiation, penalized maximum likelihood and fully Bayesian approaches.
 
 ## Installation
 Installing the package is most easily done via Julia's builtin package manager `Pkg`. This package is part of the Julia general registry, so the installation can be done via the two following lines of code:
@@ -60,7 +60,7 @@ For more details on the plotting capabilities offered by AutoHist.jl, see the [p
 
 The argument `rule` determines the method used to construct the histogram for both of the histogram functions. The rule used to construct the histogram can be changed by setting `rule` equal to a symbol indicating the method to be used, e.g. `BIC()` which yields an automatic regular histogram based on the BIC criterion.
 
-The default method is the Bayesian approach of [Simensen et al. (2025)](#simensen2025random), corresponding to keyword `rule=RIH()`.
+The default method is the Bayesian approach of [Simensen et al. (2026)](#simensen2026random), corresponding to keyword `rule=RIH()`.
 A detailed description of the supported methods can be found in the [methods documentation](https://oskarhs.github.io/AutoHist.jl/stable/methods/).
 
 ## Contributing
@@ -85,6 +85,7 @@ If you find AutoHist.jl useful in your academic work, then please cite our JOSS 
 ```
 
 ## References
-<a name="simensen2025random"></a> Simensen, O. H., Christensen, D. & Hjort, N. L. (2025). Random Irregular Histograms. _arXiv preprint_. doi: [10.48550/ARXIV.2505.22034](https://doi.org/10.48550/ARXIV.2505.22034)
-
 <a name="birge2006bins"></a> Birgé, L., & Rozenholc, Y. (2006). How many bins should be put in a regular histogram. _ESAIM: Probability and Statistics_, **10**, 24–45. doi: [10.1051/ps:2006001](https://doi.org/10.1051/ps:2006001)
+
+<a name="simensen2026random"></a> Simensen, O. H., Christensen, D., and Hjort, N. L. (2026). Random irregular histograms. _Computational
+Statistics & Data Analysis_ **220**. doi: [10.1016/j.csda.2026.108367](https://doi.org/10.1016/j.csda.2026.108367).
